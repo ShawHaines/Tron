@@ -107,12 +107,11 @@ function get_projection(angle, a, zMin, zMax) {
 var proj_matrix = get_projection(40, canvas.width / canvas.height, 1, 100);
 var mo_matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 var view_matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-
 view_matrix[14] = view_matrix[14] - 6;
 
 /*================= Mouse events ======================*/
 
-var AMORTIZATION = 0.8;
+var AMORTIZATION = 0;
 var drag = false;
 var [W, A, S, D] = [false, false, false, false];
 var old_x, old_y;
@@ -136,6 +135,7 @@ var mouseMove = function (e) {
     THETA += dX;
     PHI += dY;
     old_x = e.pageX, old_y = e.pageY;
+    
     e.preventDefault();
 };
 function keyDown(e) {
@@ -187,7 +187,6 @@ function rotateY(m, angle) {
     var c = Math.cos(angle);
     var s = Math.sin(angle);
     var mv0 = m[0], mv4 = m[4], mv8 = m[8];
-
     m[0] = c * m[0] + s * m[2];
     m[4] = c * m[4] + s * m[6];
     m[8] = c * m[8] + s * m[10];
@@ -210,17 +209,28 @@ var animate = function (time) {
         dX *= AMORTIZATION, dY *= AMORTIZATION;
         THETA += dX, PHI += dY;
     }
-
+    
+    //set model matrix to I4
+    mo_matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+    for(var i=0;i<3;i++)for(var j=0;j<3;j++)
+    view_matrix[i*4+j]=i==j?1:0;
+    // rotateY(view_matrix, THETA);
+    // rotateX(view_matrix, PHI);
+    rotateY(view_matrix,THETA);
+    rotateX(view_matrix,PHI);
     if (W) view_matrix[14] += STEP;
     if (S) view_matrix[14] -= STEP;
     if (A) view_matrix[12] += STEP;
     if (D) view_matrix[12] -= STEP;
-
-    //set model matrix to I4
-    mo_matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-    rotateY(mo_matrix, THETA);
-    rotateX(mo_matrix, PHI);
-
+    var new_view=view_matrix.slice();
+    for(var j=0;j<3;j++){
+        new_view[12+j]=0;
+        for(var i=0;i<3;i++){
+            // new_view[12+j]+=tmp[i]*new_view[i+4*j];
+            new_view[12+j]+=view_matrix[12+i]*view_matrix[j+4*i];
+        }
+    }
+    // gl.uniformMatrix4fv()
     time_old = time;
     gl.enable(gl.DEPTH_TEST);
 
@@ -232,7 +242,8 @@ var animate = function (time) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.uniformMatrix4fv(_Pmatrix, false, proj_matrix);
-    gl.uniformMatrix4fv(_Vmatrix, false, view_matrix);
+    gl.uniformMatrix4fv(_Vmatrix, false, new_view);
+    // gl.uniformMatrix4fv(_Vmatrix, false, view_matrix);
     gl.uniformMatrix4fv(_Mmatrix, false, mo_matrix);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
