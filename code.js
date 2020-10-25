@@ -218,16 +218,26 @@ var animate = function (time) {
     // rotateX(view_matrix, PHI);
     rotateY(view_matrix,THETA);
     rotateX(view_matrix,PHI);
-    if (W) view_matrix[14] += STEP;
-    if (S) view_matrix[14] -= STEP;
-    if (A) view_matrix[12] += STEP;
-    if (D) view_matrix[12] -= STEP;
     var new_view=view_matrix.slice();
     for(var j=0;j<3;j++){
         new_view[12+j]=0;
         for(var i=0;i<3;i++){
             // new_view[12+j]+=tmp[i]*new_view[i+4*j];
             new_view[12+j]+=view_matrix[12+i]*view_matrix[j+4*i];
+        }
+    }
+    if (W) new_view[14] += STEP;
+    if (S) new_view[14] -= STEP;
+    if (A) new_view[12] += STEP;
+    if (D) new_view[12] -= STEP;
+    var tmp=[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+    rotateX(tmp,-PHI);
+    rotateY(tmp,-THETA);
+    for(var j=0;j<3;j++){
+        view_matrix[12+j]=0;
+        for(var i=0;i<3;i++){
+            // new_view[12+j]+=tmp[i]*new_view[i+4*j];
+            view_matrix[12+j]+=new_view[12+i]*tmp[j+4*i];
         }
     }
     // gl.uniformMatrix4fv()
