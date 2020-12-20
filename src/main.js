@@ -1,4 +1,5 @@
-//顶点着色器程序
+import * as twgl from "../modules/twgl-full.module"
+// vertex shader
 const vs =
 `attribute vec4 a_Position;
 //uniform mat4 proj;
@@ -7,7 +8,7 @@ const vs =
 uniform float time;
 uniform float resolution[2];
 void main() {
-//设置坐标
+// setting the coordinates
 
 gl_Position = a_Position;
 if(resolution[0] > resolution[1])
@@ -18,12 +19,12 @@ gl_Position += vec4(time, 0, 0, 0);
 //a_color = g_color;
 }`;
 
-//片元着色器
+// fragment shader
 const fs =
-`precision mediump float; //指定精度
+`precision mediump float; // Adjusting precision
 varying vec4 a_color;
 void main() {
-//设置颜色
+// setting color
 //gl_FragColor = a_color;
 gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }`;
