@@ -39,8 +39,8 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
     vec3 specular = lightColor * spec * 0.5;
 
-    vec3 result = (ambient + diffuse + specular)* objectColor;
-    // vec3 result = (ambient + diffuse)* objectColor;
+    // vec3 result = (ambient + diffuse + specular)* objectColor;
+    vec3 result = (ambient + diffuse)* objectColor;
     gl_FragColor = vec4(result, 1.0);
 }`;
 
@@ -94,22 +94,23 @@ function render(time) {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
     gl.enable(gl.DEPTH_TEST);
+    // FIXME: This line of code would clip out the back facets.
     gl.enable(gl.CULL_FACE);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     const fov = 30 * Math.PI / 180;
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.5;
-    const zFar = 1000;
+    const zFar = 20;
     const projection = m4.perspective(fov, aspect, zNear, zFar);
-    const eye = [1000 + camera_x, 400 + camera_y, -60 + camera_z];
+    const eye = [1 + camera_x, 4 + camera_y, -6 + camera_z];
     const target = [0 + camera_x, 0 + camera_y, 0 + camera_z];
     const up = [0, 1, 0];
 
     const camera = m4.lookAt(eye, target, up);
     const view = m4.inverse(camera);
     const viewProjection = m4.multiply(projection, view);
-    const world = m4.rotationY(time);
+    const world = m4.scale(m4.rotationY(time),[0.01,0.01,0.01]);
 
     uniforms.view = view;
     uniforms.model = world;
