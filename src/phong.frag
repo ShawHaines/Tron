@@ -1,10 +1,10 @@
-// precision highp float;
+precision highp float;
 uniform vec3 objectColor;
 uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 
-varying vec3 Normal;
+varying vec3 v_normal;
 varying vec3 fragPos;
 void main()
 {
@@ -12,13 +12,13 @@ void main()
     vec3 ambient = ambientStrength * lightColor;
 
     vec3 lightDir = normalize(lightPos - fragPos);
-    float diff = max(dot(lightDir, normalize(Normal)),0.0);
+    float diff = max(dot(lightDir, normalize(v_normal)),0.0);
     vec3 diffuse = lightColor * diff;
 
     vec3 viewDir = normalize(viewPos - fragPos);
-    vec3 reflectDir = reflect(-lightDir, normalize(Normal));
+    vec3 reflectDir = reflect(-lightDir, normalize(v_normal));
     // 32 times
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
     vec3 specular = lightColor * spec * 0.5;
 
     vec3 result = (ambient + diffuse + specular)* objectColor;
