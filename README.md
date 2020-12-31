@@ -7,7 +7,7 @@ CG Project, inspired by the film Tron.
 - [ ] WebGL2 Support
   - [ ] Screenshot
   - [ ] Texture
-  - [ ] Lighting
+  - [x] Lighting
   - [ ] Music
 - [ ] Interactive Scene Editor
   - [ ] Import .obj files
