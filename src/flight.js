@@ -46,7 +46,10 @@ var eulerAngle = vec3.fromValues(0,0,0);
  */
 var omega = vec3.fromValues(0,0,0);
 var omegaMax=1;
-
+/**
+ * if true, reverse the Pitch axis.
+ */
+var reversePitch=false;
 /**
  *Returns the 4*4 Euler Matrix of euler angle yaw, pitch, yaw.
  * @param {number} yaw
@@ -108,10 +111,10 @@ document.addEventListener("keyup",function(event){
 
 var speedUp = function () { a[0] = amax; };
 var speedDown = function () { a[0] = -amax; };
-var pitchUp = function() { omega[1] = omegaMax; };
-var pitchDown = function() { omega[1] = -omegaMax;}; 
-var rollLeft = function() {omega[2] = omegaMax; };
-var rollRight = function() {omega[2] = -omegaMax; };
+var pitchUp = function() { omega[1] = reversePitch? omegaMax:-omegaMax; };
+var pitchDown = function() { omega[1] = reversePitch? -omegaMax:omegaMax;}; 
+var rollLeft = function() {omega[2] = -omegaMax; };
+var rollRight = function() {omega[2] = omegaMax; };
 
 var resetAcceleration = function(){ a[0]=0 };
 var resetPitch = function(){ omega[1] = 0};
