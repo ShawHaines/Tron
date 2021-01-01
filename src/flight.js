@@ -7,8 +7,10 @@ const pi = 3.1415926;
 var interval=30;
 /**
  * The position in world frame.
- * convention: x points to the nose of the flight,
+ * Convention: x points to the nose of the flight,
  * y points vertically up, z is determined by right-hand rule.
+ * Unit is approximately MKSA unit (1m). 
+ * Note that the planes are miniature planes that flies on a desk.
  * w=1 means point.
  * @type {vec4}
  */
@@ -17,7 +19,7 @@ var position=vec4.fromValues(0,0,0,1);
  * the velocity in self frame. w=0 means vector instead of point.
  * @type {vec4}
  */
-var u = vec4.fromValues(0.001,0,0,0);
+var u = vec4.fromValues(0.01,0,0,0);
 /**
  * the velocity in world frame. w=0 means vector instead of point.
  * @type {vec4}
@@ -29,7 +31,7 @@ var v = vec4.create();
  * @type {vec4}
  * */
 var a = vec4.create();
-const amax = 1;
+const amax = 0.1;
 
 
 /**
