@@ -1,4 +1,4 @@
-import { mat4, vec3, vec4 } from "../../modules/gl-matrix/src/index.js"
+import { mat4, vec3, vec4 } from "../modules/gl-matrix/src/index.js"
 
 const pi = 3.1415926;
 /**
@@ -17,7 +17,7 @@ var position=vec4.fromValues(0,0,0,1);
  * the velocity in self frame. w=0 means vector instead of point.
  * @type {vec4}
  */
-var u = vec4.fromValues(1,0,0,0);
+var u = vec4.fromValues(0.001,0,0,0);
 /**
  * the velocity in world frame. w=0 means vector instead of point.
  * @type {vec4}
@@ -56,7 +56,7 @@ function euler_matrix(yaw, pitch, roll) {
     // you have to declare one variable before use.
     var R=[];
     mat4.fromYRotation(R,yaw);
-    mat4.rotateZ(R,R,pitch)
+    mat4.rotateZ(R,R,pitch);
     mat4.rotateX(R,R,roll);
     return R;
 }
@@ -87,6 +87,23 @@ document.addEventListener("keydown", function (event) {
     }
 });
 
+document.addEventListener("keyup",function(event){
+    switch (event.key) {
+        case "a":case "s":
+            resetAcceleration();
+            break;
+        case "ArrowUp":case "ArrowDown":
+            resetPitch();
+            break;
+        case "ArrowLeft":case "ArrowRight":
+            resetRoll();
+            break;
+        default:
+            console.log(event);
+            break;
+    }
+})
+
 var speedUp = function () { a[0] = amax; };
 var speedDown = function () { a[0] = -amax; };
 var pitchUp = function() { omega[1] = omegaMax; };
@@ -94,6 +111,9 @@ var pitchDown = function() { omega[1] = -omegaMax;};
 var rollLeft = function() {omega[2] = omegaMax; };
 var rollRight = function() {omega[2] = -omegaMax; };
 
+var resetAcceleration = function(){ a[0]=0 };
+var resetPitch = function(){ omega[1] = 0};
+var resetRoll = function(){omega[2]=0};
 
 setInterval(function(){
     // TODO: Introduce improved Euler's method, or R-K method.
@@ -102,9 +122,9 @@ setInterval(function(){
     vec3.scaleAndAdd(eulerAngle,eulerAngle,omega,dt);
     let R=euler_matrix(eulerAngle[0],eulerAngle[1],eulerAngle[2]);
     vec4.scaleAndAdd(u,u,a,dt);
-    vec4.transformMat4(v,v,R);
+    vec4.transformMat4(v,u,R);
     vec4.add(position,position,v);
 },interval);
 
 // global variables.
-export {euler_matrix, eulerAngle, position};
+export {pi,euler_matrix, eulerAngle, position};

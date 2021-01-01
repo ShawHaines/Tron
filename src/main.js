@@ -48,8 +48,10 @@ var camera_x = 0;
 var camera_y = 0;
 var camera_z = 0;
 
+import { mat4, vec4 } from '../modules/gl-matrix/src/index.js';
 import * as twgl from '../modules/twgl/twgl-full.module.js';
 const m4 = twgl.m4;
+import * as flight from "./flight.js";
 const gl = document.getElementById("c").getContext("webgl");
 if (!gl) console.log("Failed");
 const programInfo = twgl.createProgramInfo(gl, [vs, fs]);
@@ -95,7 +97,7 @@ function render(time) {
 
     gl.enable(gl.DEPTH_TEST);
     // FIXME: This line of code would clip out the back facets.
-    gl.enable(gl.CULL_FACE);
+    // gl.enable(gl.CULL_FACE);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     const fov = 30 * Math.PI / 180;
@@ -110,10 +112,16 @@ function render(time) {
     const camera = m4.lookAt(eye, target, up);
     const view = m4.inverse(camera);
     const viewProjection = m4.multiply(projection, view);
-    const world = m4.scale(m4.rotationY(time),[0.01,0.01,0.01]);
+    
+    var model=[];
+    mat4.fromTranslation(model,flight.position);
+    let euler=flight.eulerAngle;
+    mat4.multiply(model,model,flight.euler_matrix(euler[0],euler[1],euler[2]));
+    mat4.rotateY(model,model,-flight.pi/2);
+    mat4.scale(model,model,vec4.fromValues(0.001,0.001,0.001));
 
     uniforms.view = view;
-    uniforms.model = world;
+    uniforms.model = model;
     uniforms.projection = projection;
     uniforms.viewPos=eye;
     // uniforms.u_worldViewProjection = m4.multiply(viewProjection, world);
