@@ -1,4 +1,4 @@
-import { mat4, vec3, vec4 } from "../modules/gl-matrix/src/index.js"
+import { mat3, mat4, vec3, vec4 } from "../modules/gl-matrix/src/index.js"
 
 const pi = 3.1415926;
 /**
@@ -124,8 +124,17 @@ setInterval(function(){
     // TODO: Introduce improved Euler's method, or R-K method.
     let dt=interval/1000;
     // updating all the values, starting from the higher order.
-    vec3.scaleAndAdd(eulerAngle,eulerAngle,omega,dt);
     let R=euler_matrix(eulerAngle[0],eulerAngle[1],eulerAngle[2]);
+    // omega in world frame
+    let omegaPrime=[];
+    let Ry=mat4.fromYRotation([],eulerAngle[0]);
+    let Rz=mat4.fromZRotation([],eulerAngle[1]);
+    mat4.multiply(Rz,Rz,Ry);
+    omegaPrime=vec3.scale(omegaPrime,vec3.fromValues(0,1,0),omega[0]);
+    vec3.add(omegaPrime,omegaPrime,vec3.scale([],vec3.transformMat4([],vec3.fromValues(0,0,1),Ry),omega[1]));
+    vec3.add(omegaPrime, omegaPrime,vec3.scale([],vec3.transformMat4([],vec3.fromValues(1,0,0),Rz),omega[2]));
+    vec3.scaleAndAdd(eulerAngle,eulerAngle,omegaPrime,dt);
+    // console.log(omegaPrime);
     vec4.scaleAndAdd(u,u,a,dt);
     vec4.transformMat4(v,u,R);
     vec4.add(position,position,v);
