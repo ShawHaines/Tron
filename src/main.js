@@ -95,6 +95,7 @@ function render(time) {
     twgl.resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
+    gl.clearColor(0, 0, 0, 1);
     gl.enable(gl.DEPTH_TEST);
     // FIXME: This line of code would clip out the back facets.
     // gl.enable(gl.CULL_FACE);
