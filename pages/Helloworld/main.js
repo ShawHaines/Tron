@@ -24,7 +24,7 @@ var camera_x = 0;
 var camera_y = 0;
 var camera_z = 0;
 
-import * as twgl from '../modules/twgl-full.module.js';
+import * as twgl from '../../modules/twgl-full.module.js';
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl2");
 if (!gl) console.log("Failed");

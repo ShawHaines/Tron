@@ -1,6 +1,6 @@
 const vs = `
-attribute vec3 aPos;
-attribute vec3 aNormal;
+attribute vec3 a_position;
+attribute vec3 a_normal;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -10,9 +10,9 @@ varying vec3 Normal;
 varying vec3 fragPos;
 void main()
 {
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
-    Normal = aNormal;
-    fragPos = (model * vec4(aPos, 1.0)).xyz;
+    gl_Position = projection * view * model * vec4(a_position, 1.0);
+    Normal = a_normal;
+    fragPos = (model * vec4(a_position, 1.0)).xyz;
 }
 `
 const fs =`
@@ -39,8 +39,8 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
     vec3 specular = lightColor * spec * 0.5;
 
-    vec3 result = (ambient + diffuse + specular)* objectColor;
-    // vec3 result = (ambient + diffuse)* objectColor;
+    // vec3 result = (ambient + diffuse + specular)* objectColor;
+    vec3 result = (ambient + diffuse)* objectColor;
     gl_FragColor = vec4(result, 1.0);
 }`;
 
@@ -48,23 +48,41 @@ var camera_x = 0;
 var camera_y = 0;
 var camera_z = 0;
 
-import * as twgl from '../modules/twgl-full.module.js';
+import { mat4, vec4 } from '../modules/gl-matrix/src/index.js';
+import * as twgl from '../modules/twgl/twgl-full.module.js';
 const m4 = twgl.m4;
+import * as flight from "./flight.js";
 const gl = document.getElementById("c").getContext("webgl");
 if (!gl) console.log("Failed");
 const programInfo = twgl.createProgramInfo(gl, [vs, fs]);
 
-//Both ways work fine!
-const arrays = {
-    aPos:     [1, 1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1],
-    aNormal:   [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1],
-    // texcoord: [1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-    indices:  [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23],
-};
-// const arrays = twgl.primitives.createCubeVertices(2);
-const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
-console.log(arrays)
-console.log(bufferInfo)
+/****************************** Load Obj Begin ******************************/
+
+var g_meshes = {};
+var arrays={};
+function webGLStart(meshes) {
+    g_meshes = meshes;
+    console.log(g_meshes);
+    arrays.a_position = g_meshes.paper_plane.vertices;
+    arrays.indices = g_meshes.paper_plane.indices;
+    arrays.a_normal = g_meshes.paper_plane.vertexNormals;
+    console.log(arrays);
+
+    bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
+    console.log(bufferInfo);
+    requestAnimationFrame(render);
+}
+
+window.onload = function () {
+    OBJ.downloadMeshes({
+        // 'viking_room': 'src/resource/viking_room.obj', // located in the models folder on the server
+        // Note that the relative path is from the index.
+        'paper_plane': "./resource/rff.obj",
+    }, webGLStart);
+}
+/****************************** Load Obj End ******************************/
+    
+var bufferInfo;
 
 const uniforms = {
     objectColor:[0.8,0.8,0.5],
@@ -77,26 +95,35 @@ function render(time) {
     twgl.resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
+    gl.clearColor(0, 0, 0, 1);
     gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.CULL_FACE);
+    // FIXME: This line of code would clip out the back facets.
+    // gl.enable(gl.CULL_FACE);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     const fov = 30 * Math.PI / 180;
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.5;
-    const zFar = 10;
+    const zFar = 20;
     const projection = m4.perspective(fov, aspect, zNear, zFar);
-    const eye = [1 + camera_x, 4 + camera_y, -6 + camera_z];
+    const eye = [1 + camera_x, 4 + camera_y, 6 + camera_z];
     const target = [0 + camera_x, 0 + camera_y, 0 + camera_z];
     const up = [0, 1, 0];
 
     const camera = m4.lookAt(eye, target, up);
     const view = m4.inverse(camera);
     const viewProjection = m4.multiply(projection, view);
-    const world = m4.rotationY(time);
+    
+    var model=[];
+    mat4.fromTranslation(model,flight.position);
+    let euler=flight.eulerAngle;
+    mat4.multiply(model,model,flight.euler_matrix(euler[0],euler[1],euler[2]));
+    mat4.rotateY(model,model,flight.pi/2);
+    // mat4.rotateX(model,model,flight.pi);
+    mat4.scale(model,model,vec4.fromValues(0.05,0.05,0.05));
 
     uniforms.view = view;
-    uniforms.model = world;
+    uniforms.model = model;
     uniforms.projection = projection;
     uniforms.viewPos=eye;
     // uniforms.u_worldViewProjection = m4.multiply(viewProjection, world);
@@ -111,4 +138,3 @@ function render(time) {
     // gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
     requestAnimationFrame(render);
 }
-requestAnimationFrame(render);
