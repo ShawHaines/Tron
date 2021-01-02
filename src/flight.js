@@ -34,6 +34,12 @@ const amax = 0.1;
  */
 var interval = 30;
 
+
+/** 
+ * A transformation matrix that represents the orientation from world frame to self frame.
+ * @type {mat4} */
+var orientation=mat4.create();
+
 /**
  * Euler Angle, three components are (in order) yaw, pitch, roll.
  * @type {vec3}
@@ -124,12 +130,19 @@ setInterval(function(){
     // TODO: Introduce improved Euler's method, or R-K method.
     let dt=interval/1000;
     // updating all the values, starting from the higher order.
-    let R=euler_matrix(eulerAngle[0],eulerAngle[1],eulerAngle[2]);
-    vec3.scaleAndAdd(eulerAngle,eulerAngle,omega,dt);
+    // let R=euler_matrix(eulerAngle[0],eulerAngle[1],eulerAngle[2]);
+    // vec3.scaleAndAdd(eulerAngle,eulerAngle,omega,dt);
+    let dYaw=0,dPitch=omega[1]*dt,dRoll=omega[2]*dt;
+    let Ry=[],Rx=[];
+    mat4.fromYRotation(Ry,dPitch);
+    mat4.fromXRotation(Rx,dRoll);
+    // FIXME: the order matters! first pitch, then roll. Also note the multiplying order.
+    mat4.multiply(orientation,orientation,Rx);
+    mat4.multiply(orientation, orientation,Ry);
     vec4.scaleAndAdd(u,u,a,dt);
-    vec4.transformMat4(v,u,R);
+    vec4.transformMat4(v,u,orientation);
     vec4.add(position,position,v);
 },interval);
 
 // global variables.
-export {euler_matrix, eulerAngle, position};
+export {euler_matrix, orientation, position};
