@@ -30,8 +30,8 @@ var paper_plane_node = new myNode();
 /** Load Textures **/
 const textures = twgl.createTextures(gl, {
 // a power of 2 image
-viking_room: { src: "resource/viking_room.png", mag: gl.NEAREST },
-paper_plane: { src: "resource/paper+airplane_textures.jpg" }
+viking_room: { src: "./resource/viking_room.png", mag: gl.NEAREST },
+paper_plane: { src: "./resource/paper+airplane_textures.jpg" }
 });
 
 /** Download objects; then call webGLStart() **/
@@ -40,12 +40,12 @@ window.onload = function(){
     let p = OBJ.downloadModels([
         {
             name: 'viking_room',
-            obj: '/resource/viking_room.obj', // located in the models folder on the server
-            mtl: '/resource/viking_room.mtl',
+            obj: './resource/viking_room.obj', // located in the models folder on the server
+            mtl: './resource/viking_room.mtl',
         },
         {
             name: 'paper_plane',
-            obj: '/resource/paper+airplane.obj',
+            obj: './resource/paper+airplane.obj',
         },
     ]);
 
