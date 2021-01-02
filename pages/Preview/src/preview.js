@@ -24,7 +24,7 @@ const uniforms = {
     u_objectColor:[0.8,0.8,0.5,1.0],
     // lightColor:[1.0,1.0,1.0],
     u_lightNumber:2,
-    u_lightPos:[0.,0.,5,5,0,5],
+    u_lightPos:[0.,0.,5,2,0,2],
     u_ambientLight: [1,1,1,0.1,0.1,0.1],
     u_diffuseLight: [1,1,1,0.1,0.1,0.1],
     u_specularLight:[1,1,1,0.1,0.1,0.1],
