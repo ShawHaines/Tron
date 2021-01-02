@@ -23,12 +23,12 @@ console.log(bufferInfo)
 const uniforms = {
     u_objectColor:[0.8,0.8,0.5,1.0],
     // lightColor:[1.0,1.0,1.0],
-    u_lightPos:[0.,3.,5],
+    u_lightPos:[0.,0.,5],
     u_ambientLight: [1,1,1],
     u_diffuseLight: [1,1,1],
     u_specularLight:[1,1,1],
     u_ambientStrength:0.2,
-    u_shininess: 32.0,
+    u_shininess: 200.0,
 };
 
 function render(time) {
