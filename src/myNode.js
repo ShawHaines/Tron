@@ -1,7 +1,7 @@
 /********************************************
     * Class **myNode** definition
 *********************************************/
-import {m4} from './twgl-full.module.js';
+import {m4} from "../modules/twgl/twgl-full.module.js";
 var myNode = function() {
     this.children = [];
     this.localMatrix = m4.identity();

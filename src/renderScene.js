@@ -21,6 +21,7 @@ var renderScene = function(base_node, objects, objectsToDraw, myCamera){
             
             //default lighting attributes
             object.drawInfo.uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(object.worldMatrix));
+            object.drawInfo.uniforms.u_lightNumber=1;
             object.drawInfo.uniforms.u_lightPos = [0, 3, 3];
             object.drawInfo.uniforms.u_viewPos = myCamera.Eye;
             object.drawInfo.uniforms.u_ambientLight = [1.0, 1.0, 1.0];

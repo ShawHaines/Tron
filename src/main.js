@@ -10,10 +10,9 @@ const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
 
 if (!gl) console.log("Failed");
-const programInfo = twgl.createProgramInfo(gl, [vs, fs]);
+const programInfo = twgl.createProgramInfo(gl, [texture_shader.vs, texture_shader.fs]);
 
 /** Some global variables **/
-var myCamera = tinyCamera.Camera(80, 2); /** camera definition **/
 var g_time; /** global time (keep updated in `render()`) **/
 
 
@@ -31,8 +30,8 @@ var paper_plane_node = new myNode();
 /** Load Textures **/
 const textures = twgl.createTextures(gl, {
 // a power of 2 image
-viking_room: { src: "/resource/viking_room.png", mag: gl.NEAREST },
-paper_plane: { src: "/resource/paper+airplane_textures.jpg" }
+viking_room: { src: "resource/viking_room.png", mag: gl.NEAREST },
+paper_plane: { src: "resource/paper+airplane_textures.jpg" }
 });
 
 /** Download objects; then call webGLStart() **/
