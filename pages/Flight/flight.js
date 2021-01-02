@@ -1,4 +1,4 @@
-import { mat4, vec3, vec4 } from "../modules/gl-matrix/src/index.js"
+import { mat4, vec3, vec4 } from "../../modules/gl-matrix/src/index.js"
 
 /**
  * The position in world frame.

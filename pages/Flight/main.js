@@ -48,8 +48,8 @@ var camera_x = 0;
 var camera_y = 0;
 var camera_z = 0;
 
-import { mat4, vec4 } from '../modules/gl-matrix/src/index.js';
-import * as twgl from '../modules/twgl/twgl-full.module.js';
+import { mat4, vec4 } from '../../modules/gl-matrix/src/index.js';
+import * as twgl from '../../modules/twgl/twgl-full.module.js';
 const m4 = twgl.m4;
 import * as flight from "./flight.js";
 const gl = document.getElementById("c").getContext("webgl");
@@ -77,7 +77,7 @@ window.onload = function () {
     OBJ.downloadMeshes({
         // 'viking_room': 'src/resource/viking_room.obj', // located in the models folder on the server
         // Note that the relative path is from the index.
-        'fighter': "./resource/rff.obj",
+        'fighter': "../../resource/rff.obj",
     }, webGLStart);
 }
 /****************************** Load Obj End ******************************/

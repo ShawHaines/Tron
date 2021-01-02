@@ -1,6 +1,6 @@
 import * as twgl from "../../../modules/twgl/twgl-full.module.js";
 import {myCamera} from "./interaction.js";
-import * as phong from "./phong.js";
+import * as phong from "./phong-shader.js";
 
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
