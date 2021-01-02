@@ -20,7 +20,6 @@ var g_time; /** global time (keep updated in `render()`) **/
 * Set up every models (initially)
 *********************************************/
 var objects = []; /**  Wrap every object **/
-var objectsToDraw = []; /** Wrap every object's drawing info **/
 
 /** create nodes for objects **/
 var base_node = new myNode();
@@ -68,14 +67,10 @@ function webGLStart(meshes){
     paper_plane_node.setParent(base_node);
     viking_room_node.setParent(base_node);
 
-    /** Add all the things you want to draw into `objects` & `objectsToDraw` **/
+    /** Add all the things you want to draw into `objects`**/
     objects = [
         viking_room_node,
         paper_plane_node,
-    ];
-    objectsToDraw = [
-        viking_room_node.drawInfo,
-        paper_plane_node.drawInfo,
     ];
     //If you want to update them later, use methods like `push()`...
 
@@ -156,6 +151,26 @@ function webGLStart(meshes){
     paper_plane_node.drawInfo.bufferInfo = paper_plane_bufferInfo;
 
     console.log(meshes);
+    setObjects();
+}
+
+function setObjects(){
+    const defaultUniform={
+        u_lightNumber : 1,
+        u_lightPos :[0, 3, 3],
+        u_ambientLight :[1.0, 1.0, 1.0],
+        u_diffuseLight :[1.0, 1.0, 1.0],
+        u_specularLight :[1.0, 1.0, 1.0],
+        u_shininess : 50,
+        u_ambientStrength : 0.4,
+
+        u_ambientMaterial :[1.0, 1.0, 1.0],
+        u_diffuseMaterial :[1.0, 1.0, 1.0],
+        u_specularMaterial :[1.0, 1.0, 1.0],
+    }
+    objects.forEach(function(each){
+        Object.assign(each.drawInfo.uniforms,defaultUniform);
+    });
 }
 
 
@@ -190,7 +205,7 @@ function render(time) {
     // gl.enable(gl.CULL_FACE);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-    renderScene(base_node, objects, objectsToDraw, myCamera);
+    renderScene(base_node, objects, myCamera);
     
     requestAnimationFrame(render);
 }

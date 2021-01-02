@@ -1,6 +1,6 @@
 import {twgl, m4, gl} from './main.js'
 
-var renderScene = function(base_node, objects, objectsToDraw, myCamera){
+var renderScene = function(base_node, objects, myCamera){
         /** Set projection matrix **/
         const fov = 30 * Math.PI / 180;
         const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
@@ -16,28 +16,15 @@ var renderScene = function(base_node, objects, objectsToDraw, myCamera){
         base_node.updateWorldMatrix();
         /** Set default `uniforms` for each element in `objects` **/
         objects.forEach(function(object) {
-            object.drawInfo.uniforms.u_world = object.worldMatrix;
-            object.drawInfo.uniforms.u_worldViewProjection = m4.multiply(viewProjection, object.worldMatrix);
-            
+            let each=object.drawInfo;
+            each.uniforms.u_world = object.worldMatrix;
+            each.uniforms.u_worldViewProjection = m4.multiply(viewProjection, object.worldMatrix);
+            each.uniforms.u_viewPos = myCamera.Eye;
             //default lighting attributes
-            object.drawInfo.uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(object.worldMatrix));
-            object.drawInfo.uniforms.u_lightNumber=1;
-            object.drawInfo.uniforms.u_lightPos = [0, 3, 3];
-            object.drawInfo.uniforms.u_viewPos = myCamera.Eye;
-            object.drawInfo.uniforms.u_ambientLight = [1.0, 1.0, 1.0];
-            object.drawInfo.uniforms.u_diffuseLight = [1.0, 1.0, 1.0];
-            object.drawInfo.uniforms.u_specularLight = [1.0, 1.0, 1.0];
-            object.drawInfo.uniforms.u_shininess = 50;
-            object.drawInfo.uniforms.u_ambientStrength = 0.4;
+            each.uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(object.worldMatrix));
 
-            object.drawInfo.uniforms.u_ambientMaterial = [1.0, 1.0, 1.0];
-            object.drawInfo.uniforms.u_diffuseMaterial = [1.0, 1.0, 1.0];
-            object.drawInfo.uniforms.u_specularMaterial = [1.0, 1.0, 1.0];
-        });
-        /** Render `objectsToDraw` (a.k.a. `objects[i].drawInfo`) **/
-        objectsToDraw.forEach(function(object) {
-            var programInfo = object.programInfo;
-            var bufferInfo = object.bufferInfo;
+            let programInfo = each.programInfo;
+            let bufferInfo = each.bufferInfo;
             
             /**
             * 3 important things to do:
@@ -45,20 +32,20 @@ var renderScene = function(base_node, objects, objectsToDraw, myCamera){
             **/
             gl.useProgram(programInfo.program);
 
-            if(object.useMTL) //if materials are specified
+            if(each.useMTL) //if materials are specified
             {
                 var i = 0;
-                for(let materialIndex in object.materialIndices)
+                for(let materialIndex in each.materialIndices)
                 {
                     //Set buffer
-                    twgl.setBuffersAndAttributes(gl, programInfo, object.bufferInfoByMaterial[i]);
+                    twgl.setBuffersAndAttributes(gl, programInfo, each.bufferInfoByMaterial[i]);
                     //Update material!
-                    object.uniforms.u_ambientMaterial = object.materialsByIndex[i].ambient;
-                    object.uniforms.u_diffuseMaterial = object.materialsByIndex[i].diffuse;
-                    object.uniforms.u_specularMaterial = object.materialsByIndex[i].specular;
-                    twgl.setUniforms(programInfo, object.uniforms);
+                    each.uniforms.u_ambientMaterial = each.materialsByIndex[i].ambient;
+                    each.uniforms.u_diffuseMaterial = each.materialsByIndex[i].diffuse;
+                    each.uniforms.u_specularMaterial = each.materialsByIndex[i].specular;
+                    twgl.setUniforms(programInfo, each.uniforms);
                     // **draw**
-                    twgl.drawBufferInfo(gl, object.bufferInfoByMaterial[i], gl.TRIANGLES);
+                    twgl.drawBufferInfo(gl, each.bufferInfoByMaterial[i], gl.TRIANGLES);
                     i++;
                 }
             }
@@ -67,7 +54,7 @@ var renderScene = function(base_node, objects, objectsToDraw, myCamera){
                 //Set buffer
                 twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
                 //Use default uniforms
-                twgl.setUniforms(programInfo, object.uniforms);       
+                twgl.setUniforms(programInfo, each.uniforms);       
                 // **draw**
                 twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES);
             }
