@@ -1,33 +1,4 @@
-const vs = `
-    attribute vec4 a_position;
-    attribute vec2 a_texcoord;
-    attribute vec3 a_normal;
-
-    uniform mat4 u_world;
-    uniform mat4 u_worldViewProjection; //redundant for efficiency
-    uniform mat4 u_worldInverseTranspose; //for calculating v_normal
-    
-    varying vec4 v_position;
-    varying vec2 v_texcoord;
-    varying vec4 v_realPosition;
-
-    varying vec3 v_normal;
-    varying vec3 v_fragPos;
-
-    void main() {
-        v_texcoord = a_texcoord;
-        v_realPosition = a_position;
-        v_position =  u_worldViewProjection * a_position;
-        gl_Position = v_position;
-
-        v_normal = mat3(u_worldInverseTranspose) * a_normal; //calculate v_normal
-        // v_normal = a_normal; //calculate v_normal
-        v_fragPos = (u_world * a_position).xyz; //calculate fragment position
-    }
-    `;
-
-const fs =
-`precision mediump float;
+precision mediump float;
 const int Max_Light=10;
 varying vec2 v_texcoord;
 varying vec4 v_position;
@@ -84,5 +55,4 @@ void main() {
     result+=light*color;
 }
 gl_FragColor = result;
-}`;
-export {vs, fs};
+}
