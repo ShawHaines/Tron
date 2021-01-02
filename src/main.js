@@ -63,9 +63,9 @@ var arrays={};
 function webGLStart(meshes) {
     g_meshes = meshes;
     console.log(g_meshes);
-    arrays.a_position = g_meshes.paper_plane.vertices;
-    arrays.indices = g_meshes.paper_plane.indices;
-    arrays.a_normal = g_meshes.paper_plane.vertexNormals;
+    arrays.a_position = g_meshes.fighter.vertices;
+    arrays.indices = g_meshes.fighter.indices;
+    arrays.a_normal = g_meshes.fighter.vertexNormals;
     console.log(arrays);
 
     bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
@@ -77,7 +77,7 @@ window.onload = function () {
     OBJ.downloadMeshes({
         // 'viking_room': 'src/resource/viking_room.obj', // located in the models folder on the server
         // Note that the relative path is from the index.
-        'paper_plane': "./resource/rff.obj",
+        'fighter': "./resource/rff.obj",
     }, webGLStart);
 }
 /****************************** Load Obj End ******************************/
@@ -118,7 +118,9 @@ function render(time) {
     mat4.fromTranslation(model,flight.position);
     let euler=flight.eulerAngle;
     mat4.multiply(model,model,flight.euler_matrix(euler[0],euler[1],euler[2]));
-    mat4.rotateY(model,model,Math.PI/2);
+    // // mat4.rotateY(model,model,Math.PI/2);
+    mat4.rotateZ(model,model,-Math.PI/2);
+    mat4.rotateX(model,model,-Math.PI/2);
     mat4.scale(model,model,vec4.fromValues(0.05,0.05,0.05));
 
     uniforms.view = view;

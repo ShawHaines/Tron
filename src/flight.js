@@ -1,10 +1,6 @@
 import { mat4, vec3, vec4 } from "../modules/gl-matrix/src/index.js"
 
 /**
- * time interval in miliseconds.
- */
-var interval=30;
-/**
  * The position in world frame.
  * Convention: (DIFFERENT from the screen coordinates, but conforms with the navigation convention)
  * x points to the nose of the flight,
@@ -33,6 +29,10 @@ var v = vec4.create();
 var a = vec4.create();
 const amax = 0.1;
 
+/**
+ * time interval in miliseconds.
+ */
+var interval = 30;
 
 /**
  * Euler Angle, three components are (in order) yaw, pitch, roll.
@@ -60,12 +60,12 @@ var reversePitch=false;
 function euler_matrix(yaw, pitch, roll) {
     // you have to declare one variable before use.
     var R=[];
-    mat4.fromYRotation(R,yaw);
-    mat4.rotateZ(R,R,pitch);
+    mat4.fromZRotation(R,yaw);
+    mat4.rotateY(R,R,pitch);
     mat4.rotateX(R,R,roll);
     return R;
 }
-// console.log(euler_mKatrix(pi/3,0,0));
+
 document.addEventListener("keydown", function (event) {
     switch (event.key) {
         case "a":
@@ -125,16 +125,7 @@ setInterval(function(){
     let dt=interval/1000;
     // updating all the values, starting from the higher order.
     let R=euler_matrix(eulerAngle[0],eulerAngle[1],eulerAngle[2]);
-    // omega in world frame
-    let omegaPrime=[];
-    let Ry=mat4.fromYRotation([],eulerAngle[0]);
-    let Rz=mat4.fromZRotation([],eulerAngle[1]);
-    mat4.multiply(Rz,Rz,Ry);
-    omegaPrime=vec3.scale(omegaPrime,vec3.fromValues(0,1,0),omega[0]);
-    vec3.add(omegaPrime,omegaPrime,vec3.scale([],vec3.transformMat4([],vec3.fromValues(0,0,1),Ry),omega[1]));
-    vec3.add(omegaPrime, omegaPrime,vec3.scale([],vec3.transformMat4([],vec3.fromValues(1,0,0),Rz),omega[2]));
-    vec3.scaleAndAdd(eulerAngle,eulerAngle,omegaPrime,dt);
-    // console.log(omegaPrime);
+    vec3.scaleAndAdd(eulerAngle,eulerAngle,omega,dt);
     vec4.scaleAndAdd(u,u,a,dt);
     vec4.transformMat4(v,u,R);
     vec4.add(position,position,v);
