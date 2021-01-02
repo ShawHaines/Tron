@@ -136,6 +136,7 @@ function Camera(_R, _step)
 
     camera.changeWatchDir = function(delta_phi, delta_theta)
     {
+        console.log(this);
         this.theta += delta_theta;
         this.phi += delta_phi;
         this.Target[0] = this.Eye[0] + this.R * Math.sin(this.theta) * Math.cos(this.phi);

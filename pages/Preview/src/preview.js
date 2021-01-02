@@ -44,11 +44,9 @@ void main()
     gl_FragColor = vec4(result, 1.0);
 }`;
 
-var camera_x = 0;
-var camera_y = 0;
-var camera_z = 0;
-
 import * as twgl from "../../../modules/twgl/twgl-full.module.js";
+import {myCamera} from "./interaction.js"
+
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
 if (!gl) console.log("Failed");
@@ -87,11 +85,8 @@ function render(time) {
     const zNear = 0.5;
     const zFar = 10;
     const projection = m4.perspective(fov, aspect, zNear, zFar);
-    const eye = [1 + camera_x, 4 + camera_y, -6 + camera_z];
-    const target = [0 + camera_x, 0 + camera_y, 0 + camera_z];
-    const up = [0, 1, 0];
 
-    const camera = m4.lookAt(eye, target, up);
+    const camera = m4.lookAt(myCamera.Eye, myCamera.Target, myCamera.Up);
     const view = m4.inverse(camera);
     const viewProjection = m4.multiply(projection, view);
     const world = m4.rotationY(time);
@@ -99,7 +94,7 @@ function render(time) {
     uniforms.view = view;
     uniforms.model = world;
     uniforms.projection = projection;
-    uniforms.viewPos=eye;
+    uniforms.viewPos=myCamera.Eye;
     // uniforms.u_worldViewProjection = m4.multiply(viewProjection, world);
 
     gl.useProgram(programInfo.program);

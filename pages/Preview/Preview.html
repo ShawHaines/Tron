@@ -5,11 +5,38 @@
         <meta charset="UTF-8">
         <title>CG Project</title>
         <script type="module" src="./src/preview.js"></script>
+        <script type="text/javascript" src="./src/virtualjoystick.js"></script>
     </head>
     <body>
         <canvas id="c" style="width: 80%;"></canvas>
         <div>
             <a href="http://code.vtu.life"> Back</a>
+        </div>
+        <div id="joy_container" style="position: absolute; left: 10%; top: 60%; width: 200px; height: 200px;z-index: 1;">
+        
+        </div>
+        <div id="container">
+            <canvas id="c" style=" width: 100%; height: 100%;"></canvas>
+        
+        
+        
+            <script>
+                var BX = document.body.clientWidth * 0.1;
+                var BY = document.body.clientHeight * 0.6;
+                console.log(BX, BY);
+
+                var joystick = new VirtualJoystick({
+                    container: document.getElementById('joy_container'),
+                    mouseSupport: true,
+                    stationaryBase: true,
+                    baseX: 100,
+                    baseY: 100,
+                    limitStickTravel: true,
+                    stickRadius: 50,
+                    biasX: BX,
+                    biasY: BY
+                });
+            </script>
         </div>
     </body>
 </html>
