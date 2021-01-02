@@ -118,8 +118,7 @@ function render(time) {
     mat4.fromTranslation(model,flight.position);
     let euler=flight.eulerAngle;
     mat4.multiply(model,model,flight.euler_matrix(euler[0],euler[1],euler[2]));
-    mat4.rotateY(model,model,flight.pi/2);
-    // mat4.rotateX(model,model,flight.pi);
+    mat4.rotateY(model,model,Math.PI/2);
     mat4.scale(model,model,vec4.fromValues(0.05,0.05,0.05));
 
     uniforms.view = view;
