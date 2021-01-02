@@ -1,46 +1,4 @@
     /********************************************
-    * Shader Code
-    *********************************************/
-    const vs =`
-    attribute vec4 position;
-    attribute vec2 texcoord;
-    uniform mat4 u_world;
-    uniform mat4 u_worldViewProjection; //redundant for efficiency
-    uniform mat4 u_worldInverseTranspose; //for calculating v_normal
-    varying vec4 v_position;
-    varying vec2 v_texcoord;
-    varying vec4 v_realPosition;
-
-    varying vec3 v_normal;
-    varying vec3 v_fragPos;
-
-    void main() {
-        v_texcoord = texcoord;
-        v_realPosition = position;
-        v_position =  u_worldViewProjection * position;
-        gl_Position = v_position;
-    }
-    `;
-
-    const fs =
-    `precision mediump float;
-    varying vec2 v_texcoord;
-    varying vec4 v_position;
-    varying vec4 v_realPosition;
-
-    uniform sampler2D u_texture;
-    uniform vec3 u_lightPos;
-    uniform vec3 u_lightColor;
-    // uniform vec3 view
-
-    void main() {
-        // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-        // gl_FragColor = vec4(v_realPosition.xyz, 1.0);
-        gl_FragColor = texture2D(u_texture, v_texcoord);
-    }`;
-
-
-    /********************************************
     * Head
     *********************************************/
     import * as twgl from "../../../modules/twgl-full.module.js"
