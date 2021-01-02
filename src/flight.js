@@ -1,14 +1,14 @@
-import { mat3, mat4, vec3, vec4 } from "../modules/gl-matrix/src/index.js"
+import { mat4, vec3, vec4 } from "../modules/gl-matrix/src/index.js"
 
-const pi = 3.1415926;
 /**
  * time interval in miliseconds.
  */
 var interval=30;
 /**
  * The position in world frame.
- * Convention: x points to the nose of the flight,
- * y points vertically up, z is determined by right-hand rule.
+ * Convention: (DIFFERENT from the screen coordinates, but conforms with the navigation convention)
+ * x points to the nose of the flight,
+ * z points vertically down, y is determined by right-hand rule.
  * Unit is approximately MKSA unit (1m). 
  * Note that the planes are miniature planes that flies on a desk.
  * w=1 means point.
@@ -141,4 +141,4 @@ setInterval(function(){
 },interval);
 
 // global variables.
-export {pi,euler_matrix, eulerAngle, position};
+export {euler_matrix, eulerAngle, position};
