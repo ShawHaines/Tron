@@ -106,7 +106,7 @@ function render(time) {
     const zNear = 0.5;
     const zFar = 20;
     const projection = m4.perspective(fov, aspect, zNear, zFar);
-    const eye = [1 + camera_x, 4 + camera_y, 6 + camera_z];
+    const eye = [0 + camera_x, 0 + camera_y, 6 + camera_z];
     const target = [0 + camera_x, 0 + camera_y, 0 + camera_z];
     const up = [0, 1, 0];
 
@@ -117,7 +117,7 @@ function render(time) {
     var model=[];
     mat4.fromTranslation(model,flight.position);
     let euler=flight.eulerAngle;
-    mat4.multiply(model,model,flight.euler_matrix(euler[0],euler[1],euler[2]));
+    mat4.multiply(model,model,flight.orientation);
     // // mat4.rotateY(model,model,Math.PI/2);
     mat4.rotateZ(model,model,-Math.PI/2);
     mat4.rotateX(model,model,-Math.PI/2);
