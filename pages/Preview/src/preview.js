@@ -29,6 +29,9 @@ const uniforms = {
     u_specularLight:[1,1,1],
     u_ambientStrength:0.2,
     u_shininess: 200.0,
+    u_ambientMaterial:[0.8,0.8,0.5],
+    u_diffuseMaterial:[0.8,0.8,0.5],
+    u_specularMaterial:[1,1,1],
 };
 
 function render(time) {

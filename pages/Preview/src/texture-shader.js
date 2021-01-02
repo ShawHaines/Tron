@@ -37,13 +37,18 @@ varying vec3 v_fragPos;
 
 uniform vec4 u_objectColor;
 uniform sampler2D u_texture;
+
 uniform vec3 u_lightPos;
-uniform vec3 u_viewPos;
 uniform vec3 u_ambientLight;
 uniform vec3 u_diffuseLight;
 uniform vec3 u_specularLight;
+uniform vec3 u_viewPos;
 uniform float u_ambientStrength;
 uniform float u_shininess;
+
+uniform vec3 u_ambientMaterial;
+uniform vec3 u_diffuseMaterial;
+uniform vec3 u_specularMaterial;
 
 
 void main() {
@@ -56,16 +61,16 @@ void main() {
     vec3 viewDir = normalize(u_viewPos - v_fragPos);
 
     //Ambient
-    vec3 ambient = u_ambientStrength * u_ambientLight;
+    vec3 ambient = u_ambientStrength * u_ambientLight * u_ambientMaterial;
     //Diffuse
     // float diff = max(dot(lightDir, normal),0.0);
     float diff = max(dot(lightDir, normal), -dot(lightDir, normal));
-    vec3 diffuse = u_diffuseLight * diff;
+    vec3 diffuse = u_diffuseLight * u_diffuseMaterial * diff;
     //Specular
     vec3 reflectDir = reflect(-lightDir, normal);
     // float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
     float spec = pow(max(dot(viewDir, reflectDir), -dot(viewDir, reflectDir)), u_shininess);
-    vec3 specular = u_specularLight * spec * 0.5;
+    vec3 specular = u_specularLight * u_specularMaterial * spec * 0.5;
     // vec3 specular = vec3(0, 0, 0);
 
 
