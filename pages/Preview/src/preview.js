@@ -1,61 +1,16 @@
-const vs = `
-attribute vec3 aPos;
-attribute vec3 aNormal;
-
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
-varying vec3 Normal;
-varying vec3 fragPos;
-void main()
-{
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
-    Normal = aNormal;
-    fragPos = (model * vec4(aPos, 1.0)).xyz;
-}
-`
-const fs =`
-precision highp float;
-uniform vec3 objectColor;
-uniform vec3 lightColor;
-uniform vec3 lightPos;
-uniform vec3 viewPos;
-
-varying vec3 Normal;
-varying vec3 fragPos;
-void main()
-{
-    float ambientStrength = 0.5;
-    vec3 ambient = ambientStrength * lightColor;
-
-    vec3 lightDir = normalize(lightPos - fragPos);
-    float diff = max(dot(lightDir, normalize(Normal)),0.0);
-    vec3 diffuse = lightColor * diff;
-
-    vec3 viewDir = normalize(viewPos - fragPos);
-    vec3 reflectDir = reflect(-lightDir, normalize(Normal));
-    // // 32 times
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-    vec3 specular = lightColor * spec * 0.5;
-
-    vec3 result = (ambient + diffuse + specular)* objectColor;
-    // vec3 result = (ambient + diffuse)* objectColor;
-    gl_FragColor = vec4(result, 1.0);
-}`;
-
 import * as twgl from "../../../modules/twgl/twgl-full.module.js";
-import {myCamera} from "./interaction.js"
+import {myCamera} from "./interaction.js";
+import * as phong from "./phong.js";
 
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
 if (!gl) console.log("Failed");
-const programInfo = twgl.createProgramInfo(gl, [vs, fs]);
+const programInfo = twgl.createProgramInfo(gl, [phong.vs, phong.fs]);
 
 //Both ways work fine!
 const arrays = {
-    aPos:     [1, 1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1],
-    aNormal:   [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1],
+    position:     [1, 1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1],
+    normal:   [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1],
     // texcoord: [1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
     indices:  [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23],
 };

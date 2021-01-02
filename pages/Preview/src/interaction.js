@@ -5,7 +5,6 @@
 import {Camera} from './camera.js';
 
 var myCamera=Camera(10,0.1);
-console.log(myCamera);
 /* mouse, keyboard, and virtual joystick support */
 document.addEventListener("keydown", function (event) {
     switch (event.key) {
