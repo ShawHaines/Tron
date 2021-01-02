@@ -6,6 +6,10 @@ var myNode = function() {
     this.children = [];
     this.localMatrix = m4.identity();
     this.worldMatrix = m4.identity();
+    this.drawInfo = {
+            uniforms: {},
+            useMTL: false,
+    };
 };
 
 myNode.prototype.setParent = function(parent) {
