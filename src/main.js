@@ -152,6 +152,7 @@ function webGLStart(meshes){
 
     console.log(meshes);
     setObjects();
+    requestAnimationFrame(render);
 }
 
 function setObjects(){
@@ -209,8 +210,6 @@ function render(time) {
     
     requestAnimationFrame(render);
 }
-
-requestAnimationFrame(render);
 
 
 export {twgl, m4, gl};
