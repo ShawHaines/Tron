@@ -51,7 +51,7 @@ var eulerAngle = vec3.fromValues(0,0,0);
  * @type {vec3}
  */
 var omega = vec3.fromValues(0,0,0);
-var omegaMax=1;
+var omegaMax=Math.PI;
 /**
  * if true, reverse the Pitch axis.
  */
@@ -70,6 +70,90 @@ function euler_matrix(yaw, pitch, roll) {
     mat4.rotateY(R,R,pitch);
     mat4.rotateX(R,R,roll);
     return R;
+}
+
+
+/**
+ * the inteval count to insert a new vertex in ribbon.
+ */
+const ribbonInterval=1;
+/** maximum number of vertices */
+const maxRibbonLength=100;
+var ribbonCount=0;
+var ribbonLength=0;
+const ribbonWidth=0.1;
+
+/**
+ * @typedef {Object} bufferArray
+ * @property {[number]} a_position
+ * @property {[number]} a_normal
+ * @property {[number]} a_texcoord
+ * @property {[number]} indices
+ * */
+
+
+/** @type {bufferArray} */
+var ribbon = {
+    a_position: [],
+    a_normal: [],
+    indices: [],
+    length:0,
+}
+
+function updateRibbon() {
+    // TODO: Improve the efficiency by getting rid of the array.shift().
+    let displacement=vec4.fromValues(0,ribbonWidth/2,0,0);
+    vec4.transformMat4(displacement,displacement,orientation);
+    let up = vec3.fromValues(0, 0, -1, 0);
+    vec3.transformMat4(up, up, orientation);
+    // aliases
+    let a_position=ribbon.a_position;
+    let a_normal = ribbon.a_normal;
+    let indices=ribbon.indices;
+    // first the left-hand-side, then the rfs.
+    if (ribbonLength<maxRibbonLength){
+        // not overfloating yet.
+        a_position.push.apply(a_position,vec3.add([], position, displacement));
+        a_position.push.apply(a_position,vec3.subtract([], position, displacement));
+        // indices
+        if (ribbonLength > 0){
+            // left triangle, counter-clockwise.
+            indices.push.apply(indices,[ribbonLength*2,ribbonLength*2-2,ribbonLength*2+1]);
+            // right triangle, ccw
+            indices.push.apply(indices,[ribbonLength*2+1,ribbonLength*2-2,ribbonLength*2-1]);
+        }
+        a_normal.push.apply(a_normal,up);
+        a_normal.push.apply(a_normal,up);
+    } else{
+        // considering the indices, it's better to deal with it like a ring buffer.
+        let a_position=ribbon.a_position;
+        // set a marker
+        let index=ribbonLength % maxRibbonLength;
+        let end=[];
+        vec3.add(end,position,displacement);
+        // 3 components for each position and normal.
+        for (let i=index*6,j=0;i<index*6+3;i++,j++){
+            a_position[i]=end[j];
+            a_normal[i]=up[j];
+        }
+        vec3.subtract(end, position, displacement);
+        for (let i=index*6+3,j=0;i<index*6+6;i++,j++){
+            a_position[i]=end[j];
+            a_normal[i]=up[j];
+        }
+        // // FIXME: as it turns out, you do have to move one index.
+        let j= (ribbonLength-1)%(maxRibbonLength-1);
+        let oldIndex=index>0?index-1:maxRibbonLength-1;
+        indices[j*6  ]=2*index;
+        indices[j*6+1]=2*oldIndex;
+        indices[j*6+2]=2*index+1;
+        indices[j*6+3]=2*index+1;
+        indices[j*6+4]=2*oldIndex;
+        indices[j*6+5]=2*oldIndex+1;
+        // prevent overfloat
+        ribbonLength = ribbonLength % (2 * (maxRibbonLength - 1) * maxRibbonLength) + (2 * (maxRibbonLength - 1) * maxRibbonLength);
+    }
+    ribbonLength++;
 }
 
 document.addEventListener("keydown", function (event) {
@@ -142,7 +226,14 @@ setInterval(function(){
     vec4.scaleAndAdd(u,u,a,dt);
     vec4.transformMat4(v,u,orientation);
     vec4.add(position,position,v);
+
+    // update ribbon.
+    ribbonCount++;
+    if (ribbonCount>=ribbonInterval){
+        ribbonCount-=ribbonInterval;
+        updateRibbon();
+    }
 },interval);
 
 // global variables.
-export {euler_matrix, orientation, position};
+export {euler_matrix, orientation, position, ribbon , ribbonLength};

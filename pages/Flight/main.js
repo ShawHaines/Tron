@@ -135,7 +135,14 @@ function render(time) {
 
     //All 3 ways work fine!
     twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
-    // twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES);
-    // gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+
+    // draw ribbon.
+    if (flight.ribbonLength > 1){
+        let ribbonBuffer=twgl.createBufferInfoFromArrays(gl,flight.ribbon);
+        twgl.setBuffersAndAttributes(gl,programInfo,ribbonBuffer);
+        uniforms.model=m4.identity();
+        twgl.setUniforms(programInfo,uniforms);
+        twgl.drawBufferInfo(gl,ribbonBuffer,gl.TRIANGLES,ribbonBuffer.numelements);
+    }
     requestAnimationFrame(render);
 }
