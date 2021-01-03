@@ -2,17 +2,17 @@
     * Class **myNode** definition
 *********************************************/
 import {m4} from "../modules/twgl/twgl-full.module.js";
-var myNode = function() {
+class myNode {
+  constructor() {
     this.children = [];
     this.localMatrix = m4.identity();
     this.worldMatrix = m4.identity();
-    this.drawInfo = {
-            uniforms: {},
-            useMTL: false,
-    };
-};
-
-myNode.prototype.setParent = function(parent) {
+    this.drawInfo={
+      uniforms:{},
+      useMTL:false,
+    }
+  }
+  setParent(parent) {
     // Move from old parent
     if (this.parent) {
       var ndx = this.parent.children.indexOf(this);
@@ -20,16 +20,14 @@ myNode.prototype.setParent = function(parent) {
         this.parent.children.splice(ndx, 1);
       }
     }
-   
+
     // Add to parent
     if (parent) {
       parent.children.push(this);
     }
     this.parent = parent;
-};
-
-
-myNode.prototype.updateWorldMatrix = function(parentWorldMatrix) {
+  }
+  updateWorldMatrix(parentWorldMatrix) {
     if (parentWorldMatrix) {
       // a matrix was passed in so do the math
       m4.multiply(parentWorldMatrix, this.localMatrix, this.worldMatrix);
@@ -40,9 +38,11 @@ myNode.prototype.updateWorldMatrix = function(parentWorldMatrix) {
 
     // now process all the children
     var worldMatrix = this.worldMatrix;
-    this.children.forEach(function(child) {
+    this.children.forEach(function (child) {
       child.updateWorldMatrix(worldMatrix);
     });
-  };
+  }
+}
+
 
 export {myNode};
