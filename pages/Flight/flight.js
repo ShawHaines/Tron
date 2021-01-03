@@ -128,7 +128,6 @@ function updateRibbon() {
         // considering the indices, it's better to deal with it like a ring buffer.
         let a_position=ribbon.a_position;
         // set a marker
-        ribbonLength=ribbonLength % maxRibbonLength + maxRibbonLength;
         let index=ribbonLength % maxRibbonLength;
         let end=[];
         vec3.add(end,position,displacement);
@@ -143,13 +142,16 @@ function updateRibbon() {
             a_normal[i]=up[j];
         }
         // // FIXME: as it turns out, you do have to move one index.
+        let j= (ribbonLength-1)%(maxRibbonLength-1);
         let oldIndex=index>0?index-1:maxRibbonLength-1;
-        indices[index*6  ]=2*index;
-        indices[index*6+1]=2*oldIndex;
-        indices[index*6+2]=2*index+1;
-        indices[index*6+3]=2*index+1;
-        indices[index*6+4]=2*oldIndex;
-        indices[index*6+5]=2*oldIndex+1;
+        indices[j*6  ]=2*index;
+        indices[j*6+1]=2*oldIndex;
+        indices[j*6+2]=2*index+1;
+        indices[j*6+3]=2*index+1;
+        indices[j*6+4]=2*oldIndex;
+        indices[j*6+5]=2*oldIndex+1;
+        // prevent overfloat
+        ribbonLength = ribbonLength % (2 * (maxRibbonLength - 1) * maxRibbonLength) + (2 * (maxRibbonLength - 1) * maxRibbonLength);
     }
     ribbonLength++;
 }
