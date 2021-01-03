@@ -72,6 +72,58 @@ function euler_matrix(yaw, pitch, roll) {
     return R;
 }
 
+
+/**
+ * the inteval count to insert a new vertex in ribbon.
+ */
+const ribbonInterval=1;
+/** maximum number of vertices */
+const maxRibbonLength=1000;
+var ribbonCount=0;
+var ribbonLength=0;
+const ribbonWidth=0.1;
+
+/**
+ * @typedef {Object} bufferArray
+ * @property {[number]} a_position
+ * @property {[number]} a_normal
+ * @property {[number]} a_texcoord
+ * @property {[number]} indices
+ * */
+
+
+/** @type {bufferArray} */
+var ribbon = {
+    a_position: [],
+    a_normal: [],
+    indices: [],
+    length:0,
+}
+
+function updateRibbon() {
+    // TODO: Improve the efficiency by getting rid of the array.shift().
+    let displacement=vec4.fromValues(0,ribbonWidth/2,0,0);
+    vec4.transformMat4(displacement,displacement,orientation);
+    // first the left-hand-side, then the rfs.
+    let a_position=ribbon.a_position;
+    a_position.push.apply(a_position,vec3.add([], position, displacement));
+    a_position.push.apply(a_position,vec3.subtract([], position, displacement));
+    // indices
+    let indices=ribbon.indices;
+    if (ribbonLength > 0){
+        // left triangle, counter-clockwise.
+        indices.push.apply(indices,[ribbonLength*2,ribbonLength*2-2,ribbonLength*2+1]);
+        // right triangle, ccw
+        indices.push.apply(indices,[ribbonLength*2+1,ribbonLength*2-2,ribbonLength*2-1]);
+    }
+    let up=vec3.fromValues(0,0,-1,0);
+    let a_normal=ribbon.a_normal;
+    vec3.transformMat4(up,up,orientation);
+    a_normal.push.apply(a_normal,up);
+    a_normal.push.apply(a_normal,up);
+    ribbonLength++;
+}
+
 document.addEventListener("keydown", function (event) {
     switch (event.key) {
         case "a":
@@ -142,7 +194,14 @@ setInterval(function(){
     vec4.scaleAndAdd(u,u,a,dt);
     vec4.transformMat4(v,u,orientation);
     vec4.add(position,position,v);
+
+    // update ribbon.
+    ribbonCount++;
+    if (ribbonCount>=ribbonInterval){
+        ribbonCount-=ribbonInterval;
+        updateRibbon();
+    }
 },interval);
 
 // global variables.
-export {euler_matrix, orientation, position};
+export {euler_matrix, orientation, position, ribbon , ribbonLength};
