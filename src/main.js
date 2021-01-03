@@ -205,4 +205,4 @@ function render(time) {
 }
 
 
-export {twgl, m4, gl};
+export {twgl, m4, gl, myCamera};
