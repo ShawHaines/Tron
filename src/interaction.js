@@ -2,43 +2,43 @@
 * Interaction Control
 *********************************************/
 
-import {Camera} from './camera.js';
+import {myCamera} from './main.js'
 
-var myCamera=Camera(10,1);
 /* mouse, keyboard, and virtual joystick support */
 document.addEventListener("keydown", function (event) {
     switch (event.key) {
         case "w":
-            myCamera.moveForward();
+            myCamera.movePos(0, 0, -2);
             break;
         case "a":
-            myCamera.moveLeft();
+            myCamera.movePos(-2, 0, 0);
             break;
         case "s":
-            myCamera.moveBackward();
+            myCamera.movePos(0, 0, 2);
             break;
         case "d":
-            myCamera.moveRight();
+            myCamera.movePos(2, 0, 0);
             break;
         case "e":
-            myCamera.moveUp();
+            myCamera.movePos(0, 2, 0);
             break;
         case "q":
-            myCamera.moveDown();
+            myCamera.movePos(0, -2, 0);
             break;
         case "j":
-            myCamera.watchLeft();
+            myCamera.moveView(-2, 0);
             break;
         case "l":
-            myCamera.watchRight();
+            myCamera.moveView(2, 0);
             break;
         case "i":
-            myCamera.watchUp();
+            myCamera.moveView(0, 2);
             break;
         case "k":
-            myCamera.watchDown();
+            myCamera.moveView(0, -2);
             break;
     }
+    // console.log("Keydown:", myCamera.viewMatrix);
 });
 
 var mouseDownX = 0;
@@ -59,7 +59,8 @@ document.getElementById("c").onmousemove = function(e) {
     mouseY = e.pageY;
 
     if(mouseDownFlag) {
-        myCamera.changeWatchDir(moveX * 0.001, -moveY * 0.001);
+        myCamera.moveView(-moveX * 0.05, moveY * 0.05);
+        // console.log("Mousemove:", myCamera.viewMatrix);
     }
 
 }
@@ -70,17 +71,17 @@ document.getElementById("c").onmouseup = function(e) {
 
 setInterval(function(){
     if(joystick.right()) {
-        myCamera.moveRight();
+        myCamera.movePos(2, 0, 0);
     }
     if(joystick.left()) {
-        myCamera.moveLeft();
+        myCamera.movePos(-2, 0, 0);
     }
     if(joystick.up()) {
         // console.log("Forward!")
-        myCamera.moveForward();
+        myCamera.movePos(0, 0, -2);
     }
     if(joystick.down()) {
-        myCamera.moveBackward();
+        myCamera.movePos(0, 0, 2);
     }
 
 }, 1/30 * 1000);
@@ -129,7 +130,5 @@ document.getElementById("c").ontouchmove = function(e) {
     // console.log(-touchMoveX * 0.002, touchMoveY * 0.002);
     if(touchDownFlag == true)
         // myCamera.watchLeft();
-        myCamera.changeWatchDir(touchMoveX * 0.001, -touchMoveY * 0.001);
+        myCamera.moveView(-touchMoveX * 0.05, touchMoveY * 0.05);
 }
-
-export {myCamera};

@@ -2,7 +2,7 @@
 * Head
 *********************************************/
 import * as twgl from "../modules/twgl/twgl-full.module.js";
-import {myCamera} from "./interaction.js";
+import {Camera} from "./camera.js";
 import {myNode} from './myNode.js';
 import * as texture_shader from "../pages/Preview/src/texture-shader.js";
 import {renderScene} from './renderScene.js';
@@ -20,6 +20,8 @@ var g_time; /** global time (keep updated in `render()`) **/
 * Set up every models (initially)
 *********************************************/
 var objects = []; /**  Wrap every object **/
+
+var myCamera = new Camera();
 
 /** create nodes for objects **/
 var base_node = new myNode();
@@ -212,4 +214,4 @@ function render(time) {
 }
 
 
-export {twgl, m4, gl};
+export {twgl, m4, gl, myCamera};
