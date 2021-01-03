@@ -19,12 +19,18 @@ var g_time; /** global time (keep updated in `render()`) **/
 /********************************************
 * Set up every models (initially)
 *********************************************/
-var objects = []; /**  Wrap every object **/
 
-/** create nodes for objects **/
 var base_node = new myNode();
 var viking_room_node = new myNode();
 var paper_plane_node = new myNode();
+
+/** Wrap up all the objects. 
+ * Add all the things you want to draw into `objects`**/
+var objects = [
+    viking_room_node,
+    paper_plane_node,
+];
+//If you want to update them later, use methods like `push()`...
 
 /** Load Textures **/
 const textures = twgl.createTextures(gl, {
@@ -61,27 +67,8 @@ window.onload = function(){
 
 //As long as meshes is downloaded successfully, do the following
 function webGLStart(meshes){
-    var world = m4.identity();
-
-    /** Set relationship of the scene graph **/
-    paper_plane_node.setParent(base_node);
-    viking_room_node.setParent(base_node);
-
-    /** Add all the things you want to draw into `objects`**/
-    objects = [
-        viking_room_node,
-        paper_plane_node,
-    ];
-    //If you want to update them later, use methods like `push()`...
-
-
+    setFrameTree();
     /** Great! Now set every node initially **/
-
-    /** Set base node **/
-    world = m4.identity();
-    world = m4.multiply(world, m4.translation([0, -15, 0]));
-    m4.copy(world, base_node.localMatrix);
-
     
     /** Set viking_room node **/
     //Prepare buffer array
@@ -91,12 +78,6 @@ function webGLStart(meshes){
     viking_room_bufferArray.a_texcoord = meshes.viking_room.textures;
     viking_room_bufferArray.a_normal = meshes.viking_room.vertexNormals;
     const viking_room_bufferInfo = twgl.createBufferInfoFromArrays(gl, viking_room_bufferArray);
-    //Set local matrix
-    world = m4.identity();
-    world = m4.multiply(world, m4.rotationY(-135 * Math.PI / 180));
-    world = m4.multiply(world, m4.rotationX(-90 * Math.PI / 180));
-    m4.scale(world, [30, 30, 30], world);
-    m4.copy(world, viking_room_node.localMatrix);
     //Set node.`drawInfo`
     //uniforms, programInfo, bufferInfo
     viking_room_node.drawInfo.uniforms.u_texture = textures.viking_room;
@@ -127,7 +108,6 @@ function webGLStart(meshes){
     }
     
     
-
     /** Set paper_plane node **/
     //Prepare buffer array
     const paper_plane_bufferArray = {};
@@ -136,14 +116,7 @@ function webGLStart(meshes){
     paper_plane_bufferArray.a_texcoord = meshes.paper_plane.textures;
     paper_plane_bufferArray.a_normal = meshes.paper_plane.vertexNormals;
     const paper_plane_bufferInfo = twgl.createBufferInfoFromArrays(gl, paper_plane_bufferArray);
-    //Set local matrix
-    world = m4.identity();
-    world = m4.multiply(world, m4.translation([0, 14, 45]));
-    world = m4.multiply(world, m4.rotationZ(200 * Math.PI / 180));
-    world = m4.multiply(world, m4.rotationY(170 * Math.PI / 180));
-    world = m4.multiply(world, m4.rotationX(25 * Math.PI / 180));
-    m4.scale(world, [0.02, 0.02, 0.02], world);
-    m4.copy(world, paper_plane_node.localMatrix);
+    
     //Set node.`drawInfo`
     //uniforms, programInfo, bufferInfo
     paper_plane_node.drawInfo.uniforms.u_texture = textures.paper_plane;
@@ -173,7 +146,31 @@ function setObjects(){
         Object.assign(each.drawInfo.uniforms,defaultUniform);
     });
 }
+/** create nodes for objects **/
+function setFrameTree(){
+    /** Set relationship of the scene graph **/
+    paper_plane_node.setParent(base_node);
+    viking_room_node.setParent(base_node);
 
+    /** Set base node **/
+    // world = m4.identity();
+    // world = m4.multiply(world, m4.translation([0, -15, 0]));
+    // m4.copy(world, base_node.localMatrix);
+    //Set local matrix of viking_room.
+    let world = m4.identity();
+    world = m4.multiply(world, m4.rotationY(-135 * Math.PI / 180));
+    world = m4.multiply(world, m4.rotationX(-90 * Math.PI / 180));
+    m4.scale(world, [30, 30, 30], world);
+    m4.copy(world, viking_room_node.localMatrix);
+    //Set local matrix of paper_plane.
+    world = m4.identity();
+    world = m4.multiply(world, m4.translation([0, 14, 45]));
+    world = m4.multiply(world, m4.rotationZ(200 * Math.PI / 180));
+    world = m4.multiply(world, m4.rotationY(170 * Math.PI / 180));
+    world = m4.multiply(world, m4.rotationX(25 * Math.PI / 180));
+    m4.scale(world, [0.02, 0.02, 0.02], world);
+    m4.copy(world, paper_plane_node.localMatrix);
+}
 
 /********************************************
 * [Example]: Rotate the paper plane 60 times a second
