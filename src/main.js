@@ -29,11 +29,9 @@ var paper_plane_node = new myNode();
 /** Wrap up all the objects. 
  * Add all the things you want to draw into `objects`**/
 var viking_room=new myObject(),paper_plane=new myObject();
-var objects = [
-    viking_room,
-    paper_plane,
-];
+var objects = [viking_room,paper_plane];
 var lights=[];
+var cameras=[];
 //If you want to update them later, use methods like `push()`...
 
 /** Load Textures **/
@@ -137,10 +135,9 @@ function webGLStart(meshes){
 function setLights(){
     let majorLight=new Light();
     majorLight.node=base_node;
-    console.log(majorLight);
     lights.push(majorLight);
     let allLights=pack(lights);
-    console.log(allLights);
+    // assign the light uniforms to all objects.
     objects.forEach(function(each){
         Object.assign(each.drawInfo.uniforms,allLights.uniforms);
     });
