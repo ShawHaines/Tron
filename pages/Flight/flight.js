@@ -51,7 +51,7 @@ var eulerAngle = vec3.fromValues(0,0,0);
  * @type {vec3}
  */
 var omega = vec3.fromValues(0,0,0);
-var omegaMax=1;
+var omegaMax=Math.PI;
 /**
  * if true, reverse the Pitch axis.
  */
