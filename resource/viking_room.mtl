@@ -1,0 +1,11 @@
+newmtl Texture1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+map_Kd ./viking_room.png
+
+newmtl Texture2
+Ka 0 0 0
+Kd 0 0 0
+Ks 1 1 1
+map_Ks ./viking_room.png

@@ -31,6 +31,7 @@ function Camera(_R, _step)
         var sin_phi = Math.sin(this.phi);
         var cos_phi = Math.cos(this.phi);
         var step = this.step;
+
         this.Eye[0] += step * sin_theta * sin_phi;
         this.Target[0] += step * sin_theta * sin_phi;
         this.Eye[2] += step * sin_theta * cos_phi;

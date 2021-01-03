@@ -1,48 +1,124 @@
-<!DOCTYPE html>
 <html>
     <head>
-        <meta lang="en">
-        <meta charset="UTF-8">
+        <!-- <meta lang="en"> -->
+        <meta charset="utf-8">
+        <meta name="full-screen" content="yes">
+        <meta name="viewport" content="user-scalable=no, width=device-width" />
+        <!-- <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"> -->
         <title>CG Project</title>
+
+        <script type='text/javascript' src="./src/webgl-obj-loader.js"></script>
+        <script type='text/javascript' src="src/webgl-lessons-ui.js"></script>
+        <script type='text/javascript' src="./src/virtualjoystick.js"></script>
         <script type="module" src="./src/main.js"></script>
-        <script type="text/javascript" src="./src/virtualjoystick.js"></script>
+
+        <style>
+        body {
+            background-color: "black";
+            overflow: hidden;
+        }
+		#container {
+			position: fixed;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            overflow: hidden;
+            /* overflow-x: hidden; */
+            /* -webkit-overflow-scrolling: touch; */
+		}
+        #uiContainer {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 3;
+        font-family: monospace;
+        pointer-events: none;
+
+        text-shadow:
+        -1px -1px 0 #FFF,
+            1px -1px 0 #FFF,
+            -1px 1px 0 #FFF,
+            1px 1px 0 #FFF;
+        }
+        #ui {
+        opacity: 0.8;
+        }
+        #ui>div {
+        pointer-events: none;
+        }
+        #ui input, #ui select, #ui option, #ui canvas {
+        pointer-events: auto;
+        }
+		</style>
     </head>
     <body>
-        <canvas id="c" style="width: 80%;"></canvas>
-        <div>
-            <ul>
-                <li>
-                    <a href="./pages/Helloworld/Hello.html">Check WebGL2 </a>
-                </li>
-                <li><a href="./pages/Preview/Preview.html">Shader Preview</a></li>
-                <li><a href="http://code.vtu.life"> Back</a></li>
-            </ul>
-        </div>
         <div id="joy_container" style="position: absolute; left: 10%; top: 60%; width: 200px; height: 200px;z-index: 1;">
-        
+
         </div>
         <div id="container">
             <canvas id="c" style=" width: 100%; height: 100%;"></canvas>
-        
-        
-        
+            
+            
+            
             <script>
-                var BX = document.body.clientWidth * 0.1;
-                var BY = document.body.clientHeight * 0.6;
-                console.log(BX, BY);
-
-                var joystick = new VirtualJoystick({
-                    container: document.getElementById('joy_container'),
-                    mouseSupport: true,
-                    stationaryBase: true,
-                    baseX: 100,
-                    baseY: 100,
-                    limitStickTravel: true,
-                    stickRadius: 50,
-                    biasX: BX,
-                    biasY: BY
-                });
+                    var BX = document.body.clientWidth * 0.1;
+                    var BY = document.body.clientHeight * 0.6;
+                    console.log(BX, BY);
+                    
+                    var joystick = new VirtualJoystick({
+                        container:  document.getElementById('joy_container'),
+                        mouseSupport: true,
+                        stationaryBase: true,
+                                baseX: 100,
+                                baseY: 100,
+                        limitStickTravel: true,
+                        stickRadius: 50,
+                        biasX: BX,
+                        biasY: BY
+                    });
             </script>
+
+            <div id="uiContainer">
+                <div id="ui">
+                    <div id="testUI"></div>
+                </div>
+            </div>
+
+            <script>
+                var display_value = 0;
+                // Setup a ui.
+                webglLessonsUI.setupSlider("#testUI", {value: display_value, slide: updateRotation, min: 0, max: 100});
+
+                function updateRotation(event, ui) {
+                    display_value = ui.value;
+                }
+            </script>
+
+            <div style="position: absolute; right: 3%; bottom: 10%;">
+                <div style="color: pink; text-align: center; width: 300px; margin: 0 auto;">
+                    <p style="font-size: 10px; border: 5px solid">
+                        Camera Navigation Demo
+                    </p>
+                    <p>
+                        WSADEQ -- Front Back Left Right Up Down
+                    </p>
+                    <p>
+                        IKJL/Slide Screen -- Change Sight View
+                    </p>
+                </div>
+                
+                <div style="text-align: center; font-size: 20px;">
+                    <ul>
+                        <li><a href="http://code.vtu.lift/vtu/link_pages/virtualjoystick/index.html">JoyStick</a></li>
+                        <li><a href="http://code.vtu.lift/vtu/link_pages/twgl-cube.html">twgl-cube</a></li>
+                        <li><a href="http://code.vtu.lift/vtu/link_pages/zju_game_course/main.htm">zju_game_course</a></li>
+                        <li><a href="./pages/Helloworld/Hello.html">Check WebGL2 </a></li>
+                        <li><a href="./pages/Flight/Flight.html">Flight</a></li>
+                        <li><a href="./pages/Preview/Preview.html">Shader Preview</a></li>
+                        <li><a href="http://code.vtu.life"> Back</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </body>
 </html>
