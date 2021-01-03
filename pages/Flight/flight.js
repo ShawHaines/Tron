@@ -78,7 +78,7 @@ function euler_matrix(yaw, pitch, roll) {
  */
 const ribbonInterval=1;
 /** maximum number of vertices */
-const maxRibbonLength=1000;
+const maxRibbonLength=100;
 var ribbonCount=0;
 var ribbonLength=0;
 const ribbonWidth=0.1;
@@ -104,23 +104,46 @@ function updateRibbon() {
     // TODO: Improve the efficiency by getting rid of the array.shift().
     let displacement=vec4.fromValues(0,ribbonWidth/2,0,0);
     vec4.transformMat4(displacement,displacement,orientation);
-    // first the left-hand-side, then the rfs.
+    let up = vec3.fromValues(0, 0, -1, 0);
+    vec3.transformMat4(up, up, orientation);
+    // aliases
     let a_position=ribbon.a_position;
-    a_position.push.apply(a_position,vec3.add([], position, displacement));
-    a_position.push.apply(a_position,vec3.subtract([], position, displacement));
-    // indices
+    let a_normal = ribbon.a_normal;
     let indices=ribbon.indices;
-    if (ribbonLength > 0){
-        // left triangle, counter-clockwise.
-        indices.push.apply(indices,[ribbonLength*2,ribbonLength*2-2,ribbonLength*2+1]);
-        // right triangle, ccw
-        indices.push.apply(indices,[ribbonLength*2+1,ribbonLength*2-2,ribbonLength*2-1]);
+    // first the left-hand-side, then the rfs.
+    if (ribbonLength<maxRibbonLength){
+        // not overfloating yet.
+        a_position.push.apply(a_position,vec3.add([], position, displacement));
+        a_position.push.apply(a_position,vec3.subtract([], position, displacement));
+        // indices
+        if (ribbonLength > 0){
+            // left triangle, counter-clockwise.
+            indices.push.apply(indices,[ribbonLength*2,ribbonLength*2-2,ribbonLength*2+1]);
+            // right triangle, ccw
+            indices.push.apply(indices,[ribbonLength*2+1,ribbonLength*2-2,ribbonLength*2-1]);
+        }
+        a_normal.push.apply(a_normal,up);
+        a_normal.push.apply(a_normal,up);
+    } else{
+        // considering the indices, it's better to deal with it like a ring buffer.
+        let a_position=ribbon.a_position;
+        // set a marker
+        ribbonLength=ribbonLength % maxRibbonLength + maxRibbonLength;
+        let index=ribbonLength % maxRibbonLength;
+        let end=[];
+        vec3.add(end,position,displacement);
+        // 3 components for each position and normal.
+        for (let i=index*6,j=0;i<index*6+3;i++,j++){
+            a_position[i]=end[j];
+            a_normal[i]=up[j];
+        }
+        vec3.subtract(end, position, displacement);
+        for (let i=index*6+3,j=0;i<index*6+6;i++,j++){
+            a_position[i]=end[j];
+            a_normal[i]=up[j];
+        }
+        // in theory, you don't have to move the indices.
     }
-    let up=vec3.fromValues(0,0,-1,0);
-    let a_normal=ribbon.a_normal;
-    vec3.transformMat4(up,up,orientation);
-    a_normal.push.apply(a_normal,up);
-    a_normal.push.apply(a_normal,up);
     ribbonLength++;
 }
 
