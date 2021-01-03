@@ -3,7 +3,9 @@
 *********************************************/
 import * as twgl from "../modules/twgl/twgl-full.module.js";
 import {myCamera} from "./interaction.js";
-import {myNode} from './myNode.js';
+import {myNode} from "./myNode.js";
+import {myObject} from "./myObject.js";
+import {Light, pack} from "./light.js";
 import * as texture_shader from "../pages/Preview/src/texture-shader.js";
 import {renderScene} from './renderScene.js';
 const m4 = twgl.m4;
@@ -19,12 +21,18 @@ var g_time; /** global time (keep updated in `render()`) **/
 /********************************************
 * Set up every models (initially)
 *********************************************/
-var objects = []; /**  Wrap every object **/
 
-/** create nodes for objects **/
 var base_node = new myNode();
 var viking_room_node = new myNode();
 var paper_plane_node = new myNode();
+
+/** Wrap up all the objects. 
+ * Add all the things you want to draw into `objects`**/
+var viking_room=new myObject(),paper_plane=new myObject();
+var objects = [viking_room,paper_plane];
+var lights=[];
+var cameras=[];
+//If you want to update them later, use methods like `push()`...
 
 /** Load Textures **/
 const textures = twgl.createTextures(gl, {
@@ -61,29 +69,11 @@ window.onload = function(){
 
 //As long as meshes is downloaded successfully, do the following
 function webGLStart(meshes){
-    var world = m4.identity();
-
-    /** Set relationship of the scene graph **/
-    paper_plane_node.setParent(base_node);
-    viking_room_node.setParent(base_node);
-
-    /** Add all the things you want to draw into `objects`**/
-    objects = [
-        viking_room_node,
-        paper_plane_node,
-    ];
-    //If you want to update them later, use methods like `push()`...
-
-
+    setFrameTree();
     /** Great! Now set every node initially **/
-
-    /** Set base node **/
-    world = m4.identity();
-    world = m4.multiply(world, m4.translation([0, -15, 0]));
-    m4.copy(world, base_node.localMatrix);
-
     
     /** Set viking_room node **/
+    viking_room.node=viking_room_node;
     //Prepare buffer array
     const viking_room_bufferArray = {};
     viking_room_bufferArray.a_position = meshes.viking_room.vertices;
@@ -91,17 +81,11 @@ function webGLStart(meshes){
     viking_room_bufferArray.a_texcoord = meshes.viking_room.textures;
     viking_room_bufferArray.a_normal = meshes.viking_room.vertexNormals;
     const viking_room_bufferInfo = twgl.createBufferInfoFromArrays(gl, viking_room_bufferArray);
-    //Set local matrix
-    world = m4.identity();
-    world = m4.multiply(world, m4.rotationY(-135 * Math.PI / 180));
-    world = m4.multiply(world, m4.rotationX(-90 * Math.PI / 180));
-    m4.scale(world, [30, 30, 30], world);
-    m4.copy(world, viking_room_node.localMatrix);
     //Set node.`drawInfo`
     //uniforms, programInfo, bufferInfo
-    viking_room_node.drawInfo.uniforms.u_texture = textures.viking_room;
-    viking_room_node.drawInfo.programInfo = programInfo;
-    viking_room_node.drawInfo.bufferInfo = viking_room_bufferInfo;
+    viking_room.drawInfo.uniforms.u_texture = textures.viking_room;
+    viking_room.drawInfo.programInfo = programInfo;
+    viking_room.drawInfo.bufferInfo = viking_room_bufferInfo;
     //(optional)If materials are provided (or enabled)
     //Set more details in node.`drawInfo`
     //Also, mark node.drawInfo.`useMTL` = *true*
@@ -119,16 +103,16 @@ function webGLStart(meshes){
             viking_room_bufferInfoByMaterial.push(tmpBufferInfo);
         });
         //add to drawInfo
-        viking_room_node.drawInfo.bufferInfoByMaterial = viking_room_bufferInfoByMaterial;
-        viking_room_node.drawInfo.useMTL = true; //set flag
-        viking_room_node.drawInfo.materialIndices = meshes.viking_room.materialIndices; //set material indices
-        viking_room_node.drawInfo.materialsByIndex = meshes.viking_room.materialsByIndex; //set mtl
-        console.log(viking_room_node);
+        viking_room.drawInfo.bufferInfoByMaterial = viking_room_bufferInfoByMaterial;
+        viking_room.drawInfo.useMTL = true; //set flag
+        viking_room.drawInfo.materialIndices = meshes.viking_room.materialIndices; //set material indices
+        viking_room.drawInfo.materialsByIndex = meshes.viking_room.materialsByIndex; //set mtl
+        console.log(viking_room);
     }
     
     
-
     /** Set paper_plane node **/
+    paper_plane.node=paper_plane_node;
     //Prepare buffer array
     const paper_plane_bufferArray = {};
     paper_plane_bufferArray.a_position = meshes.paper_plane.vertices;
@@ -136,7 +120,45 @@ function webGLStart(meshes){
     paper_plane_bufferArray.a_texcoord = meshes.paper_plane.textures;
     paper_plane_bufferArray.a_normal = meshes.paper_plane.vertexNormals;
     const paper_plane_bufferInfo = twgl.createBufferInfoFromArrays(gl, paper_plane_bufferArray);
-    //Set local matrix
+    
+    //Set node.`drawInfo`
+    //uniforms, programInfo, bufferInfo
+    paper_plane.drawInfo.uniforms.u_texture = textures.paper_plane;
+    paper_plane.drawInfo.programInfo = programInfo;
+    paper_plane.drawInfo.bufferInfo = paper_plane_bufferInfo;
+
+    console.log(meshes);
+    setLights();
+    requestAnimationFrame(render);
+}
+
+function setLights(){
+    let majorLight=new Light();
+    majorLight.node=base_node;
+    lights.push(majorLight);
+    let allLights=pack(lights);
+    // assign the light uniforms to all objects.
+    objects.forEach(function(each){
+        Object.assign(each.drawInfo.uniforms,allLights.uniforms);
+    });
+}
+/** create nodes for objects **/
+function setFrameTree(){
+    /** Set relationship of the scene graph **/
+    paper_plane_node.setParent(base_node);
+    viking_room_node.setParent(base_node);
+
+    /** Set base node **/
+    // world = m4.identity();
+    // world = m4.multiply(world, m4.translation([0, -15, 0]));
+    // m4.copy(world, base_node.localMatrix);
+    //Set local matrix of viking_room.
+    let world = m4.identity();
+    world = m4.multiply(world, m4.rotationY(-135 * Math.PI / 180));
+    world = m4.multiply(world, m4.rotationX(-90 * Math.PI / 180));
+    m4.scale(world, [30, 30, 30], world);
+    m4.copy(world, viking_room_node.localMatrix);
+    //Set local matrix of paper_plane.
     world = m4.identity();
     world = m4.multiply(world, m4.translation([0, 14, 45]));
     world = m4.multiply(world, m4.rotationZ(200 * Math.PI / 180));
@@ -144,36 +166,7 @@ function webGLStart(meshes){
     world = m4.multiply(world, m4.rotationX(25 * Math.PI / 180));
     m4.scale(world, [0.02, 0.02, 0.02], world);
     m4.copy(world, paper_plane_node.localMatrix);
-    //Set node.`drawInfo`
-    //uniforms, programInfo, bufferInfo
-    paper_plane_node.drawInfo.uniforms.u_texture = textures.paper_plane;
-    paper_plane_node.drawInfo.programInfo = programInfo;
-    paper_plane_node.drawInfo.bufferInfo = paper_plane_bufferInfo;
-
-    console.log(meshes);
-    setObjects();
-    requestAnimationFrame(render);
 }
-
-function setObjects(){
-    const defaultUniform={
-        u_lightNumber : 1,
-        u_lightPos :[0, 3, 3],
-        u_ambientLight :[1.0, 1.0, 1.0],
-        u_diffuseLight :[1.0, 1.0, 1.0],
-        u_specularLight :[1.0, 1.0, 1.0],
-        
-        u_shininess : 50,
-        u_ambientStrength : 0.4,
-        u_ambientMaterial :[1.0, 1.0, 1.0],
-        u_diffuseMaterial :[1.0, 1.0, 1.0],
-        u_specularMaterial :[1.0, 1.0, 1.0],
-    }
-    objects.forEach(function(each){
-        Object.assign(each.drawInfo.uniforms,defaultUniform);
-    });
-}
-
 
 /********************************************
 * [Example]: Rotate the paper plane 60 times a second
@@ -206,10 +199,10 @@ function render(time) {
     // gl.enable(gl.CULL_FACE);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-    renderScene(base_node, objects, myCamera);
+    renderScene(base_node, objects, lights, myCamera);
     
     requestAnimationFrame(render);
 }
 
 
-export {twgl, m4, gl};
+export {twgl, m4, gl, myCamera};

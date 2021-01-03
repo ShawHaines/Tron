@@ -1,6 +1,7 @@
+import { updateLights } from './light.js';
 import {twgl, m4, gl} from './main.js'
 
-var renderScene = function(base_node, objects, myCamera){
+var renderScene = function(base_node, objects, lights, myCamera){
         /** Set projection matrix **/
         const fov = 30 * Math.PI / 180;
         const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
@@ -8,21 +9,23 @@ var renderScene = function(base_node, objects, myCamera){
         const zFar = 500;
         const projection = m4.perspective(fov, aspect, zNear, zFar);
 
-        const camera = m4.lookAt(myCamera.Eye, myCamera.Target, myCamera.Up);
-        const view = m4.inverse(camera);
+        // const camera = m4.lookAt(myCamera.Eye, myCamera.Target, myCamera.Up);
+        // const view = m4.inverse(camera);
+        const view = myCamera.viewMatrix;
         const viewProjection = m4.multiply(projection, view);
 
         /** Update world matrix for every node **/
         base_node.updateWorldMatrix();
+        let lightPos=updateLights(lights);
         /** Set default `uniforms` for each element in `objects` **/
         objects.forEach(function(object) {
             let each=object.drawInfo;
-            each.uniforms.u_world = object.worldMatrix;
-            each.uniforms.u_worldViewProjection = m4.multiply(viewProjection, object.worldMatrix);
-            each.uniforms.u_viewPos = myCamera.Eye;
+            each.uniforms.u_world = object.node.worldMatrix;
+            each.uniforms.u_worldViewProjection = m4.multiply(viewProjection, object.node.worldMatrix);
+            each.uniforms.u_viewPos = myCamera.position;
             //default lighting attributes
-            each.uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(object.worldMatrix));
-
+            each.uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(object.node.worldMatrix));
+            each.uniforms.u_lightPos=lightPos;
             let programInfo = each.programInfo;
             let bufferInfo = each.bufferInfo;
             
