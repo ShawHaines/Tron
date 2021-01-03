@@ -17,11 +17,11 @@ var renderScene = function(base_node, objects, myCamera){
         /** Set default `uniforms` for each element in `objects` **/
         objects.forEach(function(object) {
             let each=object.drawInfo;
-            each.uniforms.u_world = object.worldMatrix;
-            each.uniforms.u_worldViewProjection = m4.multiply(viewProjection, object.worldMatrix);
+            each.uniforms.u_world = object.node.worldMatrix;
+            each.uniforms.u_worldViewProjection = m4.multiply(viewProjection, object.node.worldMatrix);
             each.uniforms.u_viewPos = myCamera.Eye;
             //default lighting attributes
-            each.uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(object.worldMatrix));
+            each.uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(object.node.worldMatrix));
 
             let programInfo = each.programInfo;
             let bufferInfo = each.bufferInfo;

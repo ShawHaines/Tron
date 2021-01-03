@@ -7,10 +7,6 @@ class myNode {
     this.children = [];
     this.localMatrix = m4.identity();
     this.worldMatrix = m4.identity();
-    this.drawInfo={
-      uniforms:{},
-      useMTL:false,
-    }
   }
   setParent(parent) {
     // Move from old parent

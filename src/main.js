@@ -3,7 +3,8 @@
 *********************************************/
 import * as twgl from "../modules/twgl/twgl-full.module.js";
 import {myCamera} from "./interaction.js";
-import {myNode} from './myNode.js';
+import {myNode} from "./myNode.js";
+import {myObject} from "./myObject.js";
 import * as texture_shader from "../pages/Preview/src/texture-shader.js";
 import {renderScene} from './renderScene.js';
 const m4 = twgl.m4;
@@ -26,9 +27,10 @@ var paper_plane_node = new myNode();
 
 /** Wrap up all the objects. 
  * Add all the things you want to draw into `objects`**/
+var viking_room=new myObject(),paper_plane=new myObject();
 var objects = [
-    viking_room_node,
-    paper_plane_node,
+    viking_room,
+    paper_plane,
 ];
 //If you want to update them later, use methods like `push()`...
 
@@ -71,6 +73,7 @@ function webGLStart(meshes){
     /** Great! Now set every node initially **/
     
     /** Set viking_room node **/
+    viking_room.node=viking_room_node;
     //Prepare buffer array
     const viking_room_bufferArray = {};
     viking_room_bufferArray.a_position = meshes.viking_room.vertices;
@@ -80,9 +83,9 @@ function webGLStart(meshes){
     const viking_room_bufferInfo = twgl.createBufferInfoFromArrays(gl, viking_room_bufferArray);
     //Set node.`drawInfo`
     //uniforms, programInfo, bufferInfo
-    viking_room_node.drawInfo.uniforms.u_texture = textures.viking_room;
-    viking_room_node.drawInfo.programInfo = programInfo;
-    viking_room_node.drawInfo.bufferInfo = viking_room_bufferInfo;
+    viking_room.drawInfo.uniforms.u_texture = textures.viking_room;
+    viking_room.drawInfo.programInfo = programInfo;
+    viking_room.drawInfo.bufferInfo = viking_room_bufferInfo;
     //(optional)If materials are provided (or enabled)
     //Set more details in node.`drawInfo`
     //Also, mark node.drawInfo.`useMTL` = *true*
@@ -100,15 +103,16 @@ function webGLStart(meshes){
             viking_room_bufferInfoByMaterial.push(tmpBufferInfo);
         });
         //add to drawInfo
-        viking_room_node.drawInfo.bufferInfoByMaterial = viking_room_bufferInfoByMaterial;
-        viking_room_node.drawInfo.useMTL = true; //set flag
-        viking_room_node.drawInfo.materialIndices = meshes.viking_room.materialIndices; //set material indices
-        viking_room_node.drawInfo.materialsByIndex = meshes.viking_room.materialsByIndex; //set mtl
-        console.log(viking_room_node);
+        viking_room.drawInfo.bufferInfoByMaterial = viking_room_bufferInfoByMaterial;
+        viking_room.drawInfo.useMTL = true; //set flag
+        viking_room.drawInfo.materialIndices = meshes.viking_room.materialIndices; //set material indices
+        viking_room.drawInfo.materialsByIndex = meshes.viking_room.materialsByIndex; //set mtl
+        console.log(viking_room);
     }
     
     
     /** Set paper_plane node **/
+    paper_plane.node=paper_plane_node;
     //Prepare buffer array
     const paper_plane_bufferArray = {};
     paper_plane_bufferArray.a_position = meshes.paper_plane.vertices;
@@ -119,9 +123,9 @@ function webGLStart(meshes){
     
     //Set node.`drawInfo`
     //uniforms, programInfo, bufferInfo
-    paper_plane_node.drawInfo.uniforms.u_texture = textures.paper_plane;
-    paper_plane_node.drawInfo.programInfo = programInfo;
-    paper_plane_node.drawInfo.bufferInfo = paper_plane_bufferInfo;
+    paper_plane.drawInfo.uniforms.u_texture = textures.paper_plane;
+    paper_plane.drawInfo.programInfo = programInfo;
+    paper_plane.drawInfo.bufferInfo = paper_plane_bufferInfo;
 
     console.log(meshes);
     setObjects();
