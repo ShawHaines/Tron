@@ -162,9 +162,9 @@ function setObjects(){
         u_ambientLight :[1.0, 1.0, 1.0],
         u_diffuseLight :[1.0, 1.0, 1.0],
         u_specularLight :[1.0, 1.0, 1.0],
+        
         u_shininess : 50,
         u_ambientStrength : 0.4,
-
         u_ambientMaterial :[1.0, 1.0, 1.0],
         u_diffuseMaterial :[1.0, 1.0, 1.0],
         u_specularMaterial :[1.0, 1.0, 1.0],
