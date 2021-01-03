@@ -5,6 +5,7 @@ import * as twgl from "../modules/twgl/twgl-full.module.js";
 import {myCamera} from "./interaction.js";
 import {myNode} from "./myNode.js";
 import {myObject} from "./myObject.js";
+import {Light, pack} from "./light.js";
 import * as texture_shader from "../pages/Preview/src/texture-shader.js";
 import {renderScene} from './renderScene.js';
 const m4 = twgl.m4;
@@ -32,6 +33,7 @@ var objects = [
     viking_room,
     paper_plane,
 ];
+var lights=[];
 //If you want to update them later, use methods like `push()`...
 
 /** Load Textures **/
@@ -128,26 +130,19 @@ function webGLStart(meshes){
     paper_plane.drawInfo.bufferInfo = paper_plane_bufferInfo;
 
     console.log(meshes);
-    setObjects();
+    setLights();
     requestAnimationFrame(render);
 }
 
-function setObjects(){
-    const defaultUniform={
-        u_lightNumber : 1,
-        u_lightPos :[0, 3, 3],
-        u_ambientLight :[1.0, 1.0, 1.0],
-        u_diffuseLight :[1.0, 1.0, 1.0],
-        u_specularLight :[1.0, 1.0, 1.0],
-        
-        u_shininess : 50,
-        u_ambientStrength : 0.4,
-        u_ambientMaterial :[1.0, 1.0, 1.0],
-        u_diffuseMaterial :[1.0, 1.0, 1.0],
-        u_specularMaterial :[1.0, 1.0, 1.0],
-    }
+function setLights(){
+    let majorLight=new Light();
+    majorLight.node=base_node;
+    console.log(majorLight);
+    lights.push(majorLight);
+    let allLights=pack(lights);
+    console.log(allLights);
     objects.forEach(function(each){
-        Object.assign(each.drawInfo.uniforms,defaultUniform);
+        Object.assign(each.drawInfo.uniforms,allLights.uniforms);
     });
 }
 /** create nodes for objects **/
@@ -207,7 +202,7 @@ function render(time) {
     // gl.enable(gl.CULL_FACE);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-    renderScene(base_node, objects, myCamera);
+    renderScene(base_node, objects, lights, myCamera);
     
     requestAnimationFrame(render);
 }
