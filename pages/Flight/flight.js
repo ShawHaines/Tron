@@ -1,14 +1,10 @@
-import { mat4, vec3, vec4 } from "../modules/gl-matrix/src/index.js"
+import { mat4, vec3, vec4 } from "../../modules/gl-matrix/src/index.js"
 
-const pi = 3.1415926;
-/**
- * time interval in miliseconds.
- */
-var interval=30;
 /**
  * The position in world frame.
- * Convention: x points to the nose of the flight,
- * y points vertically up, z is determined by right-hand rule.
+ * Convention: (DIFFERENT from the screen coordinates, but conforms with the navigation convention)
+ * x points to the nose of the flight,
+ * z points vertically down, y is determined by right-hand rule.
  * Unit is approximately MKSA unit (1m). 
  * Note that the planes are miniature planes that flies on a desk.
  * w=1 means point.
@@ -33,6 +29,16 @@ var v = vec4.create();
 var a = vec4.create();
 const amax = 0.1;
 
+/**
+ * time interval in miliseconds.
+ */
+var interval = 30;
+
+
+/** 
+ * A transformation matrix that represents the orientation from world frame to self frame.
+ * @type {mat4} */
+var orientation=mat4.create();
 
 /**
  * Euler Angle, three components are (in order) yaw, pitch, roll.
@@ -60,12 +66,12 @@ var reversePitch=false;
 function euler_matrix(yaw, pitch, roll) {
     // you have to declare one variable before use.
     var R=[];
-    mat4.fromYRotation(R,yaw);
-    mat4.rotateZ(R,R,pitch);
+    mat4.fromZRotation(R,yaw);
+    mat4.rotateY(R,R,pitch);
     mat4.rotateX(R,R,roll);
     return R;
 }
-// console.log(euler_mKatrix(pi/3,0,0));
+
 document.addEventListener("keydown", function (event) {
     switch (event.key) {
         case "a":
@@ -124,12 +130,19 @@ setInterval(function(){
     // TODO: Introduce improved Euler's method, or R-K method.
     let dt=interval/1000;
     // updating all the values, starting from the higher order.
-    vec3.scaleAndAdd(eulerAngle,eulerAngle,omega,dt);
-    let R=euler_matrix(eulerAngle[0],eulerAngle[1],eulerAngle[2]);
+    // let R=euler_matrix(eulerAngle[0],eulerAngle[1],eulerAngle[2]);
+    // vec3.scaleAndAdd(eulerAngle,eulerAngle,omega,dt);
+    let dYaw=0,dPitch=omega[1]*dt,dRoll=omega[2]*dt;
+    let Ry=[],Rx=[];
+    mat4.fromYRotation(Ry,dPitch);
+    mat4.fromXRotation(Rx,dRoll);
+    // FIXME: the order matters! first pitch, then roll. Also note the multiplying order.
+    mat4.multiply(orientation,orientation,Rx);
+    mat4.multiply(orientation, orientation,Ry);
     vec4.scaleAndAdd(u,u,a,dt);
-    vec4.transformMat4(v,u,R);
+    vec4.transformMat4(v,u,orientation);
     vec4.add(position,position,v);
 },interval);
 
 // global variables.
-export {pi,euler_matrix, eulerAngle, position};
+export {euler_matrix, orientation, position};
