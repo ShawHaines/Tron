@@ -142,7 +142,14 @@ function updateRibbon() {
             a_position[i]=end[j];
             a_normal[i]=up[j];
         }
-        // in theory, you don't have to move the indices.
+        // // FIXME: as it turns out, you do have to move one index.
+        let oldIndex=index>0?index-1:maxRibbonLength-1;
+        indices[index*6  ]=2*index;
+        indices[index*6+1]=2*oldIndex;
+        indices[index*6+2]=2*index+1;
+        indices[index*6+3]=2*index+1;
+        indices[index*6+4]=2*oldIndex;
+        indices[index*6+5]=2*oldIndex+1;
     }
     ribbonLength++;
 }
