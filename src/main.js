@@ -104,7 +104,6 @@ function setLights(){
     });
 }
 
-
 /********************************************
 * [Example]: Rotate the paper plane 60 times a second
 *********************************************/
