@@ -72,12 +72,12 @@ void main() {
     vec3 ambient = u_ambientStrength * u_ambientLight[i] * u_ambientMaterial;
     //Diffuse
     // float diff = max(dot(lightDir, normal),0.0);
-    float diff = max(dot(lightDir, normal), -dot(lightDir, normal));
+    float diff = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = u_diffuseLight[i] * u_diffuseMaterial * diff;
     //Specular
     vec3 reflectDir = reflect(-lightDir, normal);
     // float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-    float spec = pow(max(dot(viewDir, reflectDir), -dot(viewDir, reflectDir)), u_shininess);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_shininess);
     vec3 specular = u_specularLight[i] * u_specularMaterial * spec * 0.5;
     // vec3 specular = vec3(0, 0, 0);
 
