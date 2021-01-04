@@ -50,8 +50,8 @@ window.onload = function(){
         },
         {
             name: 'NaturePack_Part1',
-            obj: '/xth/src/resource/uploads_files_2242278_NaturePack/NaturePack_Part1.obj',
-            mtl: '/xth/src/resource/uploads_files_2242278_NaturePack/NaturePack_Part1.mtl',
+            obj: './resource/NaturePack_Part1.obj',
+            mtl: './resource/NaturePack_Part1.mtl',
         },
     ]);
 
