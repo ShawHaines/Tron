@@ -41,7 +41,7 @@ uniform sampler2D u_texture;
 
 // the number of lights in the scene.
 uniform int u_lightNumber;
-uniform vec3 u_lightPos[Max_Light];
+uniform vec4 u_lightPos[Max_Light];
 uniform vec3 u_ambientLight[Max_Light];
 uniform vec3 u_diffuseLight[Max_Light];
 uniform vec3 u_specularLight[Max_Light];
@@ -61,7 +61,11 @@ void main() {
     // float ambientStrength = 0.5; //debug use
     if (i>=u_lightNumber) break;
     vec3 normal = normalize(v_normal);
-    vec3 lightDir = normalize(u_lightPos[i] - v_fragPos);
+    vec3 lightDir;
+    if (u_lightPos[i].w > 0.0)
+        lightDir = normalize(u_lightPos[i].xyz - v_fragPos);
+    else
+        lightDir = normalize(u_lightPos[i].xyz);
     vec3 viewDir = normalize(u_viewPos - v_fragPos);
 
     //Ambient

@@ -97,6 +97,7 @@ function setLights(){
     lights.push(cusLights[0]);
     
     let allLights=pack(lights);
+    console.log(allLights);
     // assign the light uniforms to all objects.
     Object.values(objects).forEach(function(each){
         Object.assign(each.drawInfo.uniforms,allLights.uniforms);
