@@ -1,7 +1,9 @@
 class myObject {
     constructor() {
         this.drawInfo={
-            uniforms : {},
+            uniforms : {
+                u_objectColor: [0, 0, 0, 0],
+            },
             bufferInfo : {},
             programInfo : {},
             useMTL : false,

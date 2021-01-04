@@ -47,13 +47,14 @@ var Camera = function(_pos, _phi, _theta, _up)
    //initialize
    if(_pos)
    {
-        this.pos[0] = _pos[0];
-        this.pos[1] = _pos[1];
-        this.pos[2] = _pos[2];
+        this.position[0] = _pos[0];
+        this.position[1] = _pos[1];
+        this.position[2] = _pos[2];
    }
    if(_phi) this.phi = _phi;
    if(_theta) this.theta = _theta;
    if(_up) this.up = _up;
+   this.updateViewMatrix();
 };
 
 /**
