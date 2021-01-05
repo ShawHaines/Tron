@@ -18,7 +18,7 @@ const fs=`
 precision highp float;
 uniform vec3 objectColor;
 uniform vec3 lightColor;
-uniform vec3 lightPos;
+uniform vec4 lightPos;
 uniform vec3 viewPos;
 
 varying vec3 v_normal;
@@ -27,8 +27,11 @@ void main()
 {
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor;
-
-    vec3 lightDir = normalize(lightPos - fragPos);
+    vec3 lightDir;
+    // point source.
+    if (lightPos.w > 0.0)
+        lightDir=normalize(lightPos.xyz - fragPos);
+    else lightDir=-normalize(lightPos.xyz);
     float diff = max(dot(lightDir, normalize(v_normal)),0.0);
     vec3 diffuse = lightColor * diff;
 

@@ -1,4 +1,4 @@
-import { vec3, vec4 } from "../modules/gl-matrix/src/index.js"
+import { vec4 } from "../modules/gl-matrix/src/index.js"
 
 class Light{
     /**
@@ -9,32 +9,36 @@ class Light{
      */
     constructor(empty){
         empty= empty || false;
-        if (!empty){
-            this.uniforms={
-                // yet to be defined.
-                u_lightNumber: 0,
-                // yet to be defined.
-                u_lightPos: [0,0,0],
-                u_ambientLight: [1.0, 1.0, 1.0],
-                u_diffuseLight: [1.0, 1.0, 1.0],
-                u_specularLight:[1.0, 1.0, 1.0],
-            };
-        } else{
-            this.uniforms={
-                u_lightNumber:0,
-                u_lightPos: [],
-                u_ambientLight: [],
-                u_diffuseLight: [],
-                u_specularLight: [],
-            }
-        }
+        this.uniforms = {
+            // yet to be defined.
+            u_lightNumber: 0,
+            u_lightPos: [],
+            u_ambientLight: [],
+            u_diffuseLight: [],
+            u_specularLight: [],
+        };
         this.node={};
+        if (!empty){
+            /**
+             * yet to be defined. Default is point source(the 4th component is 1).
+             */
+            this.uniforms.u_lightPos= [0,0,0,1];
+            this.uniforms.u_ambientLight= [1.0, 1.0, 1.0];
+            this.uniforms.u_diffuseLight= [1.0, 1.0, 1.0];
+            this.uniforms.u_specularLight=[1.0, 1.0, 1.0];
+        }
     }
-    static lightCount=0;
     updatePosition(){
-        // a point at the origin.
-        let origin=vec4.fromValues(0,0,0,1);
-        vec3.transformMat4(this.uniforms.u_lightPos, origin ,this.node.worldMatrix);
+        if (this.uniforms.u_lightPos[3] > 0){
+            // point source.
+            // a point at the origin.
+            let origin=vec4.fromValues(0,0,0,1);
+            vec4.transformMat4(this.uniforms.u_lightPos, origin ,this.node.worldMatrix);
+        } else{
+            // directional light binds with the x axis of its node.
+            let xAxis=vec4.fromValues(1,0,0,0);
+            vec4.transformMat4(this.uniforms.u_lightPos, xAxis, this.node.worldMatrix);
+        }
     }
 }
 

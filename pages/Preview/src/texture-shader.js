@@ -41,7 +41,7 @@ uniform sampler2D u_texture;
 
 // the number of lights in the scene.
 uniform int u_lightNumber;
-uniform vec3 u_lightPos[Max_Light];
+uniform vec4 u_lightPos[Max_Light];
 uniform vec3 u_ambientLight[Max_Light];
 uniform vec3 u_diffuseLight[Max_Light];
 uniform vec3 u_specularLight[Max_Light];
@@ -61,19 +61,23 @@ void main() {
     // float ambientStrength = 0.5; //debug use
     if (i>=u_lightNumber) break;
     vec3 normal = normalize(v_normal);
-    vec3 lightDir = normalize(u_lightPos[i] - v_fragPos);
+    vec3 lightDir;
+    if (u_lightPos[i].w > 0.0)
+        lightDir = normalize(u_lightPos[i].xyz - v_fragPos);
+    else
+        lightDir = normalize(u_lightPos[i].xyz);
     vec3 viewDir = normalize(u_viewPos - v_fragPos);
 
     //Ambient
     vec3 ambient = u_ambientStrength * u_ambientLight[i] * u_ambientMaterial;
     //Diffuse
     // float diff = max(dot(lightDir, normal),0.0);
-    float diff = max(dot(lightDir, normal), -dot(lightDir, normal));
+    float diff = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = u_diffuseLight[i] * u_diffuseMaterial * diff;
     //Specular
     vec3 reflectDir = reflect(-lightDir, normal);
     // float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-    float spec = pow(max(dot(viewDir, reflectDir), -dot(viewDir, reflectDir)), u_shininess);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_shininess);
     vec3 specular = u_specularLight[i] * u_specularMaterial * spec * 0.5;
     // vec3 specular = vec3(0, 0, 0);
 
