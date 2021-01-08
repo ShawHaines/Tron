@@ -30,7 +30,7 @@ const uniforms = {
     u_objectColor: [0.8, 0.8, 0.5, 1.0],
     // lightColor:[1.0,1.0,1.0],
     u_lightNumber: 2,
-    u_lightPos: [0., 0., 5, 2, 0, 2],
+    u_lightPos: [0., 1, 5, 2, 0, 2],
     u_ambientLight: [1, 1, 1, 0.1, 0.1, 0.1],
     u_diffuseLight: [1, 1, 1, 0.1, 0.1, 0.1],
     u_specularLight: [1, 1, 1, 0.1, 0.1, 0.1],
@@ -123,9 +123,9 @@ function render(time) {
 
     /** Render on depth texture */
     const lightWorldMatrix = m4.lookAt(
-        [0, 0, 5],          // position
+        [0, 1, 5], // position
         [0, 0, 0], // target
-        [0, 1, 0],                                              // up
+        [0, 1, 0], // up
     );
     const lightProjectionMatrix =
         m4.perspective(
@@ -175,7 +175,6 @@ function render(time) {
 
 
 
-    // now draw scene to the canvas projecting the depth texture into the scene
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
