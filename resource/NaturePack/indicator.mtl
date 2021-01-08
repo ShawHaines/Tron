@@ -1,0 +1,22 @@
+# Blender MTL File: 'NaturePack_AllModels.blend'
+# Material Count: 2
+
+newmtl Pointer1_1
+Ns 225.000000
+Ka 0.0 0.0 0.0
+Kd 0.237364 0.113498 0.066876
+Ks 0.05 0.05 0.05
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Pointer1_2
+Ns 225.000000
+Ka 0.0 0.0 0.0
+Kd 0.496927 0.231946 0.133600
+Ks 0.05 0.05 0.05
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
