@@ -141,7 +141,7 @@ function render(time) {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
     var shadow_view_matrix = m4.inverse(lightWorldMatrix);
-    /** 1st cube **/
+    /** 1st cube depth buffer**/
     gl.useProgram(shadowProgramInfo.program);
     world = m4.rotationY(time);
     m4.multiply(m4.translation([0.8, 0, 1]), world, world);
@@ -157,7 +157,7 @@ function render(time) {
 
 
 
-    /** 2nd cube **/
+    /** 2nd cube depth buffer**/
     gl.useProgram(shadowProgramInfo.program);
     world = m4.rotationY(time);
     m4.multiply(m4.translation([-0.8, 0, 2]), world, world);
@@ -178,7 +178,7 @@ function render(time) {
     // now draw scene to the canvas projecting the depth texture into the scene
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     /** Draw 1st cube **/
     gl.useProgram(programInfo.program);
@@ -191,7 +191,7 @@ function render(time) {
 
     twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
     twgl.setUniforms(programInfo, uniforms);
-    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
+    // twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
 
     /** Draw 2nd cube **/
     gl.useProgram(programInfo.program);
@@ -204,7 +204,7 @@ function render(time) {
 
     twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
     twgl.setUniforms(programInfo, uniforms);
-    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
+    // twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
 
     requestAnimationFrame(render);
 }
