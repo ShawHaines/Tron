@@ -6,10 +6,11 @@ import {myCamera} from "./interaction.js";
 import {myNode} from "./myNode.js";
 import {myObject} from "./myObject.js";
 import {Light, pack} from "./light.js";
-import * as texture_shader from "../pages/Preview/src/texture-shader.js";
+// import * as texture_shader from "../pages/Preview/src/texture-shader.js";
+import * as texture_shader from "../../pages/Preview/src/texture-shader.js";
 import {renderScene} from './renderScene.js';
-import {initObjectList, bindObjectsDrawInfo, placeObjects} from './setObjects.js'
-import {initNodeSet, setFrameTree} from './setNodes.js'
+import {initObjectList, bindObjectsWithMeshes} from './setObjects.js'
+import {initNodeSet, setFrameTree, linkObjects} from './setNodes.js'
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
 
@@ -66,11 +67,11 @@ function webGLStart(meshes){
     initObjectList(objects);
     initNodeSet(nodes);
     /** Bind objects with info **/
-    bindObjectsDrawInfo(objects, meshes, textures, programInfo, gl);
+    bindObjectsWithMeshes(objects, meshes, textures, programInfo, gl);
     /** Set up frame trees/node graph **/
     setFrameTree(nodes);
-    /** Bind objects with nodes **/
-    placeObjects(objects, nodes);
+    /** link objects with nodes **/
+    linkObjects(nodes, objects);
     /** Set lights **/
     setLights();
 
@@ -99,8 +100,12 @@ function setLights(){
     let allLights=pack(lights);
     console.log(allLights);
     // assign the light uniforms to all objects.
-    Object.values(objects).forEach(function(each){
-        Object.assign(each.drawInfo.uniforms,allLights.uniforms);
+    Object.values(nodes).forEach(function(each){
+        if(each.type == "OBJECT")
+        {
+            for(var i = 0; i < each.drawInfo.groupNum; i++)
+                Object.assign(each.drawInfo.uniformsList[i], allLights.uniforms);
+        }
     });
 }
 
@@ -136,7 +141,7 @@ function render(time) {
     gl.enable(gl.CULL_FACE);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-    renderScene(nodes.base_node, Object.values(objects), lights, myCamera);
+    renderScene(nodes.base_node, lights, myCamera);
     
     requestAnimationFrame(render);
 }

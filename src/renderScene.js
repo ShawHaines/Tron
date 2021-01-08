@@ -1,7 +1,7 @@
 import { updateLights } from './light.js';
 import {twgl, m4, gl} from './main.js'
 
-var renderScene = function(base_node, objects, lights, myCamera){
+var renderScene = function(base_node, lights, myCamera){
         /** Set projection matrix **/
         const fov = 30 * Math.PI / 180;
         const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
@@ -17,51 +17,47 @@ var renderScene = function(base_node, objects, lights, myCamera){
         /** Update world matrix for every node **/
         base_node.updateWorldMatrix();
         let lightPos=updateLights(lights);
-        /** Set default `uniforms` for each element in `objects` **/
-        objects.forEach(function(object) {
-            let each=object.drawInfo;
-            each.uniforms.u_world = object.node.worldMatrix;
-            each.uniforms.u_worldViewProjection = m4.multiply(viewProjection, object.node.worldMatrix);
-            each.uniforms.u_viewPos = myCamera.position;
-            //default lighting attributes
-            each.uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(object.node.worldMatrix));
-            each.uniforms.u_lightPos=lightPos;
-            let programInfo = each.programInfo;
-            let bufferInfo = each.bufferInfo;
-            
-            /**
-            * 3 important things to do:
-            * program, uniforms, buffer(attributes)
-            **/
-            gl.useProgram(programInfo.program);
-
-            if(each.useMTL) //if materials are specified
+        
+        
+        var drawNode = function(curNode)
+        {
+            if(curNode.type == "OBJECT")
             {
-                var i = 0;
-                for(let materialIndex in each.materialIndices)
+                let drawInfo = curNode.drawInfo; //debug
+                // console.log(curNode)
+                for(var i = 0; i < drawInfo.groupNum; i++) //traverse curNode's draw info
                 {
-                    //Set buffer
-                    twgl.setBuffersAndAttributes(gl, programInfo, each.bufferInfoByMaterial[i]);
-                    //Update material!
-                    each.uniforms.u_ambientMaterial = each.materialsByIndex[i].ambient;
-                    each.uniforms.u_diffuseMaterial = each.materialsByIndex[i].diffuse;
-                    each.uniforms.u_specularMaterial = each.materialsByIndex[i].specular;
-                    twgl.setUniforms(programInfo, each.uniforms);
+                    /**
+                    * 3 important things to do:
+                    * program, uniforms, buffer(attributes)
+                    **/
+                    const uniform = drawInfo.uniformsList[i];
+                    const programInfo = drawInfo.programInfoList[i];
+                    const bufferInfo = drawInfo.bufferInfoList[i];
+                    // const programInfo = drawInfo.programInfo;
+                    // const bufferInfo = drawInfo.bufferInfo;
+
+                    uniform.u_world = curNode.worldMatrix;
+                    uniform.u_worldViewProjection = m4.multiply(viewProjection, curNode.worldMatrix);
+                    uniform.u_viewPos = myCamera.position;
+                    //default lighting attributes
+                    uniform.u_worldInverseTranspose = m4.transpose(m4.inverse(curNode.worldMatrix));
+                    uniform.u_lightPos=lightPos;
+
+                    
+                    gl.useProgram(programInfo.program);
+                    twgl.setUniforms(programInfo, uniform);
+                    twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
                     // **draw**
-                    twgl.drawBufferInfo(gl, each.bufferInfoByMaterial[i], gl.TRIANGLES);
-                    i++;
+                    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES);
                 }
             }
-            else //default
-            {
-                //Set buffer
-                twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
-                //Use default uniforms
-                twgl.setUniforms(programInfo, each.uniforms);       
-                // **draw**
-                twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES);
-            }
-        });
+            curNode.children.forEach(function (child) {
+                drawNode(child);
+            });
+        }
+        //recursively draw from root
+        drawNode(base_node);
 };
 
 export {renderScene}

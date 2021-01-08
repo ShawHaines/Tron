@@ -71,4 +71,71 @@ function setFrameTree(nodes){
     m4.copy(world, nodes.paper_plane_node.localMatrix);
 }
 
-export {initNodeSet, setFrameTree}
+/**
+ * Here you should manually link some nodes to objects
+ * @param{nodes}: all nodes(:{})
+ * @param{objects}: all objects(:{})
+**/
+function linkObjects(nodes, objects){
+    /** link nodes you want to draw with actual objects **/
+    setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
+    setNodeAsObject(nodes.paper_plane_node, objects.paper_plane)
+    setNodeAsObject(nodes.viking_room_node, objects.viking_room)
+}
+
+/**
+ * Internal helper function
+ * set `curNode` as an object (to draw)
+ * copy `curObject`'s info to `curNode`
+**/
+function setNodeAsObject(curNode, curObject)
+{
+    curNode.type = "OBJECT";
+    
+    curNode.drawInfo = {
+        groupNum: 0,
+        programInfoList: [],
+        bufferInfoList: [],
+        uniformsList: [],
+    };
+
+    var curNodeDrawInfo = curNode.drawInfo;
+    
+    if(curObject.useMTL) {
+        var i = 0;
+        // curNodeDrawInfo.bufferInfoList = curObject.bufferInfoByMaterial;
+        for(let materialIndex in curObject.materialIndices)
+        {
+            // curNodeDrawInfo.materialsByIndex.push(curObject.materialsByIndex[i]);
+            curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfoByMaterial[i]);
+            curNodeDrawInfo.programInfoList.push(curObject.programInfo);
+            curNodeDrawInfo.groupNum++;
+            //Set uniform
+            var uniform = {};
+            uniform.u_texture = curObject.textures;
+            uniform.u_objectColor = curObject.objectColor;
+            uniform.u_ambientMaterial = curObject.materialsByIndex[i].ambient;
+            uniform.u_diffuseMaterial = curObject.materialsByIndex[i].diffuse;
+            uniform.u_specularMaterial = curObject.materialsByIndex[i].specular;
+            uniform.u_emissiveMaterial = curObject.materialsByIndex[i].emissive;
+            curNodeDrawInfo.uniformsList.push(uniform);
+            i++;
+        }
+    }
+    else {
+        curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfo);
+        curNodeDrawInfo.programInfoList.push(curObject.programInfo);
+        curNodeDrawInfo.groupNum = 1;
+        var uniform = {};
+        uniform.u_texture = curObject.textures;
+        uniform.u_objectColor = curObject.objectColor;
+        uniform.u_ambientMaterial = [1, 1, 1];
+        uniform.u_diffuseMaterial = [0, 0, 0];
+        uniform.u_specularMaterial = [0, 0, 0];
+        uniform.u_emissiveMaterial = [0, 0, 0];
+        uniform.u_ambientStrength = 0.3;
+        curNodeDrawInfo.uniformsList.push(uniform);
+    }
+}
+
+export {initNodeSet, setFrameTree, linkObjects}
