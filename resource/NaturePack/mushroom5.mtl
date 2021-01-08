@@ -1,0 +1,22 @@
+# Blender MTL File: 'NaturePack_AllModels.blend'
+# Material Count: 2
+
+newmtl Mushroom2_1.001
+Ns 225.000000
+Ka 0.0 0.0 0.0
+Kd 0.800000 0.637302 0.499395
+Ks 0.05 0.05 0.05
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Mushroom2_2
+Ns 225.000000
+Ka 0.0 0.0 0.0
+Kd 0.264431 0.053289 0.046798
+Ks 0.05 0.05 0.05
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
