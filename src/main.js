@@ -6,8 +6,9 @@ import {myCamera} from "./interaction.js";
 import {myNode} from "./myNode.js";
 import {myObject} from "./myObject.js";
 import {Light, pack} from "./light.js";
-// import * as texture_shader from "../pages/Preview/src/texture-shader.js";
-import * as texture_shader from "../../pages/Preview/src/texture-shader.js";
+import * as texture_shader from "../pages/Preview/src/texture-shader.js";
+// import * as texture_shader from "../../pages/Preview/src/texture-shader.js";
+import {models, naturePackModelNames} from "./modelList.js"
 import {renderScene} from './renderScene.js';
 import {initObjectList, bindObjectsWithMeshes} from './setObjects.js'
 import {initNodeSet, setFrameTree, linkObjects} from './setNodes.js'
@@ -39,22 +40,7 @@ const textures = twgl.createTextures(gl, {
 /** Download objects; then call webGLStart() **/
 window.onload = function(){
     /** Load Models **/
-    let p = OBJ.downloadModels([
-        {
-            name: 'viking_room',
-            obj: './resource/viking_room.obj', // located in the models folder on the server
-            mtl: './resource/viking_room.mtl',
-        },
-        {
-            name: 'paper_plane',
-            obj: './resource/paper+airplane.obj',
-        },
-        {
-            name: 'NaturePack_Part1',
-            obj: './resource/NaturePack_Part1.obj',
-            mtl: './resource/NaturePack_Part1.mtl',
-        },
-    ]);
+    let p = OBJ.downloadModels(models);
 
     p.then(models => {
         webGLStart(models);
@@ -100,13 +86,18 @@ function setLights(){
     let allLights=pack(lights);
     console.log(allLights);
     // assign the light uniforms to all objects.
-    Object.values(nodes).forEach(function(each){
-        if(each.type == "OBJECT")
+    var assignLight2Nodes = function(curNode)
+    {
+        if(curNode.type == "OBJECT")
         {
-            for(var i = 0; i < each.drawInfo.groupNum; i++)
-                Object.assign(each.drawInfo.uniformsList[i], allLights.uniforms);
+            for(var i = 0; i < curNode.drawInfo.groupNum; i++)
+                Object.assign(curNode.drawInfo.uniformsList[i], allLights.uniforms);
         }
-    });
+        curNode.children.forEach(function (child) {
+            assignLight2Nodes(child);
+        });
+    }
+    assignLight2Nodes(nodes.base_node);
 }
 
 /********************************************
@@ -147,4 +138,4 @@ function render(time) {
 }
 
 
-export {twgl, m4, gl, myCamera, objects};
+export {twgl, m4, gl, myCamera, objects, naturePackModelNames};
