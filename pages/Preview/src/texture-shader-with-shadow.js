@@ -38,7 +38,7 @@ uniform vec3 u_viewPos; // Viewing position from the eye, already been transform
 uniform vec4 u_objectColor;
 uniform sampler2D u_texture;
 uniform sampler2D u_projectedTexture;
-float u_bias=0.04; //hard-written
+float u_bias=-0.001; //hard-written
 
 // the number of lights in the scene.
 uniform int u_lightNumber;

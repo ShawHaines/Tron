@@ -30,7 +30,7 @@ const uniforms = {
     u_objectColor: [0.8, 0.8, 0.5, 1.0],
     // lightColor:[1.0,1.0,1.0],
     u_lightNumber: 2,
-    u_lightPos: [0., 1, 5, 1, 2, 0, 2, 1],
+    u_lightPos: [0., 1, 5, 0, 2, 0, 2, 1],
     u_ambientLight: [1, 1, 1, 0.1, 0.1, 0.1],
     u_diffuseLight: [1, 1, 1, 0.1, 0.1, 0.1],
     u_specularLight: [1, 1, 1, 0.1, 0.1, 0.1],
@@ -99,6 +99,36 @@ gl.framebufferTexture2D(
     0);                    // mip level
 
 
+function drawScene(time,projection, view, programInfo){
+    gl.useProgram(programInfo.program);
+    // 1st cube.
+    let world = m4.rotationY(time);
+    m4.scale(world, [0.5, 0.5, 0.5], world);
+    m4.translate(world, [0, 0, 1], world);
+    let uniforms={
+        u_world:world,
+        u_worldViewProjection:m4.multiply(projection,m4.multiply(view,world)),
+        u_worldInverseTranspose:m4.transpose(m4.inverse(world)),
+    };
+    twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+    twgl.setUniforms(programInfo,uniforms);
+    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
+
+    /** 2nd cube**/
+    // world = m4.rotationY(time);
+    world = m4.identity();
+    m4.scale(world, [2, 2, 2], world);
+    m4.translate(world, [0, 0, -2], world);
+    uniforms = {
+        u_world: world,
+        u_worldViewProjection: m4.multiply(projection, m4.multiply(view, world)),
+        u_worldInverseTranspose: m4.transpose(m4.inverse(world)),
+    };
+    twgl.setUniforms(programInfo,uniforms);
+    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
+}
+
+
 function render(time) {
     gl.clearColor(0, 0, 0, 1);
     time *= 0.001;
@@ -118,9 +148,6 @@ function render(time) {
     const camera = m4.lookAt(myCamera.Eye, myCamera.Target, myCamera.Up);
     const view = m4.inverse(camera);
     const viewProjection = m4.multiply(projection, view);
-
-    var world = m4.identity();
-
     /** Render on depth texture */
     const lightWorldMatrix = m4.lookAt(
         [0, 1, 5], // position
@@ -137,91 +164,30 @@ function render(time) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
     gl.viewport(0, 0, depthTextureSize, depthTextureSize);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
+    // draw to the texture.
     var shadow_view_matrix = m4.inverse(lightWorldMatrix);
-    /** 1st cube depth buffer**/
     gl.useProgram(shadowProgramInfo.program);
-    world = m4.rotationY(time);
-    m4.scale(world,[0.5,0.5,0.5],world);
-    m4.translate(world,[0, 0, 1],world);
-
-    twgl.setBuffersAndAttributes(gl, shadowProgramInfo, bufferInfo);
-    twgl.setUniforms(shadowProgramInfo, {
-        u_view: shadow_view_matrix,
-        u_projection: lightProjectionMatrix,
-        u_color: [1, 0, 0, 1],
-        u_world: world,
-    });
-    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
-
-
-
-    /** 2nd cube depth buffer**/
-    gl.useProgram(shadowProgramInfo.program);
-    // world = m4.rotationY(time);
-    world = m4.identity();
-    m4.scale(world,[2,2,2],world);
-    m4.translate(world, [0, 0, -2], world);
-
-
-    twgl.setBuffersAndAttributes(gl, shadowProgramInfo, bufferInfo);
-    twgl.setUniforms(shadowProgramInfo, {
-        u_view: shadow_view_matrix,
-        u_projection: lightProjectionMatrix,
-        u_color: [1, 0, 0, 1],
-        u_world: world,
-    });
-    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
-
-
-
-
-
+    drawScene(time,lightProjectionMatrix,m4.inverse(lightWorldMatrix),shadowProgramInfo);
+    
+    // draw to the scene and write something.
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    /** Draw 1st cube **/
-    gl.useProgram(programInfo.program);
-    world = m4.rotationY(time);
-    m4.scale(world,[0.5,0.5,0.5],world);
-    m4.translate(world, [0, 0, 1], world);
-    uniforms.u_world = world;
-    uniforms.u_worldViewProjection = m4.multiply(viewProjection, world);
-    uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(world));
     uniforms.u_viewPos = myCamera.Eye;
     uniforms.u_projectedTexture=depthTexture;
     let textureMatrix = m4.identity();
-    // textureMatrix = m4.translate(textureMatrix, [0.5, 0.5, 0.5]);
-    // textureMatrix = m4.scale(textureMatrix, [0.5, 0.5, 0.5]);
+    // FIXME: Who could have expected that the bug came from here!
+    // make full use of the 4 quadrants. 
+    textureMatrix = m4.translate(textureMatrix, [0.5, 0.5, 0.5]);
+    textureMatrix = m4.scale(textureMatrix, [0.5, 0.5, 0.5]);
     m4.multiply(textureMatrix,lightProjectionMatrix,textureMatrix);
     uniforms.u_textureMatrix = m4.multiply(textureMatrix, m4.inverse(lightWorldMatrix));
     
-
-    twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
-    twgl.setUniforms(programInfo, uniforms);
-    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
-
-    /** Draw 2nd cube **/
     gl.useProgram(programInfo.program);
-    // world = m4.rotationY(time);
-    world = m4.identity();
-    m4.scale(world,[2,2,2],world);
-    m4.translate(world, [0, 0, -2], world);
-    uniforms.u_world = world;
-    uniforms.u_worldViewProjection = m4.multiply(viewProjection, world);
-    uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(world));
-    uniforms.u_viewPos = myCamera.Eye;
-    uniforms.u_projectedTexture = depthTexture;
-    uniforms.u_textureMatrix = m4.multiply(lightProjectionMatrix, m4.inverse(lightWorldMatrix));
-
-
-    twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
     twgl.setUniforms(programInfo, uniforms);
-    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
 
+    drawScene(time,projection,view,programInfo);
     requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
