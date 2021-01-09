@@ -1,16 +1,12 @@
 class myObject {
     constructor() {
-        this.drawInfo={
-            uniforms : {
-                u_objectColor: [0, 0, 0, 0],
-            },
-            bufferInfo : {},
-            programInfo : {},
-            useMTL : false,
-        }
-        this.node = {};
+        //Basic attributes
+        this.bufferInfo = {};
+        this.programInfo = {};
+        //More details
+        this.objectColor = [0, 0, 0, 0];
+        this.useMTL = false;
     }
-    
 }
 
-export {myObject};
+export { myObject };

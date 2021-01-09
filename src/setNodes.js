@@ -1,5 +1,5 @@
 import {myNode} from './myNode.js'
-import {m4} from './main.js'
+import {m4, naturePackModelNames} from './main.js'
 
 
 var initNodeSet = function(nodes)
@@ -14,6 +14,11 @@ var initNodeSet = function(nodes)
     {
         customized_light_nodes.push(new myNode());
     }
+    var random_nature_nodes = []; //randomly generated
+    for(var i = 0; i < 10; i++)
+    {
+        random_nature_nodes.push(new myNode());
+    }
 
     nodes.base_node = base_node;
     nodes.viking_room_node = viking_room_node;
@@ -21,6 +26,7 @@ var initNodeSet = function(nodes)
     nodes.NaturePack_Part1_node = NaturePack_Part1_node;
     nodes.sun_node = sun_node;
     nodes.customized_light_nodes = customized_light_nodes;
+    nodes.random_nature_nodes = random_nature_nodes;
 };
 
 /** create nodes for objects **/
@@ -30,6 +36,10 @@ function setFrameTree(nodes){
     nodes.NaturePack_Part1_node.setParent(nodes.base_node);
     nodes.paper_plane_node.setParent(nodes.base_node);
     nodes.viking_room_node.setParent(nodes.base_node);
+    nodes.random_nature_nodes.forEach(function (tmp) {
+    
+        tmp.setParent(nodes.base_node);
+    });
 
     /** Set Local Matrix **/
     let world = m4.identity();    
@@ -69,6 +79,86 @@ function setFrameTree(nodes){
     world = m4.multiply(world, m4.rotationX(25 * Math.PI / 180));
     m4.scale(world, [0.02, 0.02, 0.02], world);
     m4.copy(world, nodes.paper_plane_node.localMatrix);
+
+    nodes.random_nature_nodes.forEach(function (tmp) {
+        world = m4.identity();
+        world = m4.multiply(world, m4.translation([Math.random() * 200, Math.random() * - 50, Math.random() * 200 - 100]));
+        m4.scale(world, [5, 5, 5], world);
+        m4.copy(world, tmp.localMatrix);
+    });
 }
 
-export {initNodeSet, setFrameTree}
+/**
+ * Here you should manually link some nodes to objects
+ * @param{nodes}: all nodes(:{})
+ * @param{objects}: all objects(:{})
+**/
+function linkObjects(nodes, objects){
+    /** link nodes you want to draw with actual objects **/
+    // setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
+    setNodeAsObject(nodes.paper_plane_node, objects.paper_plane)
+    // setNodeAsObject(nodes.viking_room_node, objects.viking_room)
+    nodes.random_nature_nodes.forEach(function (tmp) {
+        setNodeAsObject(tmp, objects.naturePack[Math.floor(Math.random() * 142)]);
+    });
+}
+
+/**
+ * Internal helper function
+ * set `curNode` as an object (to draw)
+ * copy `curObject`'s info to `curNode`
+**/
+function setNodeAsObject(curNode, curObject)
+{
+    curNode.type = "OBJECT";
+    
+    curNode.drawInfo = {
+        groupNum: 0,
+        programInfoList: [],
+        bufferInfoList: [],
+        uniformsList: [],
+    };
+
+    var curNodeDrawInfo = curNode.drawInfo;
+    
+    if(curObject.useMTL) {
+        var i = 0;
+        // curNodeDrawInfo.bufferInfoList = curObject.bufferInfoByMaterial;
+        for(let materialIndex in curObject.materialIndices)
+        {
+            // curNodeDrawInfo.materialsByIndex.push(curObject.materialsByIndex[i]);
+            curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfoByMaterial[i]);
+            curNodeDrawInfo.programInfoList.push(curObject.programInfo);
+            curNodeDrawInfo.groupNum++;
+            //Set uniform
+            var uniform = {};
+            uniform.u_texture = curObject.textures;
+            uniform.u_objectColor = curObject.objectColor;
+            uniform.u_ambientMaterial = curObject.materialsByIndex[i].ambient;
+            // uniform.u_ambientMaterial = [0, 0, 0];
+            uniform.u_diffuseMaterial = curObject.materialsByIndex[i].diffuse;
+            uniform.u_specularMaterial = curObject.materialsByIndex[i].specular;
+            uniform.u_emissiveMaterial = curObject.materialsByIndex[i].emissive;
+            uniform.u_shininess = 23.0;
+            curNodeDrawInfo.uniformsList.push(uniform);
+            i++;
+        }
+    }
+    else {
+        curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfo);
+        curNodeDrawInfo.programInfoList.push(curObject.programInfo);
+        curNodeDrawInfo.groupNum = 1;
+        var uniform = {};
+        uniform.u_texture = curObject.textures;
+        uniform.u_objectColor = curObject.objectColor;
+        uniform.u_ambientMaterial = [0.3, 0.3, 0.3];
+        uniform.u_diffuseMaterial = [0.3, 0.3, 0.3];
+        uniform.u_specularMaterial = [0.05, 0.05, 0.05];
+        uniform.u_emissiveMaterial = [0, 0, 0];
+        uniform.u_ambientStrength = 0.3;
+        uniform.u_shininess = 32.0;
+        curNodeDrawInfo.uniformsList.push(uniform);
+    }
+}
+
+export {initNodeSet, setFrameTree, linkObjects}

@@ -7,6 +7,7 @@ class myNode {
     this.children = [];
     this.localMatrix = m4.identity();
     this.worldMatrix = m4.identity();
+    this.type = "PIVOT"; //default to PIVOT (connection point)
   }
   setParent(parent) {
     // Move from old parent
