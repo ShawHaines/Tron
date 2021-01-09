@@ -1,0 +1,22 @@
+# Blender MTL File: 'NaturePack_AllModels.blend'
+# Material Count: 2
+
+newmtl Flower1_1.001
+Ns 225.000000
+Ka 0.0 0.0 0.0
+Kd 0.079066 0.250684 0.081373
+Ks 0.05 0.05 0.05
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Flower1_4
+Ns 225.000000
+Ka 0.0 0.0 0.0
+Kd 0.774274 0.579394 0.000000
+Ks 0.05 0.05 0.05
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2

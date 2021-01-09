@@ -1,0 +1,22 @@
+# Blender MTL File: 'NaturePack_AllModels.blend'
+# Material Count: 2
+
+newmtl Tree5_1
+Ns 56.250000
+Ka 0.0 0.0 0.0
+Kd 0.114937 0.062978 0.044999
+Ks 0.05 0.05 0.05
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Tree5_2
+Ns 225.000000
+Ka 0.0 0.0 0.0
+Kd 0.200255 0.407940 0.075344
+Ks 0.05 0.05 0.05
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
