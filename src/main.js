@@ -12,11 +12,14 @@ import {models, naturePackModelNames} from "./modelList.js"
 import {renderScene} from './renderScene.js';
 import {initObjectList, bindObjectsWithMeshes} from './setObjects.js'
 import {initNodeSet, setFrameTree, linkObjects} from './setNodes.js'
+import {renderSky} from './renderSky.js'
+import * as sky_shader from "../pages/Preview/src/sky_shader.js";
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
 
 if (!gl) console.log("Failed");
 const programInfo = twgl.createProgramInfo(gl, [texture_shader.vs, texture_shader.fs]);
+const skyProgramInfo = twgl.createProgramInfo(gl, [sky_shader.vs, sky_shader.fs]);
 
 /** Some global variables **/
 var g_time; /** global time (keep updated in `render()`) **/
@@ -131,11 +134,12 @@ function render(time) {
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    
+    gl.depthFunc(gl.LESS);  // use the default depth test
     renderScene(nodes.base_node, lights, myCamera);
-    
+    gl.depthFunc(gl.LEQUAL);
+    renderSky(myCamera, time);
     requestAnimationFrame(render);
 }
 
 
-export {twgl, m4, gl, myCamera, objects, naturePackModelNames};
+export {twgl, m4, gl, myCamera, objects, naturePackModelNames, skyProgramInfo};
