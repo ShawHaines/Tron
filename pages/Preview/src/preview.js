@@ -30,7 +30,7 @@ const uniforms = {
     u_objectColor: [0.8, 0.8, 0.5, 1.0],
     // lightColor:[1.0,1.0,1.0],
     u_lightNumber: 2,
-    u_lightPos: [0., 1, 5, 2, 0, 2],
+    u_lightPos: [0., 1, 5, 1, 2, 0, 2, 1],
     u_ambientLight: [1, 1, 1, 0.1, 0.1, 0.1],
     u_diffuseLight: [1, 1, 1, 0.1, 0.1, 0.1],
     u_specularLight: [1, 1, 1, 0.1, 0.1, 0.1],
@@ -131,8 +131,8 @@ function render(time) {
         m4.perspective(
             100 * Math.PI / 180,
             1.0 / 1.0,
-            0.5,  // near
-            10)   // far
+            0.2,  // near
+            20)   // far
         ;
     gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
     gl.viewport(0, 0, depthTextureSize, depthTextureSize);
@@ -144,7 +144,8 @@ function render(time) {
     /** 1st cube depth buffer**/
     gl.useProgram(shadowProgramInfo.program);
     world = m4.rotationY(time);
-    m4.multiply(m4.translation([0.8, 0, 1]), world, world);
+    m4.scale(world,[0.5,0.5,0.5],world);
+    m4.translate(world,[0, 0, 1],world);
 
     twgl.setBuffersAndAttributes(gl, shadowProgramInfo, bufferInfo);
     twgl.setUniforms(shadowProgramInfo, {
@@ -159,8 +160,11 @@ function render(time) {
 
     /** 2nd cube depth buffer**/
     gl.useProgram(shadowProgramInfo.program);
-    world = m4.rotationY(time);
-    m4.multiply(m4.translation([-0.8, 0, 2]), world, world);
+    // world = m4.rotationY(time);
+    world = m4.identity();
+    m4.scale(world,[2,2,2],world);
+    m4.translate(world, [0, 0, -2], world);
+
 
     twgl.setBuffersAndAttributes(gl, shadowProgramInfo, bufferInfo);
     twgl.setUniforms(shadowProgramInfo, {
@@ -177,33 +181,46 @@ function render(time) {
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     /** Draw 1st cube **/
     gl.useProgram(programInfo.program);
     world = m4.rotationY(time);
-    m4.multiply(m4.translation([0.8, 0, 1]), world, world);
+    m4.scale(world,[0.5,0.5,0.5],world);
+    m4.translate(world, [0, 0, 1], world);
     uniforms.u_world = world;
     uniforms.u_worldViewProjection = m4.multiply(viewProjection, world);
     uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(world));
     uniforms.u_viewPos = myCamera.Eye;
+    uniforms.u_projectedTexture=depthTexture;
+    let textureMatrix = m4.identity();
+    // textureMatrix = m4.translate(textureMatrix, [0.5, 0.5, 0.5]);
+    // textureMatrix = m4.scale(textureMatrix, [0.5, 0.5, 0.5]);
+    m4.multiply(textureMatrix,lightProjectionMatrix,textureMatrix);
+    uniforms.u_textureMatrix = m4.multiply(textureMatrix, m4.inverse(lightWorldMatrix));
+    
 
     twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
     twgl.setUniforms(programInfo, uniforms);
-    // twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
+    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
 
     /** Draw 2nd cube **/
     gl.useProgram(programInfo.program);
-    world = m4.rotationY(time);
-    m4.multiply(m4.translation([-0.8, 0, -2]), world, world);
+    // world = m4.rotationY(time);
+    world = m4.identity();
+    m4.scale(world,[2,2,2],world);
+    m4.translate(world, [0, 0, -2], world);
     uniforms.u_world = world;
     uniforms.u_worldViewProjection = m4.multiply(viewProjection, world);
     uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(world));
     uniforms.u_viewPos = myCamera.Eye;
+    uniforms.u_projectedTexture = depthTexture;
+    uniforms.u_textureMatrix = m4.multiply(lightProjectionMatrix, m4.inverse(lightWorldMatrix));
+
 
     twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
     twgl.setUniforms(programInfo, uniforms);
-    // twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
+    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
 
     requestAnimationFrame(render);
 }

@@ -6,19 +6,18 @@ const vs = `
     uniform mat4 u_world;
     uniform mat4 u_worldViewProjection; //redundant for efficiency
     uniform mat4 u_worldInverseTranspose; //for calculating v_normal
-    
-    varying vec4 v_position;
+    uniform mat4 u_textureMatrix; //for shadowsmapping texture.
+
     varying vec2 v_texcoord;
-    varying vec4 v_realPosition;
+    varying vec4 v_projectedTexcoord;
 
     varying vec3 v_normal;
     varying vec3 v_fragPos;
 
     void main() {
         v_texcoord = a_texcoord;
-        v_realPosition = a_position;
-        v_position =  u_worldViewProjection * a_position;
-        gl_Position = v_position;
+        gl_Position = u_worldViewProjection * a_position;
+        v_projectedTexcoord= u_textureMatrix * u_world * a_position;
 
         v_normal = mat3(u_worldInverseTranspose) * a_normal; //calculate v_normal
         // v_normal = a_normal; //calculate v_normal
@@ -30,30 +29,30 @@ const fs =
 `precision mediump float;
 const int Max_Light=10;
 varying vec2 v_texcoord;
-varying vec4 v_position;
-varying vec4 v_realPosition;
+varying vec4 v_projectedTexcoord; // for shadow mapping texture
 
 varying vec3 v_normal;
 varying vec3 v_fragPos;
 
+uniform vec3 u_viewPos; // Viewing position from the eye, already been transformed.
 uniform vec4 u_objectColor;
 uniform sampler2D u_texture;
+uniform sampler2D u_projectedTexture;
+float u_bias=0.04; //hard-written
 
 // the number of lights in the scene.
 uniform int u_lightNumber;
-uniform vec3 u_lightPos[Max_Light];
+uniform vec4 u_lightPos[Max_Light];
 uniform vec3 u_ambientLight[Max_Light];
 uniform vec3 u_diffuseLight[Max_Light];
 uniform vec3 u_specularLight[Max_Light];
 
-uniform vec3 u_viewPos;
 uniform float u_ambientStrength;
 uniform float u_shininess;
 uniform vec3 u_ambientMaterial;
 uniform vec3 u_diffuseMaterial;
 uniform vec3 u_specularMaterial;
-
-// uniform sampler2D u_projectedTexture;
+uniform vec3 u_emissiveMaterial;
 
 void main() {
     vec4 result=vec4(0.0);
@@ -62,19 +61,23 @@ void main() {
     // float ambientStrength = 0.5; //debug use
     if (i>=u_lightNumber) break;
     vec3 normal = normalize(v_normal);
-    vec3 lightDir = normalize(u_lightPos[i] - v_fragPos);
+    vec3 lightDir;
+    if (u_lightPos[i].w > 0.0)
+        lightDir = normalize(u_lightPos[i].xyz - v_fragPos);
+    else
+        lightDir = normalize(u_lightPos[i].xyz);
     vec3 viewDir = normalize(u_viewPos - v_fragPos);
 
     //Ambient
     vec3 ambient = u_ambientStrength * u_ambientLight[i] * u_ambientMaterial;
     //Diffuse
     // float diff = max(dot(lightDir, normal),0.0);
-    float diff = max(dot(lightDir, normal), -dot(lightDir, normal));
+    float diff = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = u_diffuseLight[i] * u_diffuseMaterial * diff;
     //Specular
     vec3 reflectDir = reflect(-lightDir, normal);
     // float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-    float spec = pow(max(dot(viewDir, reflectDir), -dot(viewDir, reflectDir)), u_shininess);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_shininess);
     vec3 specular = u_specularLight[i] * u_specularMaterial * spec * 0.5;
     // vec3 specular = vec3(0, 0, 0);
 
@@ -84,6 +87,19 @@ void main() {
     vec4 color = texColor + u_objectColor;
     result+=light*color;
 }
-gl_FragColor = result;
+// shadow mapping
+vec3 projectedTexcoord = v_projectedTexcoord.xyz / v_projectedTexcoord.w;
+float currentDepth = projectedTexcoord.z + u_bias;
+bool inRange=
+    projectedTexcoord.x >=0.0 &&
+    projectedTexcoord.x <=1.0 &&
+    projectedTexcoord.y >=0.0 &&
+    projectedTexcoord.y <=1.0;
+// the 'r' channel has the depth values
+float projectedDepth = texture2D(u_projectedTexture, projectedTexcoord.xy).r;
+// if true, then in the shadows.
+float shadowLight = (inRange && projectedDepth <= currentDepth)?0.0:1.0;
+    
+gl_FragColor = result*shadowLight +vec4(u_emissiveMaterial, 1.0);
 }`;
-export {vs, fs};
+export { vs, fs };
