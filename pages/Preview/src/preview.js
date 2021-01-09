@@ -44,7 +44,7 @@ const uniforms = {
 
 //Set depth texture
 const depthTexture = gl.createTexture();
-const depthTextureSize = 512;
+const depthTextureSize = 1024;
 gl.bindTexture(gl.TEXTURE_2D, depthTexture);
 gl.texImage2D(
     gl.TEXTURE_2D,      // target

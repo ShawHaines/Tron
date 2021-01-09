@@ -56,6 +56,19 @@ uniform vec3 u_emissiveMaterial;
 
 void main() {
     vec4 result=vec4(0.0);
+    // shadow mapping
+    vec3 projectedTexcoord = v_projectedTexcoord.xyz / v_projectedTexcoord.w;
+    float currentDepth = projectedTexcoord.z + u_bias;
+    bool inRange=
+        projectedTexcoord.x >=0.0 &&
+        projectedTexcoord.x <=1.0 &&
+        projectedTexcoord.y >=0.0 &&
+        projectedTexcoord.y <=1.0;
+    // the 'r' channel has the depth values
+    float projectedDepth = texture2D(u_projectedTexture, projectedTexcoord.xy).r;
+    // if true, then the fragment is now in the shadows of the first light.
+    float shadowLight = (inRange && projectedDepth <= currentDepth)?0.0:1.0;
+    
     for (int i=0;i<Max_Light;i++){
     // vec3 lightColor = vec3(1.0, 1.0, 1.0); //debug use
     // float ambientStrength = 0.5; //debug use
@@ -83,23 +96,15 @@ void main() {
 
 
     vec4 texColor = texture2D(u_texture, v_texcoord);
+    // only enables shadow effect on the 0th light, and don't apply to the ambient components.
+    if (i==0){
+        specular*=shadowLight;
+        diffuse*=shadowLight;
+    }
     vec4 light = vec4((ambient + diffuse + specular), 1.0);
     vec4 color = texColor + u_objectColor;
     result+=light*color;
 }
-// shadow mapping
-vec3 projectedTexcoord = v_projectedTexcoord.xyz / v_projectedTexcoord.w;
-float currentDepth = projectedTexcoord.z + u_bias;
-bool inRange=
-    projectedTexcoord.x >=0.0 &&
-    projectedTexcoord.x <=1.0 &&
-    projectedTexcoord.y >=0.0 &&
-    projectedTexcoord.y <=1.0;
-// the 'r' channel has the depth values
-float projectedDepth = texture2D(u_projectedTexture, projectedTexcoord.xy).r;
-// if true, then in the shadows.
-float shadowLight = (inRange && projectedDepth <= currentDepth)?0.0:1.0;
-    
-gl_FragColor = result*shadowLight +vec4(u_emissiveMaterial, 1.0);
+gl_FragColor = result + vec4(u_emissiveMaterial, 1.0);
 }`;
 export { vs, fs };
