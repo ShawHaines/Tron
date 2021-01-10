@@ -158,10 +158,10 @@ function updateRibbon() {
 
 document.addEventListener("keydown", function (event) {
     switch (event.key) {
-        case "a":
+        case "z":
             speedUp();
             break;
-        case "s":
+        case "x":
             speedDown();
             break;
         case "ArrowUp":
@@ -184,7 +184,7 @@ document.addEventListener("keydown", function (event) {
 
 document.addEventListener("keyup",function(event){
     switch (event.key) {
-        case "a":case "s":
+        case "z":case "x":
             resetAcceleration();
             break;
         case "ArrowUp":case "ArrowDown":

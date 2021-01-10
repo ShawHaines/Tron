@@ -10,6 +10,7 @@ import {Light, pack} from "./light.js";
 import * as texture_shader from "../pages/Preview/src/texture-shader-with-shadow.js";
 import * as shadow_shader from '../pages/Preview/src/shadow-shader.js';
 import * as sky_shader from "../pages/Preview/src/sky_shader.js";
+import * as flight from "../pages/Flight/flight.js";
 import {models, naturePackModelNames} from "./modelList.js"
 import {renderScene} from './renderScene.js';
 import { renderShadow } from "./renderShadow.js";
@@ -84,7 +85,7 @@ function webGLStart(meshes){
     /** Set lights **/
     setLights();
 
-    console.log(meshes);
+    // console.log(meshes);
     requestAnimationFrame(main);
     requestAnimationFrame(render);
 }
@@ -155,10 +156,13 @@ function update(time) {
     m4.copy(world, nodes.paper_plane_node.localMatrix);
 
     /** Update the sun light position **/
-    world = m4.identity();
+    world = m4.translation([0,300,0]);
     m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
     m4.copy(world, nodes.sun_node.localMatrix);
-
+    // fighter position update.
+    let fighter = m4.translation(flight.position);
+    m4.multiply(fighter, flight.orientation, fighter);
+    nodes.fighter_base.localMatrix = fighter;
 
     /** Update world matrix for every node **/
     nodes.base_node.updateWorldMatrix();

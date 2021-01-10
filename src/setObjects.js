@@ -23,6 +23,7 @@ var initObjectList = function(objects)
     objects.paper_plane = paper_plane;
     objects.naturePack = naturePack;
     objects.mountain = mountain;
+    objects.fighter = new myObject();
 }
 
 
@@ -32,6 +33,7 @@ var bindObjectsWithMeshes = function(objects, meshes, textures, programInfo, gl)
     const viking_room = objects.viking_room;
     const paper_plane = objects.paper_plane;
     const mountain = objects.mountain;
+    const fighter = objects.fighter;
 
     // var bind = function(curObjectName, curObject)
     // {
@@ -102,13 +104,13 @@ var bindObjectsWithMeshes = function(objects, meshes, textures, programInfo, gl)
         });
         //add
         curObject.bufferInfoByMaterial = curObject_bufferInfoByMaterial; 
-        console.log(curObject);
+        // console.log(curObject);
     }
     bind("NaturePack_Part1", NaturePack_Part1);
     // NaturePack_Part1.objectColor = [1.0, 1.0, 1.0, 1.0];    //(optional)If materials are provided (or enabled)
     bind("viking_room", viking_room);
     bind("paper_plane", paper_plane);
-
+    bind("fighter", fighter);
     var i = 0;
 
     objects.naturePack.forEach(function (tmp) {
