@@ -85,7 +85,7 @@ function webGLStart(meshes){
     setLights();
 
     console.log(meshes);
-    requestAnimationFrame(example);
+    requestAnimationFrame(main);
     requestAnimationFrame(render);
 }
 
@@ -137,7 +137,14 @@ function setCameras(){
 /********************************************
 * [Example]: Rotate the paper plane 60 times a second
 *********************************************/
-var example = function(){
+var main = function(time){
+    update(time);
+    render(time);
+    requestAnimationFrame(main);
+};
+
+function update(time) {
+    /** Rotate the plane **/
     var world = m4.identity();
     world = m4.multiply(world, m4.translation([0, 14, 45]));
     world = m4.multiply(world, m4.rotationX(1.1 * g_time));
@@ -146,9 +153,16 @@ var example = function(){
     world = m4.multiply(world, m4.rotationX(25 * Math.PI / 180));
     m4.scale(world, [0.02, 0.02, 0.02], world);
     m4.copy(world, nodes.paper_plane_node.localMatrix);
-    requestAnimationFrame(example);
-};
 
+    /** Update the sun light position **/
+    world = m4.identity();
+    m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
+    m4.copy(world, nodes.sun_node.localMatrix);
+
+
+    /** Update world matrix for every node **/
+    nodes.base_node.updateWorldMatrix();
+}
 
 /********************************************
 * Render Function
@@ -162,9 +176,6 @@ function render(time) {
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.depthFunc(gl.LESS);  // use the default depth test
-    
-    /** Update world matrix for every node **/
-    nodes.base_node.updateWorldMatrix();
 
     // render the shadow map to texture.
     // By default, only the shadow of light[0] is generated, and it should be a directional light.
@@ -181,7 +192,6 @@ function render(time) {
     renderScene(nodes.base_node, lights, myCamera);
     gl.depthFunc(gl.LEQUAL);
     renderSky(myCamera, time);
-    requestAnimationFrame(render);
 }
 
 
