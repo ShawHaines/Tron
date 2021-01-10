@@ -210,6 +210,7 @@ var resetAcceleration = function(){ a[0]=0 };
 var resetPitch = function(){ omega[1] = 0};
 var resetRoll = function(){omega[2]=0};
 
+// update the plane's orientation and position information.
 setInterval(function(){
     // TODO: Introduce improved Euler's method, or R-K method.
     let dt=interval/1000;

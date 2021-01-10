@@ -7,6 +7,14 @@ class myNode {
     this.children = [];
     this.localMatrix = m4.identity();
     this.worldMatrix = m4.identity();
+    /**
+     * describes the type of the node, possible values are
+     * "PIVOT", dummy node;
+     * "CAMERA", camera;
+     * "LIGHT", light;
+     * "OBJECT", objects.
+     * @type {string}
+     */  
     this.type = "PIVOT"; //default to PIVOT (connection point)
   }
   setParent(parent) {

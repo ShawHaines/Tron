@@ -1,7 +1,6 @@
 import {myNode} from './myNode.js'
 import {m4, naturePackModelNames} from './main.js'
 
-
 var initNodeSet = function(nodes)
 {
     var base_node = new myNode();

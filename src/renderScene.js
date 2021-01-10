@@ -19,8 +19,7 @@ var renderScene = function(base_node, lights, myCamera){
         let lightPos=updateLights(lights);
         
         
-        var drawNode = function(curNode)
-        {
+        var drawNode = function(curNode){
             if(curNode.type == "OBJECT")
             {
                 let drawInfo = curNode.drawInfo; //debug
