@@ -74,6 +74,47 @@ var bindObjectsWithMeshes = function(objects, meshes, textures, programInfo, gl)
     //     }
     // }
 
+    // var bind = function(curObjectName, curObject)
+    // {
+    //     /** Set curObject **/
+    //     //Prepare buffer array
+    //     const curObject_bufferArray = {};
+    //     curObject_bufferArray.a_position = meshes[curObjectName].vertices;
+    //     curObject_bufferArray.indices = meshes[curObjectName].indices;
+    //     if(meshes[curObjectName].textures.length > 0) curObject_bufferArray.a_texcoord = meshes[curObjectName].textures;
+    //     curObject_bufferArray.a_normal = meshes[curObjectName].vertexNormals;
+    //     console.log(curObjectName, curObject_bufferArray)
+    //     const curObject_bufferInfo = twgl.createBufferInfoFromArrays(gl, curObject_bufferArray);
+    //     //Set programInfo, bufferInfo
+    //     curObject.programInfo = programInfo;
+    //     curObject.bufferInfo = curObject_bufferInfo;
+    //     //Set more details
+    //     if(textures[curObjectName])
+    //         curObject.textures = textures[curObjectName];
+    //     else curObject.objectColor = [1.0, 1.0, 1.0, 1.0];
+    //     console.log(curObject);
+    //     //Also, mark `useMTL` = *true*
+    //     if(Object.keys(meshes[curObjectName].materialsByIndex).length > 0)
+    //     {
+    //         //Prepare indices by materials
+    //         const curObject_bufferInfoByMaterial = []; //an array of indices arrays info
+    //         meshes[curObjectName].indicesPerMaterial.forEach(function(object) {
+    //             const curObject_bufferArrayByMaterial = {};
+    //             curObject_bufferArrayByMaterial.a_position = meshes[curObjectName].vertices;
+    //             curObject_bufferArrayByMaterial.indices = object;
+    //             if(meshes[curObjectName].textures.length > 0) curObject_bufferArrayByMaterial.a_texcoord = meshes[curObjectName].textures;
+    //             curObject_bufferArrayByMaterial.a_normal = meshes[curObjectName].vertexNormals;
+    //             const tmpBufferInfo = twgl.createBufferInfoFromArrays(gl, curObject_bufferArrayByMaterial);
+    //             curObject_bufferInfoByMaterial.push(tmpBufferInfo);
+    //         });
+    //         //add
+    //         curObject.bufferInfoByMaterial = curObject_bufferInfoByMaterial;
+    //         curObject.useMTL = true; //set flag
+    //         curObject.materialIndices = meshes[curObjectName].materialIndices; //set material indices
+    //         curObject.materialsByIndex = meshes[curObjectName].materialsByIndex; //set mtl
+    //     }
+    // }
+
     var bind = function(curObjectName, curObject)
     {
         curObject.programInfo = programInfo;
