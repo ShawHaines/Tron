@@ -155,7 +155,7 @@ function update(time) {
     m4.copy(world, nodes.paper_plane_node.localMatrix);
 
     /** Update the sun light position **/
-    world = m4.identity();
+    world = m4.translation([0,300,0]);
     m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
     m4.copy(world, nodes.sun_node.localMatrix);
 
