@@ -38,7 +38,7 @@ var bindObjectsWithMeshes = function(objects, meshes, textures, programInfo, gl)
         curObject_bufferArray.indices = meshes[curObjectName].indices;
         if(meshes[curObjectName].textures.length > 0) curObject_bufferArray.a_texcoord = meshes[curObjectName].textures;
         curObject_bufferArray.a_normal = meshes[curObjectName].vertexNormals;
-        console.log(curObjectName, curObject_bufferArray)
+        // console.log(curObjectName, curObject_bufferArray)
         const curObject_bufferInfo = twgl.createBufferInfoFromArrays(gl, curObject_bufferArray);
         //Set programInfo, bufferInfo
         curObject.programInfo = programInfo;
@@ -47,7 +47,7 @@ var bindObjectsWithMeshes = function(objects, meshes, textures, programInfo, gl)
         if(textures[curObjectName])
             curObject.textures = textures[curObjectName];
         else curObject.objectColor = [1.0, 1.0, 1.0, 1.0];
-        console.log(curObject);
+        // console.log(curObject);
         //Also, mark `useMTL` = *true*
         if(Object.keys(meshes[curObjectName].materialsByIndex).length > 0)
         {
