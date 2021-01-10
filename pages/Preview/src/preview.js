@@ -44,6 +44,7 @@ const uniforms = {
 const depthTextureSize = 1024;
 
 const attachments =[
+    // FIXME: type MUST be set to UNSIGNED_INT! Not UNSIGNED_BYTE!, or just leave twgl with it.
     {format:gl.DEPTH_COMPONENT, type:gl.UNSIGNED_INT, min: gl.LINEAR, wrap:gl.CLAMP_TO_EDGE},
     {}, //default to RGBA, actually it can work withou this excessive texture attachment.
 ];
