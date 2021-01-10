@@ -97,7 +97,7 @@ function linkObjects(nodes, objects){
     /** link nodes you want to draw with actual objects **/
     // setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
     setNodeAsObject(nodes.paper_plane_node, objects.paper_plane)
-    // setNodeAsObject(nodes.viking_room_node, objects.viking_room)
+    setNodeAsObject(nodes.viking_room_node, objects.viking_room)
     nodes.random_nature_nodes.forEach(function (tmp) {
         setNodeAsObject(tmp, objects.naturePack[Math.floor(Math.random() * 142)]);
     });
@@ -133,12 +133,12 @@ function setNodeAsObject(curNode, curObject)
             //Set uniform
             var uniform = {};
             uniform.u_texture = curObject.textures;
-            uniform.u_objectColor = curObject.objectColor;
-            uniform.u_ambientMaterial = curObject.materialsByIndex[i].ambient;
+            if(curObject.objectColor) uniform.u_objectColor = curObject.objectColor;
+            if(curObject.materialsByIndex[i].ambient) uniform.u_ambientMaterial = curObject.materialsByIndex[i].ambient;
             // uniform.u_ambientMaterial = [0, 0, 0];
-            uniform.u_diffuseMaterial = curObject.materialsByIndex[i].diffuse;
-            uniform.u_specularMaterial = curObject.materialsByIndex[i].specular;
-            uniform.u_emissiveMaterial = curObject.materialsByIndex[i].emissive;
+            if(curObject.materialsByIndex[i].diffuse) uniform.u_diffuseMaterial = curObject.materialsByIndex[i].diffuse;
+            if(curObject.materialsByIndex[i].specular) uniform.u_specularMaterial = curObject.materialsByIndex[i].specular;
+            if(curObject.materialsByIndex[i].emissive) uniform.u_emissiveMaterial = curObject.materialsByIndex[i].emissive;
             uniform.u_shininess = 23.0;
             curNodeDrawInfo.uniformsList.push(uniform);
         }
