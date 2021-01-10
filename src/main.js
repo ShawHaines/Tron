@@ -14,6 +14,7 @@ import {initObjectList, bindObjectsWithMeshes} from './setObjects.js'
 import {initNodeSet, setFrameTree, linkObjects} from './setNodes.js'
 import {renderSky} from './renderSky.js'
 import * as sky_shader from "../pages/Preview/src/sky_shader.js";
+import {parseModel} from './objLoader.js'
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
 
@@ -43,15 +44,20 @@ const textures = twgl.createTextures(gl, {
 /** Download objects; then call webGLStart() **/
 window.onload = function(){
     /** Load Models **/
-    let p = OBJ.downloadModels(models);
+    // let p = OBJ.downloadModels(models);
 
-    p.then(models => {
-        webGLStart(models);
-    });
+    // p.then(models => {
+    //     test(models);
+    //     console.log(models);
+    // });
+
+    parseModel(models, webGLStart);
+    
 }
 
 //As long as meshes is downloaded successfully, do the following
 function webGLStart(meshes){
+    console.log(meshes);
     /** Initialize the them! **/
     initObjectList(objects);
     initNodeSet(nodes);

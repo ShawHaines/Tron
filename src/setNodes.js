@@ -124,7 +124,7 @@ function setNodeAsObject(curNode, curObject)
     if(curObject.useMTL) {
         var i = 0;
         // curNodeDrawInfo.bufferInfoList = curObject.bufferInfoByMaterial;
-        for(let materialIndex in curObject.materialIndices)
+        for(i = 0; i < curObject.geoNum; i++)
         {
             // curNodeDrawInfo.materialsByIndex.push(curObject.materialsByIndex[i]);
             curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfoByMaterial[i]);
@@ -141,11 +141,10 @@ function setNodeAsObject(curNode, curObject)
             uniform.u_emissiveMaterial = curObject.materialsByIndex[i].emissive;
             uniform.u_shininess = 23.0;
             curNodeDrawInfo.uniformsList.push(uniform);
-            i++;
         }
     }
     else {
-        curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfo);
+        curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfoByMaterial[0]);
         curNodeDrawInfo.programInfoList.push(curObject.programInfo);
         curNodeDrawInfo.groupNum = 1;
         var uniform = {};
@@ -162,3 +161,58 @@ function setNodeAsObject(curNode, curObject)
 }
 
 export {initNodeSet, setFrameTree, linkObjects}
+
+
+
+// function setNodeAsObject(curNode, curObject)
+// {
+//     curNode.type = "OBJECT";
+    
+//     curNode.drawInfo = {
+//         groupNum: 0,
+//         programInfoList: [],
+//         bufferInfoList: [],
+//         uniformsList: [],
+//     };
+
+//     var curNodeDrawInfo = curNode.drawInfo;
+    
+//     if(curObject.useMTL) {
+//         var i = 0;
+//         // curNodeDrawInfo.bufferInfoList = curObject.bufferInfoByMaterial;
+//         for(let materialIndex in curObject.materialIndices)
+//         {
+//             // curNodeDrawInfo.materialsByIndex.push(curObject.materialsByIndex[i]);
+//             curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfoByMaterial[i]);
+//             curNodeDrawInfo.programInfoList.push(curObject.programInfo);
+//             curNodeDrawInfo.groupNum++;
+//             //Set uniform
+//             var uniform = {};
+//             uniform.u_texture = curObject.textures;
+//             uniform.u_objectColor = curObject.objectColor;
+//             uniform.u_ambientMaterial = curObject.materialsByIndex[i].ambient;
+//             // uniform.u_ambientMaterial = [0, 0, 0];
+//             uniform.u_diffuseMaterial = curObject.materialsByIndex[i].diffuse;
+//             uniform.u_specularMaterial = curObject.materialsByIndex[i].specular;
+//             uniform.u_emissiveMaterial = curObject.materialsByIndex[i].emissive;
+//             uniform.u_shininess = 23.0;
+//             curNodeDrawInfo.uniformsList.push(uniform);
+//             i++;
+//         }
+//     }
+//     else {
+//         curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfo);
+//         curNodeDrawInfo.programInfoList.push(curObject.programInfo);
+//         curNodeDrawInfo.groupNum = 1;
+//         var uniform = {};
+//         uniform.u_texture = curObject.textures;
+//         uniform.u_objectColor = curObject.objectColor;
+//         uniform.u_ambientMaterial = [0.3, 0.3, 0.3];
+//         uniform.u_diffuseMaterial = [0.3, 0.3, 0.3];
+//         uniform.u_specularMaterial = [0.05, 0.05, 0.05];
+//         uniform.u_emissiveMaterial = [0, 0, 0];
+//         uniform.u_ambientStrength = 0.3;
+//         uniform.u_shininess = 32.0;
+//         curNodeDrawInfo.uniformsList.push(uniform);
+//     }
+// }
