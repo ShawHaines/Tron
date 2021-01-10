@@ -154,6 +154,10 @@ const models = [
         obj: './resource/paper+airplane.obj',
     },
     {
+        name: 'fighter',
+        obj: './resource/rff.obj',
+    },
+    {
         name: 'NaturePack_Part1',
         obj: './resource/NaturePack_Part1.obj',
         mtl: './resource/NaturePack_Part1.mtl',
@@ -867,7 +871,7 @@ const models = [
         name: 'wooden_stick3',
         obj: './resource/NaturePack/wooden_stick3.obj',
         mtl: './resource/NaturePack/wooden_stick3.mtl',
-    },    
+    },
 ];
 
 export {models, naturePackModelNames}

@@ -28,6 +28,9 @@ var initNodeSet = function(nodes)
     nodes.customized_light_nodes = customized_light_nodes;
     nodes.random_nature_nodes = random_nature_nodes;
     nodes.mountain_node = mountain_node;
+    // fighter_base is the orientation reference frame, while the fighter needs to do some transformations to fit into the frame.
+    nodes.fighter_base = new myNode();
+    nodes.fighter = new myNode();
 };
 
 /** create nodes for objects **/
@@ -41,6 +44,8 @@ function setFrameTree(nodes){
     nodes.customized_light_nodes.forEach(each => {
         each.setParent(nodes.base_node); 
     });
+    nodes.fighter_base.setParent(nodes.base_node);
+    nodes.fighter.setParent(nodes.fighter_base);
     nodes.random_nature_nodes.forEach(function (tmp) {
         tmp.setParent(nodes.base_node);
     });
@@ -88,6 +93,15 @@ function setFrameTree(nodes){
     m4.scale(world, [0.02, 0.02, 0.02], world);
     m4.copy(world, nodes.paper_plane_node.localMatrix);
 
+    // initial position of the plane.
+    nodes.fighter_base.localMatrix=m4.translation([0,5,0]);
+    
+    //Set local matrix of fighter.
+    world = m4.rotationZ(-Math.PI/2);
+    m4.rotateX(world,-Math.PI/2,world);
+    m4.scale(world,[5,5,5],world);
+    m4.copy(world, nodes.fighter.localMatrix);
+
     nodes.random_nature_nodes.forEach(function (tmp) {
         world = m4.identity();
         world = m4.multiply(world, m4.translation([Math.random() * 200, Math.random() * - 50, Math.random() * 200 - 100]));
@@ -108,13 +122,14 @@ function setFrameTree(nodes){
 **/
 function linkObjects(nodes, objects){
     /** link nodes you want to draw with actual objects **/
-    setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
+    // setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
     setNodeAsObject(nodes.paper_plane_node, objects.paper_plane)
-    setNodeAsObject(nodes.viking_room_node, objects.viking_room)
+    // setNodeAsObject(nodes.viking_room_node, objects.viking_room)
     nodes.random_nature_nodes.forEach(function (tmp) {
         setNodeAsObject(tmp, objects.naturePack[Math.floor(Math.random() * 142)]);
     });
     setNodeAsObject(nodes.mountain_node, objects.mountain);
+    setNodeAsObject(nodes.fighter,objects.fighter);
 }
 
 /**

@@ -55,8 +55,7 @@ class Camera {
         this.viewMatrix = m4.identity();
         // the view matrix, position, etc, are all relative to this
         this.node=new myNode();
-        
-        
+        this.node.type="LIGHT";
         //initialize
         if (_pos) {
             this.position[0] = _pos[0];
