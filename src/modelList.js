@@ -156,6 +156,7 @@ const models = [
     {
         name: 'fighter',
         obj: './resource/rff.obj',
+        mtl: './resource/rff.mtl',
     },
     {
         name: 'NaturePack_Part1',

@@ -99,7 +99,7 @@ function setFrameTree(nodes){
     //Set local matrix of fighter.
     world = m4.rotationZ(-Math.PI/2);
     m4.rotateX(world,-Math.PI/2,world);
-    m4.scale(world,[5,5,5],world);
+    // m4.scale(world,[5,5,5],world);
     m4.copy(world, nodes.fighter.localMatrix);
 
     nodes.random_nature_nodes.forEach(function (tmp) {
@@ -122,9 +122,9 @@ function setFrameTree(nodes){
 **/
 function linkObjects(nodes, objects){
     /** link nodes you want to draw with actual objects **/
-    // setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
+    setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
     setNodeAsObject(nodes.paper_plane_node, objects.paper_plane)
-    // setNodeAsObject(nodes.viking_room_node, objects.viking_room)
+    setNodeAsObject(nodes.viking_room_node, objects.viking_room)
     nodes.random_nature_nodes.forEach(function (tmp) {
         setNodeAsObject(tmp, objects.naturePack[Math.floor(Math.random() * 142)]);
     });
