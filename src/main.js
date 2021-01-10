@@ -2,9 +2,9 @@
 * Head
 *********************************************/
 import * as twgl from "../modules/twgl/twgl-full.module.js";
-import {myCamera} from "./interaction.js";
 import {myNode} from "./myNode.js";
 import {myObject} from "./myObject.js";
+import {Camera} from "./camera.js";
 import {Light, pack} from "./light.js";
 import * as texture_shader from "../pages/Preview/src/texture-shader.js";
 // import * as texture_shader from "../../pages/Preview/src/texture-shader.js";
@@ -29,7 +29,7 @@ var nodes = {};
 var objects = {};
 var lights=[];
 var cameras=[];
-
+var myCamera = new Camera([-200, 100, 20], 80, -23, [0, 1, 0]);
 
 //If you want to update them later, use internal methods...
 
@@ -61,6 +61,7 @@ function webGLStart(meshes){
     setFrameTree(nodes);
     /** link objects with nodes **/
     linkObjects(nodes, objects);
+    setCameras();
     /** Set lights **/
     setLights();
 
@@ -101,6 +102,11 @@ function setLights(){
         });
     }
     assignLight2Nodes(nodes.base_node);
+}
+
+function setCameras(){
+    myCamera.node.setParent(nodes.base_node);
+    cameras.push(myCamera);
 }
 
 /********************************************
