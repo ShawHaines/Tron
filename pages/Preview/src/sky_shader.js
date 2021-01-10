@@ -62,7 +62,7 @@ const fs=`
         for (int i = 0 ; i < 9 ; i++) {
             f += abs(noise(s * P)) / s;
             s *= 2.;
-            P = vec3(.866 * P.x + .5 * P.z, P.y + 100., -.5 * P.x + .866 * P.z);
+            P = vec3(.866 * P.x - .5 * P.z + .3 * P.y, -.866 * P.x - .5 * P.z + .3 * P.y, .866 * P.x -.5 * P.z - .3 * P.y);
             // P = vec3(.866 * P.x + .5 * P.z, P.y + 100., -.5 * P.x + .866 * P.z);
         }
         return f;
@@ -78,7 +78,7 @@ const fs=`
         float x = v_position.x;
         float y = v_position.y;
         vec3 cloudEffect = clouds(v_position.x, v_position.y);
-        color = cloudEffect + vec3(.2, .8, 0.95);
+        color = -0.4 * cloudEffect + vec3(106.0/255.0, 198.0/255.0, 211.0/255.0);
         gl_FragColor = vec4(color, 1.);
    }
 `
