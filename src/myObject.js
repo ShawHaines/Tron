@@ -1,8 +1,8 @@
 class myObject {
     constructor() {
         //Basic attributes
-        this.bufferInfo = {};
-        this.programInfo = {};
+        // this.bufferInfo = {};
+        // this.programInfo = {};
         //More details
         this.objectColor = [0, 0, 0, 0];
         this.useMTL = false;

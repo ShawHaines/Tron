@@ -5,12 +5,15 @@
         <meta name="full-screen" content="yes">
         <meta name="viewport" content="user-scalable=no, width=device-width" />
         <!-- <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"> -->
+        <link rel="stylesheet" href="./navStyle.css">
         <title>CG Project</title>
 
         <script type='text/javascript' src="./src/webgl-obj-loader.js"></script>
-        <script type='text/javascript' src="src/webgl-lessons-ui.js"></script>
+        <script type='text/javascript' src="./src/webgl-lessons-ui.js"></script>
         <script type='text/javascript' src="./src/virtualjoystick.js"></script>
+        <script type='module' src="./src/ui.js"></script>
         <script type="module" src="./src/main.js"></script>
+        <script type="module" src="./src/interaction.js"></script>
 
         <style>
         body {
@@ -28,7 +31,7 @@
 		}
         #uiContainer {
         position: absolute;
-        top: 10px;
+        top: 50px;
         right: 10px;
         z-index: 3;
         font-family: monospace;
@@ -52,13 +55,106 @@
 		</style>
     </head>
     <body>
-        <div id="joy_container" style="position: absolute; left: 10%; top: 60%; width: 200px; height: 200px;z-index: 1;">
+        <!-- Navigation bar -->
+        <header class="nav-container">
+            <h1 class="nav-header">
+                <text class="nav-item is-header-item">Demo</text>
+            </h1>
 
+            <nav class="nav-menu-wrapper">
+                <span class="nav-item is-menu-item menu-icon" onclick="return false;"></span>
+
+                <ul class="nav-menu-list">
+                    <li><button id="pauseButton" class="nav-item" onclick="showMenu();">Show Menu</button></li>
+                    <li><button id="OBJButton" class="nav-item" style="visibility: hidden;" onclick="editOBJSize();">Import</button></li>
+                    <li><button id="lightButton" class="nav-item" style="visibility: hidden;" onclick="editLight();">Edit Light</button></li>
+                </ul>
+
+                <ul class="nav-menu-list">
+                    <!-- <li><a href="https://webgl-shaders.com/about.html" class="nav-item">About</a></li>
+                    <li><a href="https://github.com/jagracar/webgl-shader-examples" class="nav-item"><span class="github-icon"></span>
+                            Github</a></li> -->
+                </ul>
+            </nav>
+        </header>
+
+        <script>
+            window.pauseCond = false;
+            var editLightCond = false;
+            var editOBJSizeCond = false;
+            var showMenu = function()
+            {
+                window.pauseCond = !window.pauseCond;
+                item = document.getElementById('pauseButton');
+                if(window.pauseCond)
+                {
+                    item.innerHTML = "Hide Menu";
+                    document.getElementById('OBJButton').style.visibility = "visible";
+                    document.getElementById('lightButton').style.visibility = "visible";
+                }
+                else
+                {
+                    item.innerHTML = "Show Menu";
+                    document.getElementById('OBJButton').style.visibility = "hidden";
+                    document.getElementById('lightButton').style.visibility = "hidden";
+                }
+            }
+
+            var editLight = function()
+            {
+                editLightCond = !editLightCond;
+                var item = [];
+                item.push(document.getElementById('lightButton'));
+                item.push(document.getElementById('OBJButton'));
+                var ui = [];
+                ui.push(document.getElementById('Light'));
+                ui.push(document.getElementById('OBJ-size'));
+                if(editLightCond)
+                {
+                    editOBJSizeCond = false;
+                    item[1].innerHTML = "Edit OBJ Size";
+                    item[0].innerHTML = "Close";
+                    ui[1].style.visibility = "hidden";
+                    ui[0].style.visibility = "visible";
+                }
+                else
+                {
+                    item[0].innerHTML = "Light";
+                    ui[0].style.visibility = "hidden";
+                }
+            }
+
+            editOBJSize = function()
+            {
+                editOBJSizeCond = !editOBJSizeCond;
+                var item = [];
+                item.push(document.getElementById('lightButton'));
+                item.push(document.getElementById('OBJButton'));
+                var ui = [];
+                ui.push(document.getElementById('Light'));
+                ui.push(document.getElementById('OBJ-size'));
+
+                if(editOBJSizeCond)
+                {
+                    editLightCond = false;
+                    item[0].innerHTML = "Light";
+                    item[1].innerHTML = "Close";
+                    ui[0].style.visibility = "hidden";
+                    ui[1].style.visibility = "visible";
+                }
+                else
+                {
+                    item[1].innerHTML = "Edit OBJ Size";
+                    ui[1].style.visibility = "hidden";
+                }
+            }
+        </script>
+    
+        <div id="joy_container" style="position: absolute; left: 10%; top: 60%; width: 200px; height: 200px;z-index: 1;">
+        
         </div>
         <div id="container">
             <canvas id="c" style=" width: 100%; height: 100%;"></canvas>
-            
-            
             
             <script>
                     var BX = document.body.clientWidth * 0.1;
@@ -80,19 +176,11 @@
 
             <div id="uiContainer">
                 <div id="ui">
-                    <div id="testUI"></div>
+                    <div id="Light" style="visibility: hidden;"></div>
+                    <div id="OBJ-size" style="position: absolute; top: 0px; visibility: none;"></div>
                 </div>
             </div>
 
-            <script>
-                var display_value = 0;
-                // Setup a ui.
-                webglLessonsUI.setupSlider("#testUI", {value: display_value, slide: updateRotation, min: 0, max: 100});
-
-                function updateRotation(event, ui) {
-                    display_value = ui.value;
-                }
-            </script>
 
             <div style="position: absolute; right: 3%; bottom: 10%;">
                 <div style="color: pink; text-align: center; width: 300px; margin: 0 auto;">
@@ -109,10 +197,6 @@
                 
                 <div style="text-align: center; font-size: 20px;">
                     <ul>
-                        <li><a href="http://code.vtu.lift/vtu/link_pages/virtualjoystick/index.html">JoyStick</a></li>
-                        <li><a href="http://code.vtu.lift/vtu/link_pages/twgl-cube.html">twgl-cube</a></li>
-                        <li><a href="http://code.vtu.lift/vtu/link_pages/zju_game_course/main.htm">zju_game_course</a></li>
-                        <li><a href="./pages/Helloworld/Hello.html">Check WebGL2 </a></li>
                         <li><a href="./pages/Flight/Flight.html">Flight</a></li>
                         <li><a href="./pages/Preview/Preview.html">Shader Preview</a></li>
                         <li><a href="http://code.vtu.life"> Back</a></li>

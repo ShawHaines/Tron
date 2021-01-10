@@ -1,7 +1,6 @@
 import {myNode} from './myNode.js'
 import {m4, naturePackModelNames} from './main.js'
 
-
 var initNodeSet = function(nodes)
 {
     var base_node = new myNode();
@@ -19,6 +18,7 @@ var initNodeSet = function(nodes)
     {
         random_nature_nodes.push(new myNode());
     }
+    var mountain_node = new myNode();
 
     nodes.base_node = base_node;
     nodes.viking_room_node = viking_room_node;
@@ -27,6 +27,7 @@ var initNodeSet = function(nodes)
     nodes.sun_node = sun_node;
     nodes.customized_light_nodes = customized_light_nodes;
     nodes.random_nature_nodes = random_nature_nodes;
+    nodes.mountain_node = mountain_node;
 };
 
 /** create nodes for objects **/
@@ -40,6 +41,8 @@ function setFrameTree(nodes){
     
         tmp.setParent(nodes.base_node);
     });
+    nodes.mountain_node.setParent(nodes.base_node);
+    nodes.sun_node.setParent(nodes.base_node);
 
     /** Set Local Matrix **/
     let world = m4.identity();    
@@ -48,9 +51,11 @@ function setFrameTree(nodes){
     // world = m4.multiply(world, m4.translation([0, -15, 0]));
     // m4.copy(world, nodes.base_node.localMatrix);
     
-    //Set local matrix of sun
+    //Set local matrix of sun.
     world = m4.identity();
-    world = m4.multiply(world, m4.translation([0, 80, 80]));
+    m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
+    // m4.rotateY(world, Math.PI/2, world);
+    // world = m4.multiply(world, m4.translation([0, 15, 0]));
     m4.copy(world, nodes.sun_node.localMatrix);
 
     //Set local matrix of customized lights
@@ -86,6 +91,11 @@ function setFrameTree(nodes){
         m4.scale(world, [5, 5, 5], world);
         m4.copy(world, tmp.localMatrix);
     });
+    
+    world = m4.identity();
+    world = m4.multiply(world, m4.translation([-100, 0, 0]));
+    m4.scale(world, [30, 30, 30], world);
+    m4.copy(world, nodes.mountain_node.localMatrix);
 }
 
 /**
@@ -95,12 +105,13 @@ function setFrameTree(nodes){
 **/
 function linkObjects(nodes, objects){
     /** link nodes you want to draw with actual objects **/
-    // setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
+    setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
     setNodeAsObject(nodes.paper_plane_node, objects.paper_plane)
     // setNodeAsObject(nodes.viking_room_node, objects.viking_room)
     nodes.random_nature_nodes.forEach(function (tmp) {
         setNodeAsObject(tmp, objects.naturePack[Math.floor(Math.random() * 142)]);
     });
+    setNodeAsObject(nodes.mountain_node, objects.mountain);
 }
 
 /**
@@ -124,7 +135,7 @@ function setNodeAsObject(curNode, curObject)
     if(curObject.useMTL) {
         var i = 0;
         // curNodeDrawInfo.bufferInfoList = curObject.bufferInfoByMaterial;
-        for(let materialIndex in curObject.materialIndices)
+        for(i = 0; i < curObject.geoNum; i++)
         {
             // curNodeDrawInfo.materialsByIndex.push(curObject.materialsByIndex[i]);
             curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfoByMaterial[i]);
@@ -133,19 +144,18 @@ function setNodeAsObject(curNode, curObject)
             //Set uniform
             var uniform = {};
             uniform.u_texture = curObject.textures;
-            uniform.u_objectColor = curObject.objectColor;
-            uniform.u_ambientMaterial = curObject.materialsByIndex[i].ambient;
+            if(curObject.objectColor) uniform.u_objectColor = curObject.objectColor;
+            if(curObject.materialsByIndex[i].ambient) uniform.u_ambientMaterial = curObject.materialsByIndex[i].ambient;
             // uniform.u_ambientMaterial = [0, 0, 0];
-            uniform.u_diffuseMaterial = curObject.materialsByIndex[i].diffuse;
-            uniform.u_specularMaterial = curObject.materialsByIndex[i].specular;
-            uniform.u_emissiveMaterial = curObject.materialsByIndex[i].emissive;
+            if(curObject.materialsByIndex[i].diffuse) uniform.u_diffuseMaterial = curObject.materialsByIndex[i].diffuse;
+            if(curObject.materialsByIndex[i].specular) uniform.u_specularMaterial = curObject.materialsByIndex[i].specular;
+            if(curObject.materialsByIndex[i].emissive) uniform.u_emissiveMaterial = curObject.materialsByIndex[i].emissive;
             uniform.u_shininess = 23.0;
             curNodeDrawInfo.uniformsList.push(uniform);
-            i++;
         }
     }
     else {
-        curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfo);
+        curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfoByMaterial[0]);
         curNodeDrawInfo.programInfoList.push(curObject.programInfo);
         curNodeDrawInfo.groupNum = 1;
         var uniform = {};
@@ -162,3 +172,58 @@ function setNodeAsObject(curNode, curObject)
 }
 
 export {initNodeSet, setFrameTree, linkObjects}
+
+
+
+// function setNodeAsObject(curNode, curObject)
+// {
+//     curNode.type = "OBJECT";
+    
+//     curNode.drawInfo = {
+//         groupNum: 0,
+//         programInfoList: [],
+//         bufferInfoList: [],
+//         uniformsList: [],
+//     };
+
+//     var curNodeDrawInfo = curNode.drawInfo;
+    
+//     if(curObject.useMTL) {
+//         var i = 0;
+//         // curNodeDrawInfo.bufferInfoList = curObject.bufferInfoByMaterial;
+//         for(let materialIndex in curObject.materialIndices)
+//         {
+//             // curNodeDrawInfo.materialsByIndex.push(curObject.materialsByIndex[i]);
+//             curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfoByMaterial[i]);
+//             curNodeDrawInfo.programInfoList.push(curObject.programInfo);
+//             curNodeDrawInfo.groupNum++;
+//             //Set uniform
+//             var uniform = {};
+//             uniform.u_texture = curObject.textures;
+//             uniform.u_objectColor = curObject.objectColor;
+//             uniform.u_ambientMaterial = curObject.materialsByIndex[i].ambient;
+//             // uniform.u_ambientMaterial = [0, 0, 0];
+//             uniform.u_diffuseMaterial = curObject.materialsByIndex[i].diffuse;
+//             uniform.u_specularMaterial = curObject.materialsByIndex[i].specular;
+//             uniform.u_emissiveMaterial = curObject.materialsByIndex[i].emissive;
+//             uniform.u_shininess = 23.0;
+//             curNodeDrawInfo.uniformsList.push(uniform);
+//             i++;
+//         }
+//     }
+//     else {
+//         curNodeDrawInfo.bufferInfoList.push(curObject.bufferInfo);
+//         curNodeDrawInfo.programInfoList.push(curObject.programInfo);
+//         curNodeDrawInfo.groupNum = 1;
+//         var uniform = {};
+//         uniform.u_texture = curObject.textures;
+//         uniform.u_objectColor = curObject.objectColor;
+//         uniform.u_ambientMaterial = [0.3, 0.3, 0.3];
+//         uniform.u_diffuseMaterial = [0.3, 0.3, 0.3];
+//         uniform.u_specularMaterial = [0.05, 0.05, 0.05];
+//         uniform.u_emissiveMaterial = [0, 0, 0];
+//         uniform.u_ambientStrength = 0.3;
+//         uniform.u_shininess = 32.0;
+//         curNodeDrawInfo.uniformsList.push(uniform);
+//     }
+// }
