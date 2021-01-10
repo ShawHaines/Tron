@@ -14,14 +14,12 @@ if (!ext) {
 const programInfo = twgl.createProgramInfo(gl, [texture_shader.vs, texture_shader.fs]);
 const shadowProgramInfo = twgl.createProgramInfo(gl, [shadow_shader.shadow_vs, shadow_shader.shadow_fs])
 
-//Both ways work fine!
 const arrays = {
     a_position: [1, 1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1],
     a_normal: [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1],
     // texcoord: [1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
     indices: [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23],
 };
-// const arrays = twgl.primitives.createCubeVertices(2);
 const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
 console.log(arrays)
 console.log(bufferInfo)
@@ -43,60 +41,15 @@ const uniforms = {
 
 
 //Set depth texture
-const depthTexture = gl.createTexture();
 const depthTextureSize = 1024;
-gl.bindTexture(gl.TEXTURE_2D, depthTexture);
-gl.texImage2D(
-    gl.TEXTURE_2D,      // target
-    0,                  // mip level
-    gl.DEPTH_COMPONENT, // internal format
-    depthTextureSize,   // width
-    depthTextureSize,   // height
-    0,                  // border
-    gl.DEPTH_COMPONENT, // format
-    gl.UNSIGNED_INT,    // type
-    null);              // data
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-const depthFramebuffer = gl.createFramebuffer();
-gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
-gl.framebufferTexture2D(
-    gl.FRAMEBUFFER,       // target
-    gl.DEPTH_ATTACHMENT,  // attachment point
-    gl.TEXTURE_2D,        // texture target
-    depthTexture,         // texture
-    0);                   // mip level
-
-// create a color texture of the same size as the depth texture
-// see article why this is needed_
-const unusedTexture = gl.createTexture();
-gl.bindTexture(gl.TEXTURE_2D, unusedTexture);
-gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    depthTextureSize,
-    depthTextureSize,
-    0,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    null,
-);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-// attach it to the framebuffer
-gl.framebufferTexture2D(
-    gl.FRAMEBUFFER,        // target
-    gl.COLOR_ATTACHMENT0,  // attachment point
-    gl.TEXTURE_2D,         // texture target
-    unusedTexture,         // texture
-    0);                    // mip level
+const attachments =[
+    {format:gl.DEPTH_COMPONENT, type:gl.UNSIGNED_INT, min: gl.LINEAR, wrap:gl.CLAMP_TO_EDGE},
+    {}, //default to RGBA, actually it can work withou this excessive texture attachment.
+];
+const depthFramebufferInfo = twgl.createFramebufferInfo(gl,attachments,depthTextureSize,depthTextureSize);
+// console.log("attachments",attachments);
+// console.log(depthFramebufferInfo);
 
 
 function drawScene(time,projection, view, programInfo){
@@ -161,8 +114,8 @@ function render(time) {
             0.2,  // near
             20)   // far
         ;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
-    gl.viewport(0, 0, depthTextureSize, depthTextureSize);
+    // bind framebuffer is simplified, this function sets the viewport automatically.
+    twgl.bindFramebufferInfo(gl, depthFramebufferInfo);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     // draw to the texture.
     var shadow_view_matrix = m4.inverse(lightWorldMatrix);
@@ -170,12 +123,12 @@ function render(time) {
     drawScene(time,lightProjectionMatrix,m4.inverse(lightWorldMatrix),shadowProgramInfo);
     
     // draw to the scene and write something.
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    twgl.bindFramebufferInfo(gl);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     uniforms.u_viewPos = myCamera.Eye;
-    uniforms.u_projectedTexture=depthTexture;
+    // attachments[0] is the depth component.
+    uniforms.u_projectedTexture=depthFramebufferInfo.attachments[0];
     let textureMatrix = m4.identity();
     // FIXME: Who could have expected that the bug came from here!
     // make full use of the 4 quadrants. 
