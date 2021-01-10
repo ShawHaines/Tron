@@ -106,6 +106,9 @@ function setLights(){
 
 function setCameras(){
     myCamera.node.setParent(nodes.base_node);
+    // set aspect ratio according to the size of the canvas.
+    myCamera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    myCamera.updateProjectionMatrix();
     cameras.push(myCamera);
 }
 

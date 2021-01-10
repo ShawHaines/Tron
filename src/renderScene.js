@@ -1,16 +1,17 @@
-import { updateLights } from './light.js';
+import { updateLights,Light } from './light.js';
 import {twgl, m4, gl} from './main.js'
+import {Camera} from './camera.js';
+import { myNode } from './myNode.js';
 
+/**
+ * renderScene.
+ *
+ * @param {myNode} base_node
+ * @param {[Light]} lights
+ * @param {Camera} myCamera
+ */
 var renderScene = function(base_node, lights, myCamera){
-        /** Set projection matrix **/
-        const fov = 30 * Math.PI / 180;
-        const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-        const zNear = 0.5;
-        const zFar = 500;
-        const projection = m4.perspective(fov, aspect, zNear, zFar);
-
-        // const camera = m4.lookAt(myCamera.Eye, myCamera.Target, myCamera.Up);
-        // const view = m4.inverse(camera);
+        const projection=myCamera.projection;
         const view = myCamera.viewMatrix;
         const viewProjection = m4.multiply(projection, view);
 

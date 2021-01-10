@@ -1,4 +1,5 @@
 import {m4} from '../modules/twgl/twgl-full.module.js'
+import { twgl } from './main.js';
 import { myNode } from './myNode.js';
 
 
@@ -43,6 +44,14 @@ class Camera {
         * -Posx -Posy -Posz 1
         * @type {mat4}
         */
+        /** Set projection matrix **/
+        this.fov = 30 * Math.PI / 180;
+        // should be reset in main.
+        this.aspect = 1.0;
+        this.zNear = 0.5;
+        this.zFar = 500;
+        // should be updated as soon as aspect is correctly set.
+        this.projection = m4.identity();
         this.viewMatrix = m4.identity();
         // the view matrix, position, etc, are all relative to this
         this.node=new myNode();
@@ -154,6 +163,10 @@ class Camera {
     */
     viewDir() {
         return [-this.viewMatrix[2], -this.viewMatrix[6], -this.viewMatrix[10]];
+    }
+    updateProjectionMatrix(){
+        this.projection = m4.perspective(this.fov, this.aspect, this.zNear, this.zFar);
+        return this.projection;
     }
 }
 
