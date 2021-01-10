@@ -34,11 +34,14 @@ var initNodeSet = function(nodes)
 function setFrameTree(nodes){
 
     /** Set relationship of the scene graph **/
-    nodes.NaturePack_Part1_node.setParent(nodes.base_node);
-    nodes.paper_plane_node.setParent(nodes.base_node);
     nodes.viking_room_node.setParent(nodes.base_node);
+    nodes.paper_plane_node.setParent(nodes.base_node);
+    nodes.NaturePack_Part1_node.setParent(nodes.base_node);
+    nodes.sun_node.setParent(nodes.base_node);
+    nodes.customized_light_nodes.forEach(each => {
+        each.setParent(nodes.base_node); 
+    });
     nodes.random_nature_nodes.forEach(function (tmp) {
-    
         tmp.setParent(nodes.base_node);
     });
     nodes.mountain_node.setParent(nodes.base_node);
@@ -53,9 +56,9 @@ function setFrameTree(nodes){
     
     //Set local matrix of sun.
     world = m4.identity();
-    m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
-    // m4.rotateY(world, Math.PI/2, world);
-    // world = m4.multiply(world, m4.translation([0, 15, 0]));
+    // FIXME: The order of the multiplication is still confusing.
+    world = m4.multiply(world, m4.translation([0, 300, 0]));
+    m4.rotateX(world,-Math.PI/2,world);
     m4.copy(world, nodes.sun_node.localMatrix);
 
     //Set local matrix of customized lights

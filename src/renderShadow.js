@@ -1,8 +1,7 @@
 import { updateLights, Light } from './light.js';
-import { twgl, m4, gl } from './main.js'
+import { twgl, m4, gl, shadowProgramInfo } from './main.js'
 import { Camera } from './camera.js';
 import { myNode } from './myNode.js';
-import {shadowProgramInfo} from './main.js';
 /**
  * renderShadow.
  * @param {myNode} base_node
@@ -10,8 +9,8 @@ import {shadowProgramInfo} from './main.js';
  */
 var renderShadow = function (base_node, lights) {
     // the sidelength of the area that is lit
-    let sideLength = 10;
-    let lightProjectionMatrix = m4.ortho(-sideLength / 2, sideLength / 2, -sideLength / 2, sideLength / 2, 1, 20);
+    let sideLength = 300;
+    let lightProjectionMatrix = m4.ortho(-sideLength / 2, sideLength / 2, -sideLength / 2, sideLength / 2, 5, 500);
     let lightWorldMatrix=lights[0].node.worldMatrix;
     let viewProjection=m4.multiply(lightProjectionMatrix,m4.inverse(lightWorldMatrix));
     //recursively draw from root.

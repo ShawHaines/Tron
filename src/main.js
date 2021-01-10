@@ -84,7 +84,7 @@ function webGLStart(meshes){
     /** Set lights **/
     setLights();
 
-    console.log(meshes);
+    // console.log(meshes);
     requestAnimationFrame(main);
     requestAnimationFrame(render);
 }
