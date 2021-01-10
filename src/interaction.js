@@ -1,10 +1,7 @@
 /********************************************
 * Interaction Control
 *********************************************/
-
-import {Camera} from './camera.js';
-
-var myCamera = new Camera([-200, 100, 20], 80, -23, [0, 1, 0]);
+import {myCamera} from "./main.js";
 
 /* mouse, keyboard, and virtual joystick support */
 document.addEventListener("keydown", function (event) {
@@ -59,12 +56,10 @@ document.getElementById("c").onmousemove = function(e) {
     var moveY = e.pageY - mouseY;
     mouseX = e.pageX;
     mouseY = e.pageY;
-
     if(mouseDownFlag) {
-        myCamera.moveView(-moveX * 0.05, moveY * 0.05);
         // console.log("Mousemove:", myCamera.viewMatrix);
+        myCamera.moveView(-moveX * 0.05, moveY * 0.05);
     }
-
 }
 
 document.getElementById("c").onmouseup = function(e) {
@@ -134,5 +129,3 @@ document.getElementById("c").ontouchmove = function(e) {
         // myCamera.watchLeft();
         myCamera.moveView(-touchMoveX * 0.05, touchMoveY * 0.05);
 }
-
-export {myCamera};

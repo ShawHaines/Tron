@@ -35,8 +35,8 @@ class Light{
             let origin=vec4.fromValues(0,0,0,1);
             vec4.transformMat4(this.uniforms.u_lightPos, origin ,this.node.worldMatrix);
         } else{
-            // directional light binds with the x axis of its node.
-            let xAxis=vec4.fromValues(1,0,0,0);
+            // directional light binds with the z axis of its node.
+            let xAxis=vec4.fromValues(0,0,1,0);
             vec4.transformMat4(this.uniforms.u_lightPos, xAxis, this.node.worldMatrix);
         }
     }
