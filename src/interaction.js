@@ -57,7 +57,7 @@ document.getElementById("c").onmousemove = function(e) {
     mouseX = e.pageX;
     mouseY = e.pageY;
     if(mouseDownFlag) {
-        console.log("Mousemove:", myCamera.viewMatrix);
+        // console.log("Mousemove:", myCamera.viewMatrix);
         myCamera.moveView(-moveX * 0.05, moveY * 0.05);
     }
 }

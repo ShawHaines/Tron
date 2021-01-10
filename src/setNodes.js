@@ -47,9 +47,10 @@ function setFrameTree(nodes){
     // world = m4.multiply(world, m4.translation([0, -15, 0]));
     // m4.copy(world, nodes.base_node.localMatrix);
     
-    //Set local matrix of sun
+    //Set local matrix of sun.
     world = m4.identity();
-    world = m4.multiply(world, m4.translation([0, 80, 80]));
+    m4.rotateX(world,-Math.PI/2,world);
+    world = m4.multiply(world, m4.translation([0, 15, 0]));
     m4.copy(world, nodes.sun_node.localMatrix);
 
     //Set local matrix of customized lights
