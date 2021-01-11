@@ -2,7 +2,7 @@ import * as twgl from "../../../modules/twgl/twgl-full.module.js";
 import { myCamera } from "./interaction.js";
 import * as texture_shader from "./texture-shader-with-shadow.js"
 import * as shadow_shader from "./shadow-shader.js"
-
+import * as transparent_shader from "./transparent-shader.js";
 
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
@@ -13,7 +13,7 @@ if (!ext) {
 }
 const programInfo = twgl.createProgramInfo(gl, [texture_shader.vs, texture_shader.fs]);
 const shadowProgramInfo = twgl.createProgramInfo(gl, [shadow_shader.shadow_vs, shadow_shader.shadow_fs])
-
+const transparentProgramInfo=twgl.createProgramInfo(gl,[transparent_shader.vs,transparent_shader.fs]);
 const arrays = {
     a_position: [1, 1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1],
     a_normal: [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1],
@@ -22,7 +22,7 @@ const arrays = {
 };
 const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
 console.log(arrays)
-console.log(bufferInfo)
+console.log("bufferInfo: ",bufferInfo)
 
 const uniforms = {
     u_objectColor: [0.8, 0.8, 0.5, 1.0],
@@ -37,7 +37,13 @@ const uniforms = {
     u_ambientMaterial: [0.8, 0.8, 0.5],
     u_diffuseMaterial: [0.8, 0.8, 0.5],
     u_specularMaterial: [1, 1, 1],
+    u_glowColor:[0.0,1,1],
 };
+let sphereBufferInfo=twgl.primitives.createSphereBufferInfo(gl,0.5,20,20);
+// so f**king inconvenient...
+sphereBufferInfo.attribs.a_position=sphereBufferInfo.attribs.position;
+sphereBufferInfo.attribs.a_normal=sphereBufferInfo.attribs.normal;
+console.log("sphere:",sphereBufferInfo);
 
 
 //Set depth texture
@@ -53,14 +59,15 @@ const depthFramebufferInfo = twgl.createFramebufferInfo(gl,attachments,depthText
 // console.log(depthFramebufferInfo);
 
 
-function drawScene(time,projection, view, programInfo){
+function drawScene(time, projection, view, programInfo){
     gl.useProgram(programInfo.program);
     // 1st cube.
-    let world = m4.rotationY(time);
-    m4.scale(world, [0.5, 0.5, 0.5], world);
-    m4.translate(world, [0, 0, 1], world);
+    let world = m4.identity();
+    m4.scale(world, [2, 2, 2], world);
+    m4.translate(world, [0, 0, -2], world);
     let uniforms={
         u_world:world,
+        u_worldView:m4.multiply(view,world),
         u_worldViewProjection:m4.multiply(projection,m4.multiply(view,world)),
         u_worldInverseTranspose:m4.transpose(m4.inverse(world)),
     };
@@ -68,17 +75,36 @@ function drawScene(time,projection, view, programInfo){
     twgl.setUniforms(programInfo,uniforms);
     twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
 
-    /** 2nd cube**/
-    // world = m4.rotationY(time);
-    world = m4.identity();
-    m4.scale(world, [2, 2, 2], world);
-    m4.translate(world, [0, 0, -2], world);
+    // sphere
+    twgl.setBuffersAndAttributes(gl, programInfo, sphereBufferInfo);
+    world=m4.identity();
+    m4.scale(world,[0.5,0.5,0.5],world);
+    m4.translate(world,[0,0,3],world);
     uniforms = {
         u_world: world,
+        u_worldView: m4.multiply(view, world),
         u_worldViewProjection: m4.multiply(projection, m4.multiply(view, world)),
         u_worldInverseTranspose: m4.transpose(m4.inverse(world)),
     };
-    twgl.setUniforms(programInfo,uniforms);
+    twgl.setUniforms(programInfo, uniforms);
+    twgl.drawBufferInfo(gl,sphereBufferInfo, gl.TRIANGLES, sphereBufferInfo.numelements);
+}
+
+function drawTransparent(time, projection, view, programInfo){
+    gl.useProgram(programInfo.program);
+    /** 2nd cube**/
+    // world = m4.rotationY(time);
+    let world = m4.rotationY(time);
+    m4.scale(world, [0.5, 0.5, 0.5], world);
+    m4.translate(world, [0, 0, 1], world);
+    twgl.setBuffersAndAttributes(gl,programInfo,bufferInfo);
+    let uniforms = {
+        u_world: world,
+        u_worldView: m4.multiply(view,world),
+        u_worldViewProjection: m4.multiply(projection, m4.multiply(view, world)),
+        u_worldInverseTranspose: m4.transpose(m4.inverse(world)),
+    };
+    twgl.setUniforms(programInfo, uniforms);
     twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES, bufferInfo.numelements);
 }
 
@@ -115,11 +141,11 @@ function render(time) {
             0.2,  // near
             20)   // far
         ;
+    gl.disable(gl.BLEND);
     // bind framebuffer is simplified, this function sets the viewport automatically.
     twgl.bindFramebufferInfo(gl, depthFramebufferInfo);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     // draw to the texture.
-    var shadow_view_matrix = m4.inverse(lightWorldMatrix);
     gl.useProgram(shadowProgramInfo.program);
     drawScene(time,lightProjectionMatrix,m4.inverse(lightWorldMatrix),shadowProgramInfo);
     
@@ -142,6 +168,15 @@ function render(time) {
     twgl.setUniforms(programInfo, uniforms);
 
     drawScene(time,projection,view,programInfo);
+    
+    // draw the transparent objects.
+    gl.enable(gl.BLEND); // blending
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.depthMask(false); //lock the depth writing
+    gl.useProgram(transparentProgramInfo.program);
+    twgl.setUniforms(transparentProgramInfo,uniforms);
+    drawTransparent(time, projection, view, transparentProgramInfo);
+    gl.depthMask(true);
     requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
