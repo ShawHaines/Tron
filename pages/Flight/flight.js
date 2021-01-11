@@ -42,6 +42,7 @@ var orientation=mat4.create();
 
 /**
  * Euler Angle, three components are (in order) yaw, pitch, roll.
+ * Redundant with orientation, but provides more flexibility.
  * @type {vec3}
  */
 var eulerAngle = vec3.fromValues(0,0,0);
@@ -61,7 +62,7 @@ var reversePitch=false;
  * @param {number} yaw
  * @param {number} pitch
  * @param {number} roll
- * @return {mat4}
+ * @returns {mat4}
  */
 function euler_matrix(yaw, pitch, roll) {
     // you have to declare one variable before use.
@@ -72,7 +73,23 @@ function euler_matrix(yaw, pitch, roll) {
     return R;
 }
 
-
+/**
+ *returns an vec3 as yaw, pitch, roll components of a orthogonal matrix
+ *
+ * @param {mat4} R Orthogonal Matrix
+ * @returns {vec3}
+ */
+function euler_angle(R){
+    /**
+     * formula: z=atan2(r21,r11);
+     * y=atan2(-r31,sqrt(r31^2+r33^2));
+     * x=atan2(r32,r33); (regular row order, 3*3 matrix)
+    */
+    let z=Math.atan2(R[1],R[0]);
+    let y=Math.atan2(-R[2],Math.sqrt(R[2]*R[2]+R[10]*R[10]));
+    let x=Math.atan2(R[6],R[10]);
+    return vec3.fromValues(z,y,x);
+}
 /**
  * the inteval count to insert a new vertex in ribbon.
  */
@@ -227,7 +244,7 @@ setInterval(function(){
     vec4.scaleAndAdd(u,u,a,dt);
     vec4.transformMat4(v,u,orientation);
     vec4.add(position,position,v);
-
+    eulerAngle=euler_angle(orientation);
     // update ribbon.
     ribbonCount++;
     if (ribbonCount>=ribbonInterval){
@@ -237,4 +254,4 @@ setInterval(function(){
 },interval);
 
 // global variables.
-export {euler_matrix, orientation, position, ribbon , ribbonLength};
+export {euler_matrix, orientation, eulerAngle, position, ribbon , ribbonLength};
