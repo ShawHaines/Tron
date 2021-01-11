@@ -10,6 +10,7 @@ import {Light, pack, updateLights} from "./light.js";
 import * as texture_shader from "../pages/Preview/src/texture-shader-with-shadow.js";
 import * as shadow_shader from '../pages/Preview/src/shadow-shader.js';
 import * as sky_shader from "../pages/Preview/src/sky_shader.js";
+import * as transparent_shader from "../pages/Preview/src/transparent-shader.js";
 import * as flight from "../pages/Flight/flight.js";
 import {models, naturePackModelNames} from "./modelList.js"
 import {renderScene} from './renderScene.js';
@@ -31,6 +32,7 @@ if (!ext) {
 const programInfo = twgl.createProgramInfo(gl, [texture_shader.vs, texture_shader.fs]);
 const skyProgramInfo = twgl.createProgramInfo(gl, [sky_shader.vs, sky_shader.fs]);
 const shadowProgramInfo = twgl.createProgramInfo(gl, [shadow_shader.shadow_vs, shadow_shader.shadow_fs]);
+const transparentProgramInfo=twgl.createProgramInfo(gl,[transparent_shader.vs,transparent_shader.fs]);
 const depthTextureSize = 1024;
 // set the textures as attachments for the framebuffer. See the comments in preview.js
 const attachments = [
@@ -226,23 +228,32 @@ function render(time, camera) {
     renderSky(camera, time);
     // draw ribbon.
     if (flight.ribbonLength > 1) {
-        const projection = myCamera.projection;
-        const view = myCamera.viewMatrix;
+        // draw the transparent objects.
+        gl.enable(gl.BLEND); // blending
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.depthMask(false); //lock the depth writing
+        let cam=cameras.tailCamera;
+        const projection = cam.projection;
+        const view = cam.viewMatrix;
         const viewProjection = m4.multiply(projection, view);
-        let ribbonBuffer = twgl.createBufferInfoFromArrays(gl, flight.ribbon);
-        twgl.setBuffersAndAttributes(gl, programInfo, ribbonBuffer);
+        let ribbonBufferInfo = twgl.createBufferInfoFromArrays(gl, flight.ribbon);
+        twgl.setBuffersAndAttributes(gl, transparentProgramInfo, ribbonBufferInfo);
         let uniform = {};
         uniform.u_world = m4.identity();
+        uniform.u_worldView=view;
         uniform.u_worldViewProjection = viewProjection;
-        uniform.u_viewPos = myCamera.position;
+        uniform.u_viewPos = cam.position;
         //default lighting attributes
         uniform.u_worldInverseTranspose = m4.identity();
         uniform.u_lightPos = updateLights(lights);
         // uniform.u_textureMatrix = textureMatrix;
         uniform.u_projectedTexture = depthFramebufferInfo.attachments[0];
-        gl.useProgram(programInfo.program);
-        twgl.setUniforms(programInfo, uniform);
-        twgl.drawBufferInfo(gl, ribbonBuffer, gl.TRIANGLES, ribbonBuffer.numelements);
+        uniform.u_glowColor=[1,0,0];
+        gl.useProgram(transparentProgramInfo.program);
+        twgl.setUniforms(transparentProgramInfo, uniform);
+        twgl.drawBufferInfo(gl, ribbonBufferInfo, gl.TRIANGLES, ribbonBufferInfo.numelements);
+        gl.depthMask(true);
+        gl.disable(gl.BLEND);
     }
 
 }

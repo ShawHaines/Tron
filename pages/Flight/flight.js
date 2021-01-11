@@ -78,10 +78,10 @@ function euler_matrix(yaw, pitch, roll) {
  */
 const ribbonInterval=1;
 /** maximum number of vertices */
-const maxRibbonLength=100;
+const maxRibbonLength=1000;
 var ribbonCount=0;
 var ribbonLength=0;
-const ribbonWidth=0.1;
+const ribbonWidth=5;
 
 /**
  * @typedef {Object} bufferArray

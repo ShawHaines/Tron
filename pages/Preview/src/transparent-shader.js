@@ -23,9 +23,9 @@ void main()
 const fs=`
 precision mediump float;
 uniform vec3 u_glowColor;
-float b= 1.0; //bias
+float b= 0.95; //bias
 float p= 5.0; //power
-float s= -0.8; //scale
+float s= -0.6; //scale
 varying vec3 v_normal;
 varying vec3 v_viewWorldPosition;
 void main() 
