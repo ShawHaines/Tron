@@ -4,7 +4,7 @@
 import * as twgl from "../modules/twgl/twgl-full.module.js";
 import {myNode} from "./myNode.js";
 import {myObject} from "./myObject.js";
-import {Camera} from "./camera.js";
+import {Camera,updateCameras} from "./camera.js";
 import {Light, pack} from "./light.js";
 // import * as texture_shader from "../pages/Preview/src/texture-shader.js";
 import * as texture_shader from "../pages/Preview/src/texture-shader-with-shadow.js";
@@ -43,7 +43,7 @@ var g_time; /** global time (keep updated in `render()`) **/
 var nodes = {};
 var objects = {};
 var lights=[];
-var cameras=[];
+var cameras={};
 var myCamera = new Camera([-200, 100, 20], 80, -23, [0, 1, 0]);
 
 //If you want to update them later, use internal methods...
@@ -132,7 +132,19 @@ function setCameras(){
     // set aspect ratio according to the size of the canvas.
     myCamera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     myCamera.updateProjectionMatrix();
-    cameras.push(myCamera);
+    cameras.myCamera=myCamera;
+
+    // camera that follows the fighter.
+    let tailCamera=new Camera();
+    tailCamera.node.setParent(nodes.fighter_base);
+    tailCamera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    tailCamera.updateProjectionMatrix();
+    let tail=m4.identity();
+    m4.translate(tail,[-20,0,-3],tail);
+    m4.rotateY(tail,-Math.PI/2,tail);
+    m4.rotateZ(tail,Math.PI/2,tail);
+    tailCamera.node.localMatrix=tail;
+    cameras.tailCamera=tailCamera;
 }
 
 /********************************************
@@ -166,6 +178,7 @@ function update(time) {
 
     /** Update world matrix for every node **/
     nodes.base_node.updateWorldMatrix();
+    updateCameras(cameras);
 }
 
 /********************************************
@@ -193,9 +206,9 @@ function render(time) {
     twgl.bindFramebufferInfo(gl);
     gl.clearColor(0.1, 0.8, 0.9, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    renderScene(nodes.base_node, lights, myCamera);
+    renderScene(nodes.base_node, lights, cameras.tailCamera);
     gl.depthFunc(gl.LEQUAL);
-    renderSky(myCamera, time);
+    renderSky(cameras.tailCamera, time);
 }
 
 

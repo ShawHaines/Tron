@@ -169,4 +169,16 @@ class Camera {
     }
 }
 
-export {Camera};
+/**
+ * update all the viewMatrix in the cameraList.
+ * @param {{Camera}} cameraList
+ * @returns {void}
+ */
+function updateCameras(cameraList){
+    for (let each in cameraList){
+        let item=cameraList[each];
+        item.viewMatrix=m4.inverse(item.node.worldMatrix);
+    }
+}
+
+export {Camera, updateCameras};
