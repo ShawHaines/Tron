@@ -78,10 +78,10 @@ function euler_matrix(yaw, pitch, roll) {
  */
 const ribbonInterval=1;
 /** maximum number of vertices */
-const maxRibbonLength=100;
+const maxRibbonLength=1000;
 var ribbonCount=0;
 var ribbonLength=0;
-const ribbonWidth=0.1;
+const ribbonWidth=5;
 
 /**
  * @typedef {Object} bufferArray
@@ -121,6 +121,10 @@ function updateRibbon() {
             indices.push.apply(indices,[ribbonLength*2,ribbonLength*2-2,ribbonLength*2+1]);
             // right triangle, ccw
             indices.push.apply(indices,[ribbonLength*2+1,ribbonLength*2-2,ribbonLength*2-1]);
+            // left triangle, cw.
+            indices.push.apply(indices, [ribbonLength * 2 + 1,ribbonLength*2,ribbonLength*2-2]);
+            // right triangle, cw.
+            indices.push.apply(indices, [ribbonLength * 2 - 1,ribbonLength*2+1,ribbonLength*2-2]);
         }
         a_normal.push.apply(a_normal,up);
         a_normal.push.apply(a_normal,up);
@@ -144,12 +148,19 @@ function updateRibbon() {
         // // FIXME: as it turns out, you do have to move one index.
         let j= (ribbonLength-1)%(maxRibbonLength-1);
         let oldIndex=index>0?index-1:maxRibbonLength-1;
-        indices[j*6  ]=2*index;
-        indices[j*6+1]=2*oldIndex;
-        indices[j*6+2]=2*index+1;
-        indices[j*6+3]=2*index+1;
-        indices[j*6+4]=2*oldIndex;
-        indices[j*6+5]=2*oldIndex+1;
+        indices[j*12  ]=2*index;
+        indices[j*12+1]=2*oldIndex;
+        indices[j*12+2]=2*index+1;
+        indices[j*12+3]=2*index+1;
+        indices[j*12+4]=2*oldIndex;
+        indices[j*12+5]=2*oldIndex+1;
+        // clockwise, back facet.
+        indices[j*12+6]=2*index;
+        indices[j*12+7]=2*index+1;
+        indices[j*12+8]=2*oldIndex;
+        indices[j*12+9]=2*index+1;
+        indices[j*12+10]=2*oldIndex+1;
+        indices[j*12+11]=2*oldIndex;
         // prevent overfloat
         ribbonLength = ribbonLength % (2 * (maxRibbonLength - 1) * maxRibbonLength) + (2 * (maxRibbonLength - 1) * maxRibbonLength);
     }
