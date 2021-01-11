@@ -1,9 +1,32 @@
 /********************************************
 * Interaction Control
 *********************************************/
-import {myCamera} from "./main.js";
+import {myCamera, g_time_interval} from "./main.js";
 
 var navMovePosFlags = [0, 0, 0];
+
+function moveNavCamera(camera)
+{
+    const FACTOR = 20;
+    //only enabled when `navMode` is on
+    if(window.navMode){
+        //joystick
+        if(joystick.right()) {
+            camera.movePos(FACTOR * g_time_interval, 0, 0)
+        }
+        if(joystick.left()) {
+            camera.movePos(-FACTOR  * g_time_interval, 0, 0)
+        }
+        if(joystick.up()) {
+            camera.movePos(0, 0, -FACTOR * g_time_interval)
+        }
+        if(joystick.down()) {
+            camera.movePos(0, 0, -FACTOR * g_time_interval)
+        }
+        //keyboard
+        camera.movePos(FACTOR * navMovePosFlags[0] * g_time_interval, FACTOR * navMovePosFlags[1] * g_time_interval, FACTOR * navMovePosFlags[2] * g_time_interval);
+    }
+}
 
 /* mouse, keyboard, and virtual joystick support */
 document.addEventListener("keydown", function (event) {
@@ -140,4 +163,4 @@ document.getElementById("c").ontouchmove = function(e) {
     }
 }
 
-export {navMovePosFlags}
+export {moveNavCamera}

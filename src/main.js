@@ -18,7 +18,7 @@ import {initObjectList, bindObjectsWithMeshes} from './setObjects.js'
 import {initNodeSet, setFrameTree, linkObjects} from './setNodes.js'
 import {renderSky} from './renderSky.js'
 import {parseModel} from './objLoader.js'
-import {navMovePosFlags} from './navInteraction.js'
+import {moveNavCamera} from './navInteraction.js'
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
 if (!gl) console.log("Failed");
@@ -47,7 +47,7 @@ var nodes = {};
 var objects = {};
 var lights=[];
 var cameras={};
-var myCamera = new Camera([-200, 100, 20], 80, -23, [0, 1, 0]);
+var myCamera = new Camera([-200, 100, 0], 80, -23, [0, 1, 0]);
 
 //If you want to update them later, use internal methods...
 
@@ -88,9 +88,7 @@ function webGLStart(meshes){
     /** Set lights **/
     setLights();
 
-    // console.log(meshes);
     requestAnimationFrame(main);
-    requestAnimationFrame(render);
 }
 
 function setLights(){
@@ -277,28 +275,6 @@ function updateModels()
     });
 }
 
-function moveNavCamera(camera)
-{
-    const FACTOR = 20;
-    //only enabled when `navMode` is on
-    if(window.navMode){
-        //joystick
-        if(joystick.right()) {
-            camera.movePos(FACTOR * g_time_interval, 0, 0)
-        }
-        if(joystick.left()) {
-            camera.movePos(-FACTOR  * g_time_interval, 0, 0)
-        }
-        if(joystick.up()) {
-            camera.movePos(0, 0, -FACTOR * g_time_interval)
-        }
-        if(joystick.down()) {
-            camera.movePos(0, 0, -FACTOR * g_time_interval)
-        }
-        //keyboard
-        camera.movePos(FACTOR * navMovePosFlags[0] * g_time_interval, FACTOR * navMovePosFlags[1] * g_time_interval, FACTOR * navMovePosFlags[2] * g_time_interval);
-    }
-}
 
 
-export {twgl, m4, gl, myCamera, objects, naturePackModelNames, skyProgramInfo, shadowProgramInfo, depthFramebufferInfo};
+export {twgl, m4, gl, myCamera, objects, naturePackModelNames, skyProgramInfo, shadowProgramInfo, depthFramebufferInfo, g_time_interval, g_time};
