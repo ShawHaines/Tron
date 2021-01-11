@@ -70,20 +70,20 @@ function setFrameTree(nodes){
 
     //Set local matrix of customized lights
     world = m4.identity();
-    world = m4.multiply(world, m4.translation([0, 80, -80]));
+    world = m4.multiply(world, m4.translation([0, 20, -20]));
     m4.copy(world, nodes.customized_light_nodes[0].localMatrix);
     
     //Set local matrix of NaturePack_Part1.
     world = m4.identity();
     world = m4.multiply(world, m4.translation([0, 0, 0]));
-    m4.scale(world, [10, 10, 10], world);
+    m4.scale(world, [2, 2, 2], world);
     m4.copy(world, nodes.NaturePack_Part1_node.localMatrix);
     
     //Set local matrix of viking_room.
     world = m4.identity();
     world = m4.multiply(world, m4.rotationY(-135 * Math.PI / 180));
     world = m4.multiply(world, m4.rotationX(-90 * Math.PI / 180));
-    m4.scale(world, [30, 30, 30], world);
+    m4.scale(world, [6, 6, 6], world);
     m4.copy(world, nodes.viking_room_node.localMatrix);
     
     //Set local matrix of paper_plane.
@@ -92,7 +92,7 @@ function setFrameTree(nodes){
     world = m4.multiply(world, m4.rotationZ(200 * Math.PI / 180));
     world = m4.multiply(world, m4.rotationY(170 * Math.PI / 180));
     world = m4.multiply(world, m4.rotationX(25 * Math.PI / 180));
-    m4.scale(world, [0.02, 0.02, 0.02], world);
+    m4.scale(world, [0.01, 0.01, 0.01], world);
     m4.copy(world, nodes.paper_plane_node.localMatrix);
 
     // initial position of the plane.
@@ -101,13 +101,13 @@ function setFrameTree(nodes){
     //Set local matrix of fighter.
     world = m4.rotationZ(Math.PI/2);
     m4.rotateX(world,Math.PI/2,world);
-    m4.scale(world, [0.01, 0.01, 0.01],world);
+    m4.scale(world, [0.01, 0.01, 0.01], world);
     m4.copy(world, nodes.fighter.localMatrix);
 
     nodes.random_nature_nodes.forEach(function (tmp) {
-        tmp.xInit = Math.random() * 200 - 100;
-        tmp.yInit = Math.random() * 200 - 100;
-        tmp.zInit = Math.random() * 200 - 100;
+        tmp.xInit = Math.random() * 40 - 20;
+        tmp.yInit = Math.random() * 40 - 20;
+        tmp.zInit = Math.random() * 40 - 20;
         tmp.ySpeed = Math.random() * 2 - 1;
         tmp.x = tmp.xInit;
         tmp.y = tmp.yInit;
@@ -115,9 +115,9 @@ function setFrameTree(nodes){
         tmp.xRotInit = Math.random() * 360;
         tmp.yRotInit = Math.random() * 360;
         tmp.zRotInit = Math.random() * 360;
-        tmp.xRotSpeed = Math.random() * 2 - 1;
-        tmp.yRotSpeed = Math.random() * 2 - 1;
-        tmp.zRotSpeed = Math.random() * 2 - 1;
+        tmp.xRotSpeed = Math.random() * 0.4 - 1;
+        tmp.yRotSpeed = Math.random() * 0.4 - 1;
+        tmp.zRotSpeed = Math.random() * 0.4 - 1;
         tmp.xRot = tmp.xRotInit;
         tmp.yRot = tmp.yRotInit;
         tmp.zRot = tmp.zRotInit;
@@ -128,13 +128,13 @@ function setFrameTree(nodes){
         world = m4.multiply(world, m4.rotateX(world, tmp.xRot / 180 * Math.PI));
         world = m4.multiply(world, m4.rotateY(world, tmp.yRot / 180 * Math.PI));
         world = m4.multiply(world, m4.rotateZ(world, tmp.zRot / 180 * Math.PI));
-        m4.scale(world, [5, 5, 5], world);
+        // m4.scale(world, [5, 5, 5], world);
         m4.copy(world, tmp.localMatrix);
     });
     
     world = m4.identity();
-    world = m4.multiply(world, m4.translation([-100, 0, 0]));
-    m4.scale(world, [30, 30, 30], world);
+    world = m4.multiply(world, m4.translation([-300, 0, -300]));
+    m4.scale(world, [20, 20, 20], world);
     m4.copy(world, nodes.mountain_node.localMatrix);
 }
 
