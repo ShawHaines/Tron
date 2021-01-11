@@ -250,11 +250,8 @@ function updateModels()
 
     // fighter position update.
     let fighter = m4.translation(flight.position);
-    m4.rotateZ(fighter,flight.eulerAngle[0],fighter);
-    m4.copy(fighter, nodes.fighter_base.localMatrix);
-    fighter=m4.rotationY(flight.eulerAngle[1]);
-    m4.rotateX(fighter,flight.eulerAngle[2],fighter);
-    nodes.fighter_pitch_roll.localMatrix = fighter;
+    m4.multiply(fighter, flight.orientation, fighter);
+    nodes.fighter_base.localMatrix = fighter;
 
     /** Update random objects **/
     //FIXME: need to improve the bounding with g_time
