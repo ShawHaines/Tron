@@ -37,7 +37,8 @@ const attachments = [
 const depthFramebufferInfo = twgl.createFramebufferInfo(gl, attachments, depthTextureSize, depthTextureSize);
 console.log(depthFramebufferInfo);
 /** Some global variables **/
-var g_time; /** global time (keep updated in `render()`) **/
+var g_time = 0; /** global time (keep updated in `render()`) **/
+var old_time = 0, new_time = 0;
 
 /** IMPORTANT THINGS **/
 var nodes = {};
@@ -147,12 +148,38 @@ function setCameras(){
 * [Example]: Rotate the paper plane 60 times a second
 *********************************************/
 var main = function(time){
+    time *= 0.001;
+    new_time = time;
+    if(!window.pauseCond) g_time += new_time - old_time;
+    old_time = new_time;
+
     update(time);
-    render(time);
+    if(window.navMode)
+        render(time, cameras.myCamera);
+    else if(cameras.tailCamera.projection)
+        render(time, cameras.tailCamera);
     requestAnimationFrame(main);
 };
 
 function update(time) {
+    if(!window.pauseCond) updateModels(); //if pause, every model should not update
+                                              //FIXME: plane's internal position should stop moving
+    updateSunLight();
+    /** Update world matrix for every node **/
+    nodes.base_node.updateWorldMatrix();
+    updateCameras(gl, cameras);
+}
+
+function updateSunLight()
+{
+    /** Update the sun light position **/
+    var world = m4.translation([0,300,0]);
+    m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
+    m4.copy(world, nodes.sun_node.localMatrix);
+}
+
+function updateModels()
+{
     /** Rotate the plane **/
     var world = m4.identity();
     world = m4.multiply(world, m4.translation([0, 14, 45]));
@@ -163,26 +190,50 @@ function update(time) {
     m4.scale(world, [0.02, 0.02, 0.02], world);
     m4.copy(world, nodes.paper_plane_node.localMatrix);
 
-    /** Update the sun light position **/
-    world = m4.translation([0,300,0]);
-    m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
-    m4.copy(world, nodes.sun_node.localMatrix);
     // fighter position update.
     let fighter = m4.translation(flight.position);
     m4.multiply(fighter, flight.orientation, fighter);
     nodes.fighter_base.localMatrix = fighter;
 
-    /** Update world matrix for every node **/
-    nodes.base_node.updateWorldMatrix();
-    updateCameras(gl,cameras);
+    /** Update random objects **/
+    //FIXME: need to improve the bounding with g_time
+    nodes.random_nature_nodes.forEach(function (tmp) {
+        tmp.xRot = tmp.xRotInit + tmp.xRotSpeed * g_time;
+        tmp.yRot = tmp.yRotInit + tmp.yRotSpeed * g_time;
+        tmp.zRot = tmp.zRotInit + tmp.zRotSpeed * g_time;
+        tmp.y = tmp.yInit + tmp.ySpeed * g_time;
+
+        while(tmp.xRot > 360) tmp.xRot -= 360;
+        while(tmp.yRot > 360) tmp.yRot -= 360;
+        while(tmp.zRot > 360) tmp.zRot -= 360;
+        while(tmp.xRot < 0) tmp.xRot += 360;
+        while(tmp.yRot < 0) tmp.yRot += 360;
+        while(tmp.zRot < 0) tmp.zRot += 360;
+        while(tmp.y > 30)
+        {
+            tmp.yInit -= 30;
+            tmp.y -= 30;
+        }
+        while(tmp.y < 0)
+        {
+            tmp.yInit += 30;
+            tmp.y += 30;
+        }
+        var world = m4.identity();
+        world = m4.multiply(world, m4.translation([tmp.x, tmp.y, tmp.z]));
+        world = m4.multiply(world, m4.rotateX(world, tmp.xRot / 180 * Math.PI));
+        world = m4.multiply(world, m4.rotateY(world, tmp.yRot / 180 * Math.PI));
+        world = m4.multiply(world, m4.rotateZ(world, tmp.zRot / 180 * Math.PI));
+        m4.scale(world, [5, 5, 5], world);
+        m4.copy(world, tmp.localMatrix);
+    });
 }
 
 /********************************************
 * Render Function
 *********************************************/
-function render(time) {
+function render(time, camera) {
     time *= 0.001;
-    g_time = time;
 
     twgl.resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -202,9 +253,9 @@ function render(time) {
     twgl.bindFramebufferInfo(gl);
     gl.clearColor(0.1, 0.8, 0.9, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    renderScene(nodes.base_node, lights, cameras.tailCamera);
+    renderScene(nodes.base_node, lights, camera);
     gl.depthFunc(gl.LEQUAL);
-    renderSky(cameras.tailCamera, time);
+    renderSky(camera, time);
 }
 
 

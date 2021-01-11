@@ -1,6 +1,8 @@
 import {myNode} from './myNode.js'
 import {m4, naturePackModelNames} from './main.js'
 
+const RANDOM_NATURE_NUM = 100;
+
 var initNodeSet = function(nodes)
 {
     var base_node = new myNode();
@@ -14,7 +16,7 @@ var initNodeSet = function(nodes)
         customized_light_nodes.push(new myNode());
     }
     var random_nature_nodes = []; //randomly generated
-    for(var i = 0; i < 10; i++)
+    for(var i = 0; i < RANDOM_NATURE_NUM; i++)
     {
         random_nature_nodes.push(new myNode());
     }
@@ -97,14 +99,35 @@ function setFrameTree(nodes){
     nodes.fighter_base.localMatrix=m4.translation([0,5,0]);
     
     //Set local matrix of fighter.
-    world = m4.rotationZ(-Math.PI/2);
-    m4.rotateX(world,-Math.PI/2,world);
+    world = m4.rotationZ(Math.PI/2);
+    m4.rotateX(world,Math.PI/2,world);
     m4.scale(world, [0.01, 0.01, 0.01],world);
     m4.copy(world, nodes.fighter.localMatrix);
 
     nodes.random_nature_nodes.forEach(function (tmp) {
+        tmp.xInit = Math.random() * 200 - 100;
+        tmp.yInit = Math.random() * 200 - 100;
+        tmp.zInit = Math.random() * 200 - 100;
+        tmp.ySpeed = Math.random() * 2 - 1;
+        tmp.x = tmp.xInit;
+        tmp.y = tmp.yInit;
+        tmp.z = tmp.zInit;
+        tmp.xRotInit = Math.random() * 360;
+        tmp.yRotInit = Math.random() * 360;
+        tmp.zRotInit = Math.random() * 360;
+        tmp.xRotSpeed = Math.random() * 2 - 1;
+        tmp.yRotSpeed = Math.random() * 2 - 1;
+        tmp.zRotSpeed = Math.random() * 2 - 1;
+        tmp.xRot = tmp.xRotInit;
+        tmp.yRot = tmp.yRotInit;
+        tmp.zRot = tmp.zRotInit;
+        
+
         world = m4.identity();
-        world = m4.multiply(world, m4.translation([Math.random() * 200, Math.random() * - 50, Math.random() * 200 - 100]));
+        world = m4.multiply(world, m4.translation([tmp.x, tmp.y, tmp.z]));
+        world = m4.multiply(world, m4.rotateX(world, tmp.xRot / 180 * Math.PI));
+        world = m4.multiply(world, m4.rotateY(world, tmp.yRot / 180 * Math.PI));
+        world = m4.multiply(world, m4.rotateZ(world, tmp.zRot / 180 * Math.PI));
         m4.scale(world, [5, 5, 5], world);
         m4.copy(world, tmp.localMatrix);
     });
@@ -122,7 +145,7 @@ function setFrameTree(nodes){
 **/
 function linkObjects(nodes, objects){
     /** link nodes you want to draw with actual objects **/
-    setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
+    // setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
     setNodeAsObject(nodes.paper_plane_node, objects.paper_plane)
     // setNodeAsObject(nodes.viking_room_node, objects.viking_room)
     nodes.random_nature_nodes.forEach(function (tmp) {
