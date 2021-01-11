@@ -13,7 +13,7 @@
         <script type='text/javascript' src="./src/virtualjoystick.js"></script>
         <script type='module' src="./src/ui.js"></script>
         <script type="module" src="./src/main.js"></script>
-        <script type="module" src="./src/interaction.js"></script>
+        <script type="module" src="./src/navInteraction.js"></script>
 
         <style>
         body {
@@ -65,9 +65,11 @@
                 <span class="nav-item is-menu-item menu-icon" onclick="return false;"></span>
 
                 <ul class="nav-menu-list">
-                    <li><button id="pauseButton" class="nav-item" onclick="showMenu();">Show Menu</button></li>
-                    <li><button id="OBJButton" class="nav-item" style="visibility: hidden;" onclick="editOBJSize();">Import</button></li>
-                    <li><button id="lightButton" class="nav-item" style="visibility: hidden;" onclick="editLight();">Edit Light</button></li>
+                    <li><button id="pauseButton" class="nav-item" onclick="pauseTime();">Pause</button></li>
+                    <li><button id="navButton" class="nav-item" style="visibility: visible;" onclick="navigationModeOn();">Enable Navigation</button></li>
+                    <li><button id="lightButton" class="nav-item" style="visibility: visible;" onclick="editLight();">Edit Light</button></li>
+                    <li><button id="fogButton" class="nav-item" style="visibility: visible;" onclick="editFog();">Edit Fog</button></li>
+                    <li><button id="OBJButton" class="nav-item" style="visibility: visible;">Export OBJ</button></li>
                 </ul>
 
                 <ul class="nav-menu-list">
@@ -79,74 +81,70 @@
         </header>
 
         <script>
+            window.navMode = false;
             window.pauseCond = false;
             var editLightCond = false;
-            var editOBJSizeCond = false;
-            var showMenu = function()
+            window.exportOBJCond = false;
+            var editFogCond = false;
+            var pauseTime = function()
             {
                 window.pauseCond = !window.pauseCond;
                 item = document.getElementById('pauseButton');
                 if(window.pauseCond)
                 {
-                    item.innerHTML = "Hide Menu";
-                    document.getElementById('OBJButton').style.visibility = "visible";
-                    document.getElementById('lightButton').style.visibility = "visible";
+                    item.innerHTML = "Continue";
                 }
                 else
                 {
-                    item.innerHTML = "Show Menu";
-                    document.getElementById('OBJButton').style.visibility = "hidden";
-                    document.getElementById('lightButton').style.visibility = "hidden";
+                    item.innerHTML = "Pause";
                 }
             }
 
             var editLight = function()
             {
                 editLightCond = !editLightCond;
-                var item = [];
-                item.push(document.getElementById('lightButton'));
-                item.push(document.getElementById('OBJButton'));
-                var ui = [];
-                ui.push(document.getElementById('Light'));
-                ui.push(document.getElementById('OBJ-size'));
                 if(editLightCond)
                 {
-                    editOBJSizeCond = false;
-                    item[1].innerHTML = "Edit OBJ Size";
-                    item[0].innerHTML = "Close";
-                    ui[1].style.visibility = "hidden";
-                    ui[0].style.visibility = "visible";
+                    editFogCond = false;
+                    document.getElementById('fogButton').innerHTML = "Edit Fog";
+                    document.getElementById('lightButton').innerHTML = "Close";
+                    document.getElementById('Fog').style.visibility = "hidden";
+                    document.getElementById('Light').style.visibility = "visible";
                 }
                 else
                 {
-                    item[0].innerHTML = "Light";
-                    ui[0].style.visibility = "hidden";
+                    document.getElementById('lightButton').innerHTML = "Edit Light";
+                    document.getElementById('Light').style.visibility = "hidden";
                 }
             }
-
-            editOBJSize = function()
+            
+            var editFog = function()
             {
-                editOBJSizeCond = !editOBJSizeCond;
-                var item = [];
-                item.push(document.getElementById('lightButton'));
-                item.push(document.getElementById('OBJButton'));
-                var ui = [];
-                ui.push(document.getElementById('Light'));
-                ui.push(document.getElementById('OBJ-size'));
-
-                if(editOBJSizeCond)
+                editFogCond = !editFogCond;
+                if(editFogCond)
                 {
                     editLightCond = false;
-                    item[0].innerHTML = "Light";
-                    item[1].innerHTML = "Close";
-                    ui[0].style.visibility = "hidden";
-                    ui[1].style.visibility = "visible";
+                    document.getElementById('lightButton').innerHTML = "Edit Light";
+                    document.getElementById('fogButton').innerHTML = "Close";
+                    document.getElementById('Light').style.visibility = "hidden";
+                    document.getElementById('Fog').style.visibility = "visible";
                 }
                 else
                 {
-                    item[1].innerHTML = "Edit OBJ Size";
-                    ui[1].style.visibility = "hidden";
+                    document.getElementById('fogButton').innerHTML = "Edit Fog";
+                    document.getElementById('Fog').style.visibility = "hidden";
                 }
+            }
+            
+
+            navigationModeOn = function()
+            {
+                item = document.getElementById('navButton');
+                window.navMode = !window.navMode;
+                if(window.navMode)
+                    item.innerHTML = "Disable Navigation";
+                else
+                    item.innerHTML = "Enable Navigation";
             }
         </script>
     
@@ -176,8 +174,8 @@
 
             <div id="uiContainer">
                 <div id="ui">
-                    <div id="Light" style="visibility: hidden;"></div>
-                    <div id="OBJ-size" style="position: absolute; top: 0px; visibility: none;"></div>
+                    <div id="Light" style="position: absolute; top: 20px; right: 20px; visibility: hidden;"></div>
+                    <div id="Fog" style="position: absolute; top: 20px; right: 20px; visibility: hidden;"></div>
                 </div>
             </div>
 

@@ -4,7 +4,7 @@
 import * as twgl from "../modules/twgl/twgl-full.module.js";
 import {myNode} from "./myNode.js";
 import {myObject} from "./myObject.js";
-import {Camera} from "./camera.js";
+import {Camera,updateCameras} from "./camera.js";
 import {Light, pack} from "./light.js";
 // import * as texture_shader from "../pages/Preview/src/texture-shader.js";
 import * as texture_shader from "../pages/Preview/src/texture-shader-with-shadow.js";
@@ -18,6 +18,9 @@ import {initObjectList, bindObjectsWithMeshes} from './setObjects.js'
 import {initNodeSet, setFrameTree, linkObjects} from './setNodes.js'
 import {renderSky} from './renderSky.js'
 import {parseModel} from './objLoader.js'
+import {moveNavCamera} from './navInteraction.js'
+import {bindOBJExportInfo2Nodes} from './objExport.js'
+
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
 if (!gl) console.log("Failed");
@@ -37,14 +40,16 @@ const attachments = [
 const depthFramebufferInfo = twgl.createFramebufferInfo(gl, attachments, depthTextureSize, depthTextureSize);
 console.log(depthFramebufferInfo);
 /** Some global variables **/
-var g_time; /** global time (keep updated in `render()`) **/
+var g_time = 0; /** global time (keep updated in `render()`) **/
+var g_time_interval = 0;
+var old_time = 0, new_time = 0;
 
 /** IMPORTANT THINGS **/
 var nodes = {};
 var objects = {};
 var lights=[];
-var cameras=[];
-var myCamera = new Camera([-200, 100, 20], 80, -23, [0, 1, 0]);
+var cameras={};
+var myCamera = new Camera([-200, 100, 0], 80, -23, [0, 1, 0]);
 
 //If you want to update them later, use internal methods...
 
@@ -81,13 +86,16 @@ function webGLStart(meshes){
     setFrameTree(nodes);
     /** link objects with nodes **/
     linkObjects(nodes, objects);
+    /** bind objects with mesh info (to export as OBJ later) **/
+    bindOBJExportInfo2Nodes(nodes.base_node, meshes);
+    /** Set cameras **/
     setCameras();
     /** Set lights **/
     setLights();
+    /** Set fogs **/
+    assignFog2Nodes(nodes.base_node);
 
-    // console.log(meshes);
     requestAnimationFrame(main);
-    requestAnimationFrame(render);
 }
 
 function setLights(){
@@ -130,50 +138,70 @@ function setLights(){
 function setCameras(){
     myCamera.node.setParent(nodes.base_node);
     // set aspect ratio according to the size of the canvas.
-    myCamera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-    myCamera.updateProjectionMatrix();
-    cameras.push(myCamera);
+    cameras.myCamera=myCamera;
+
+    // camera that follows the fighter.
+    let tailCamera=new Camera();
+    tailCamera.node.setParent(nodes.fighter_base);
+    let tail=m4.identity();
+    m4.translate(tail,[-20,0,-3],tail);
+    m4.rotateY(tail,-Math.PI/2,tail);
+    m4.rotateZ(tail,Math.PI/2,tail);
+    tailCamera.node.localMatrix=tail;
+    cameras.tailCamera=tailCamera;
 }
 
 /********************************************
-* [Example]: Rotate the paper plane 60 times a second
+* main() function
 *********************************************/
 var main = function(time){
+    time *= 0.001;
+    new_time = time;
+    //Limited maximum FPS!
+    if(new_time - old_time < 1.0 / 60.0)
+    {
+        requestAnimationFrame(main);
+        return;
+    }
+
+    if(!window.pauseCond)
+    {
+        // g_time_interval = (new_time - old_time <= 0.1)?(new_time - old_time):0.1;
+        g_time_interval = new_time - old_time;
+        g_time += g_time_interval;
+    }
+    old_time = new_time;
+
     update(time);
-    render(time);
+    if(window.navMode)
+        render(time, cameras.myCamera);
+    else if(cameras.tailCamera.projection)
+        render(time, cameras.tailCamera);
     requestAnimationFrame(main);
 };
 
+/********************************************
+* update() function
+*********************************************/
 function update(time) {
-    /** Rotate the plane **/
-    var world = m4.identity();
-    world = m4.multiply(world, m4.translation([0, 14, 45]));
-    world = m4.multiply(world, m4.rotationX(1.1 * g_time));
-    world = m4.multiply(world, m4.rotationZ(200 * Math.PI / 180));
-    world = m4.multiply(world, m4.rotationY(170 * Math.PI / 180));
-    world = m4.multiply(world, m4.rotationX(25 * Math.PI / 180));
-    m4.scale(world, [0.02, 0.02, 0.02], world);
-    m4.copy(world, nodes.paper_plane_node.localMatrix);
-
-    /** Update the sun light position **/
-    world = m4.translation([0,300,0]);
-    m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
-    m4.copy(world, nodes.sun_node.localMatrix);
-    // fighter position update.
-    let fighter = m4.translation(flight.position);
-    m4.multiply(fighter, flight.orientation, fighter);
-    nodes.fighter_base.localMatrix = fighter;
-
+    if(!window.pauseCond) updateModels(); //if pause, every model should not update
+                                              //FIXME: plane's internal position should stop moving
+    /** Update sunlight **/
+    updateSunLight();
+    /** Set fogs **/
+    assignFog2Nodes(nodes.base_node);
+    /** Update Navigation Camera **/
+    moveNavCamera(myCamera);
     /** Update world matrix for every node **/
     nodes.base_node.updateWorldMatrix();
+    updateCameras(gl, cameras);
 }
 
 /********************************************
-* Render Function
+* render() function
 *********************************************/
-function render(time) {
+function render(time, camera) {
     time *= 0.001;
-    g_time = time;
 
     twgl.resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -193,10 +221,85 @@ function render(time) {
     twgl.bindFramebufferInfo(gl);
     gl.clearColor(0.1, 0.8, 0.9, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    renderScene(nodes.base_node, lights, myCamera);
+    renderScene(nodes.base_node, lights, camera);
     gl.depthFunc(gl.LEQUAL);
-    renderSky(myCamera, time);
+    renderSky(camera, time);
 }
 
 
-export {twgl, m4, gl, myCamera, objects, naturePackModelNames, skyProgramInfo, shadowProgramInfo, depthFramebufferInfo};
+
+function updateSunLight()
+{
+    /** Update the sun light position **/
+    var world=m4.identity();
+    m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
+    m4.copy(world, nodes.sun_node.localMatrix);
+}
+
+function updateModels()
+{
+    /** Rotate the plane **/
+    var world = m4.identity();
+    world = m4.multiply(world, m4.translation([0, 14, 45]));
+    world = m4.multiply(world, m4.rotationX(1.1 * g_time));
+    world = m4.multiply(world, m4.rotationZ(200 * Math.PI / 180));
+    world = m4.multiply(world, m4.rotationY(170 * Math.PI / 180));
+    world = m4.multiply(world, m4.rotationX(25 * Math.PI / 180));
+    m4.scale(world, [0.02, 0.02, 0.02], world);
+    m4.copy(world, nodes.paper_plane_node.localMatrix);
+
+    // fighter position update.
+    let fighter = m4.translation(flight.position);
+    m4.multiply(fighter, flight.orientation, fighter);
+    nodes.fighter_base.localMatrix = fighter;
+
+    /** Update random objects **/
+    //FIXME: need to improve the bounding with g_time
+    nodes.random_nature_nodes.forEach(function (tmp) {
+        // tmp.xRot = tmp.xRotInit + tmp.xRotSpeed * g_time;
+        // tmp.yRot = tmp.yRotInit + tmp.yRotSpeed * g_time;
+        // tmp.zRot = tmp.zRotInit + tmp.zRotSpeed * g_time;
+        // tmp.y = tmp.yInit + tmp.ySpeed * g_time;
+
+        tmp.xRot += tmp.xRotSpeed * g_time_interval;
+        tmp.yRot += tmp.yRotSpeed * g_time_interval;
+        tmp.zRot += tmp.zRotSpeed * g_time_interval;
+        tmp.y += tmp.ySpeed * g_time_interval;
+
+        while(tmp.xRot > 360) tmp.xRot -= 360;
+        while(tmp.yRot > 360) tmp.yRot -= 360;
+        while(tmp.zRot > 360) tmp.zRot -= 360;
+        while(tmp.xRot < 0) tmp.xRot += 360;
+        while(tmp.yRot < 0) tmp.yRot += 360;
+        while(tmp.zRot < 0) tmp.zRot += 360;
+        while(tmp.y > 30) tmp.y -= 30;
+        while(tmp.y < 0) tmp.y += 30;
+        
+        var world = m4.identity();
+        world = m4.multiply(world, m4.translation([tmp.x, tmp.y, tmp.z]));
+        world = m4.multiply(world, m4.rotateX(world, tmp.xRot / 180 * Math.PI));
+        world = m4.multiply(world, m4.rotateY(world, tmp.yRot / 180 * Math.PI));
+        world = m4.multiply(world, m4.rotateZ(world, tmp.zRot / 180 * Math.PI));
+        m4.scale(world, [5, 5, 5], world);
+        m4.copy(world, tmp.localMatrix);
+    });
+}
+
+var assignFog2Nodes = function(curNode)
+    {
+        if(curNode.type == "OBJECT")
+        {
+            for(var i = 0; i < curNode.drawInfo.groupNum; i++)
+                Object.assign(curNode.drawInfo.uniformsList[i], {
+                    u_fogDensity: window.fogDensity / 10000,
+                    u_fogColor: [0.8, 0.9, 1, 1]
+                });
+        }
+        curNode.children.forEach(function (child) {
+            assignFog2Nodes(child);
+        });
+    }
+
+
+
+export {twgl, m4, gl, myCamera, objects, naturePackModelNames, skyProgramInfo, shadowProgramInfo, depthFramebufferInfo, g_time_interval, g_time, nodes};

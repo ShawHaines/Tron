@@ -163,10 +163,24 @@ class Camera {
     viewDir() {
         return [-this.viewMatrix[2], -this.viewMatrix[6], -this.viewMatrix[10]];
     }
-    updateProjectionMatrix(){
+    updateProjectionMatrix(gl){
+        this.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
         this.projection = m4.perspective(this.fov, this.aspect, this.zNear, this.zFar);
         return this.projection;
     }
 }
 
-export {Camera};
+/**
+ * update all the viewMatrix in the cameraList.
+ * @param {{Camera}} cameraList
+ * @returns {void}
+ */
+function updateCameras(gl, cameraList){
+    for (let each in cameraList){
+        let item=cameraList[each];
+        item.updateProjectionMatrix(gl);
+        item.viewMatrix=m4.inverse(item.node.worldMatrix);
+    }
+}
+
+export {Camera, updateCameras};
