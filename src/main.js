@@ -221,7 +221,7 @@ function render(time, camera) {
 function updateSunLight()
 {
     /** Update the sun light position **/
-    var world = m4.translation([0,300,0]);
+    var world=m4.identity();
     m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
     m4.copy(world, nodes.sun_node.localMatrix);
 }

@@ -10,7 +10,7 @@ import { myNode } from './myNode.js';
 var renderShadow = function (base_node, lights) {
     // the sidelength of the area that is lit
     let sideLength = 300;
-    let lightProjectionMatrix = m4.ortho(-sideLength / 2, sideLength / 2, -sideLength / 2, sideLength / 2, 5, 500);
+    let lightProjectionMatrix = m4.ortho(-sideLength / 2, sideLength / 2, -sideLength / 2, sideLength / 2, -300, 300);
     let lightWorldMatrix=lights[0].node.worldMatrix;
     let viewProjection=m4.multiply(lightProjectionMatrix,m4.inverse(lightWorldMatrix));
     //recursively draw from root.

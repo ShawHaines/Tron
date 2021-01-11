@@ -16,7 +16,7 @@ var renderScene = function(base_node, lights, myCamera){
     let lightPos=updateLights(lights);
     // the sidelength of the area that is lit
     let sideLength = 300;
-    let lightProjectionMatrix = m4.ortho(-sideLength / 2, sideLength / 2, -sideLength / 2, sideLength / 2, 5, 500);
+    let lightProjectionMatrix = m4.ortho(-sideLength / 2, sideLength / 2, -sideLength / 2, sideLength / 2, -300, 300);
     let lightWorldMatrix = lights[0].node.worldMatrix;
     let textureMatrix=m4.identity();
     textureMatrix = m4.translate(textureMatrix, [0.5, 0.5, 0.5]);
