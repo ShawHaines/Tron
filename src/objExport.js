@@ -25,7 +25,7 @@ document.getElementById("OBJButton").onclick = function()
     if(exportOBJCond)
     {
         item.innerHTML = "Exporting...";
-        exportOBJ(nodes);
+        exportOBJ(nodes.base_node);
     }
     else
     {
@@ -33,7 +33,7 @@ document.getElementById("OBJButton").onclick = function()
     }
 }
 
-var exportOBJ = function(nodes)
+var exportOBJ = function(curNode)
 {
     /**
      * Add your code here
