@@ -30,8 +30,10 @@ var initNodeSet = function(nodes)
     nodes.customized_light_nodes = customized_light_nodes;
     nodes.random_nature_nodes = random_nature_nodes;
     nodes.mountain_node = mountain_node;
-    // fighter_base is the orientation reference frame, while the fighter needs to do some transformations to fit into the frame.
+    // fighter_base is the yaw reference frame, fighter_pitch_roll takes care of the rest of the euler angle.
+    // while the fighter needs to do some transformations to fit into the frame fighter_pitch_roll.
     nodes.fighter_base = new myNode();
+    nodes.fighter_pitch_roll = new myNode();
     nodes.fighter = new myNode();
 };
 
@@ -47,7 +49,8 @@ function setFrameTree(nodes){
         each.setParent(nodes.base_node); 
     });
     nodes.fighter_base.setParent(nodes.base_node);
-    nodes.fighter.setParent(nodes.fighter_base);
+    nodes.fighter_pitch_roll.setParent(nodes.fighter_base);
+    nodes.fighter.setParent(nodes.fighter_pitch_roll);
     nodes.random_nature_nodes.forEach(function (tmp) {
         tmp.setParent(nodes.base_node);
     });
@@ -97,7 +100,7 @@ function setFrameTree(nodes){
 
     // initial position of the plane.
     nodes.fighter_base.localMatrix=m4.translation([0,5,0]);
-    
+    nodes.fighter_pitch_roll.localMatrix = m4.identity();
     //Set local matrix of fighter.
     world = m4.rotationZ(Math.PI/2);
     m4.rotateX(world,Math.PI/2,world);
