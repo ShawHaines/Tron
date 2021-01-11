@@ -66,7 +66,7 @@
 
                 <ul class="nav-menu-list">
                     <li><button id="pauseButton" class="nav-item" onclick="showMenu();">Pause</button></li>
-                    <li><button id="OBJButton" class="nav-item" style="visibility: visible;" onclick="exportOBJ();">Export</button></li>
+                    <li><button id="OBJButton" class="nav-item" style="visibility: visible;">Export OBJ</button></li>
                     <li><button id="lightButton" class="nav-item" style="visibility: visible;" onclick="editLight();">Edit Light</button></li>
                     <li><button id="navButton" class="nav-item" style="visibility: visible;" onclick="navigationModeOn();">Enable Navigation</button></li>
                 </ul>
@@ -83,7 +83,7 @@
             window.navMode = false;
             window.pauseCond = false;
             var editLightCond = false;
-            var exportOBJCond = false;
+            window.exportOBJCond = false;
             var showMenu = function()
             {
                 window.pauseCond = !window.pauseCond;
@@ -116,20 +116,7 @@
                 }
             }
 
-            exportOBJ = function()
-            {
-                exportOBJCond = true;
-                var item = document.getElementById('OBJButton');
-
-                if(exportOBJCond)
-                {
-                    item.innerHTML = "Loading...";
-                }
-                else
-                {
-                    item.innerHTML = "Edit OBJ Size";
-                }
-            }
+            
 
             navigationModeOn = function()
             {

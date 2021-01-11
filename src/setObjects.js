@@ -78,6 +78,7 @@ var bindObjectsWithMeshes = function(objects, meshes, textures, programInfo, gl)
 
     var bind = function(curObjectName, curObject)
     {
+        curObject.name = curObjectName;
         curObject.programInfo = programInfo;
         if(textures[curObjectName])
             curObject.textures = textures[curObjectName];

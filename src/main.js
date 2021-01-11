@@ -19,6 +19,8 @@ import {initNodeSet, setFrameTree, linkObjects} from './setNodes.js'
 import {renderSky} from './renderSky.js'
 import {parseModel} from './objLoader.js'
 import {moveNavCamera} from './navInteraction.js'
+import {bindOBJExportInfo2Nodes} from './objExport.js'
+
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
 if (!gl) console.log("Failed");
@@ -84,6 +86,9 @@ function webGLStart(meshes){
     setFrameTree(nodes);
     /** link objects with nodes **/
     linkObjects(nodes, objects);
+    /** bind objects with mesh info (to export as OBJ later) **/
+    bindOBJExportInfo2Nodes(nodes.base_node, meshes);
+    /** Set cameras **/
     setCameras();
     /** Set lights **/
     setLights();
@@ -277,4 +282,4 @@ function updateModels()
 
 
 
-export {twgl, m4, gl, myCamera, objects, naturePackModelNames, skyProgramInfo, shadowProgramInfo, depthFramebufferInfo, g_time_interval, g_time};
+export {twgl, m4, gl, myCamera, objects, naturePackModelNames, skyProgramInfo, shadowProgramInfo, depthFramebufferInfo, g_time_interval, g_time, nodes};

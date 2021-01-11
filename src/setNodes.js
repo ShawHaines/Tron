@@ -163,6 +163,8 @@ function linkObjects(nodes, objects){
 function setNodeAsObject(curNode, curObject)
 {
     curNode.type = "OBJECT";
+    curNode.bindObject = curObject;
+    curNode.bindObjectName = curObject.name;
     
     curNode.drawInfo = {
         groupNum: 0,
