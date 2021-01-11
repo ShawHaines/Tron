@@ -223,7 +223,7 @@ function render(time, camera) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     renderScene(nodes.base_node, lights, camera);
     gl.depthFunc(gl.LEQUAL);
-    renderSky(camera, time);
+    renderSky(camera, time * 1000);
 }
 
 
@@ -295,7 +295,7 @@ function updateModels()
         tmp.xRot += tmp.xRotSpeed * g_time_interval;
         tmp.yRot += tmp.yRotSpeed * g_time_interval;
         tmp.zRot += tmp.zRotSpeed * g_time_interval;
-        tmp.y += tmp.ySpeed * g_time_interval;
+        // tmp.y += tmp.ySpeed * g_time_interval;
 
         while(tmp.xRot > 360) tmp.xRot -= 360;
         while(tmp.yRot > 360) tmp.yRot -= 360;
@@ -303,8 +303,8 @@ function updateModels()
         while(tmp.xRot < 0) tmp.xRot += 360;
         while(tmp.yRot < 0) tmp.yRot += 360;
         while(tmp.zRot < 0) tmp.zRot += 360;
-        while(tmp.y > 30) tmp.y -= 30;
-        while(tmp.y < 0) tmp.y += 30;
+        // while(tmp.y > 100) tmp.y -= 100;
+        // while(tmp.y < 0) tmp.y += 100;
         
         var world = m4.identity();
         world = m4.multiply(world, m4.translation([tmp.x, tmp.y, tmp.z]));

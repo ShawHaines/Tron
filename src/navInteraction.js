@@ -2,6 +2,8 @@
 * Interaction Control
 *********************************************/
 import {myCamera, g_time_interval} from "./main.js";
+import {pitchUp, pitchDown, resetPitch} from "../pages/Flight/flight.js"
+import {gl} from "./main.js"
 
 var navMovePosFlags = [0, 0, 0];
 
@@ -21,7 +23,7 @@ function moveNavCamera(camera)
             camera.movePos(0, 0, -FACTOR * g_time_interval)
         }
         if(joystick.down()) {
-            camera.movePos(0, 0, -FACTOR * g_time_interval)
+            camera.movePos(0, 0, FACTOR * g_time_interval)
         }
         //keyboard
         camera.movePos(FACTOR * navMovePosFlags[0] * g_time_interval, FACTOR * navMovePosFlags[1] * g_time_interval, FACTOR * navMovePosFlags[2] * g_time_interval);
@@ -124,11 +126,22 @@ document.getElementById("c").ontouchstart = function(e) {
         touchX = e.changedTouches[0].pageX;
         touchY = e.changedTouches[0].pageY;
     }
+    else
+    {
+        var _x = e.changedTouches[0].pageX;
+        var _y = e.changedTouches[0].pageY;
+        if(_x > gl.canvas.width / 2 && _y > gl.canvas.height / 2) pitchDown();
+        else if(_x > gl.canvas.width / 2 && _y < gl.canvas.height / 2) pitchUp();
+    }
 }
 document.getElementById("c").ontouchend = function(e) {
     if(window.navMode){
         touchDownFlag = false;
         touchId = null;
+        resetPitch();
+    }
+    else{
+        resetPitch();
     }
 }
 

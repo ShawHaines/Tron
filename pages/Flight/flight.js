@@ -55,7 +55,7 @@ var omegaMax=Math.PI;
 /**
  * if true, reverse the Pitch axis.
  */
-var reversePitch=false;
+var reversePitch=true;
 /**
  *Returns the 4*4 Euler Matrix of euler angle yaw, pitch, yaw.
  * @param {number} yaw
@@ -156,25 +156,35 @@ function updateRibbon() {
     ribbonLength++;
 }
 
+//record key state to solve conflicts between joystick
+var keyState = {
+    speedUp: false,
+    speedDown: false,
+    pitchUp: false,
+    pitchDown: false,
+    rollLeft: false,
+    rollRight: false,
+}
+
 document.addEventListener("keydown", function (event) {
     switch (event.key) {
         case "z":
-            speedUp();
+            speedUp(); keyState.speedUp = true;
             break;
         case "x":
-            speedDown();
+            speedDown(); keyState.speedDown = true;
             break;
         case "ArrowUp":
-            pitchUp();
+            pitchUp(); keyState.pitchUp = true;
             break;
         case "ArrowDown":
-            pitchDown();
+            pitchDown(); keyState.pitchDown = true;
             break;
         case "ArrowLeft":
-            rollLeft();
+            rollLeft(); keyState.rollLeft = true;
             break;
         case "ArrowRight":
-            rollRight();
+            rollRight(); keyState.rollRight = true;
             break;
         default:
             console.log(event);
@@ -185,13 +195,13 @@ document.addEventListener("keydown", function (event) {
 document.addEventListener("keyup",function(event){
     switch (event.key) {
         case "z":case "x":
-            resetAcceleration();
+            resetAcceleration(); keyState.speedUp = false; keyState.speedDown = false;
             break;
         case "ArrowUp":case "ArrowDown":
-            resetPitch();
+            resetPitch(); keyState.pitchDown = false; keyState.pitchUp = false;
             break;
         case "ArrowLeft":case "ArrowRight":
-            resetRoll();
+            resetRoll(); keyState.rollLeft = false; keyState.rollRight = false;
             break;
         default:
             console.log(event);
@@ -214,27 +224,55 @@ var resetRoll = function(){omega[2]=0};
 setInterval(function(){
     // TODO: Introduce improved Euler's method, or R-K method.
     let dt=interval/1000;
+
+    if(!window.navMode)
+    {
+        //joystick
+        if(joystick.right()) {
+            rollRight();
+        }
+        if(joystick.left()) {
+            rollLeft();
+        }
+        if(joystick.up()) {   
+            speedUp();
+        }
+        if(joystick.down()) {
+            speedDown();
+        }
+    }
+    if(!joystick.right() && !joystick.left() && !keyState.rollRight && !keyState.rollLeft) {
+        resetRoll();
+    }
+    if(!joystick.up() && !joystick.down() && !keyState.speedUp && !keyState.speedDown) {
+        resetAcceleration();
+    }
+
     // updating all the values, starting from the higher order.
     // let R=euler_matrix(eulerAngle[0],eulerAngle[1],eulerAngle[2]);
     // vec3.scaleAndAdd(eulerAngle,eulerAngle,omega,dt);
-    let dYaw=0,dPitch=omega[1]*dt,dRoll=omega[2]*dt;
-    let Ry=[],Rx=[];
-    mat4.fromYRotation(Ry,dPitch);
-    mat4.fromXRotation(Rx,dRoll);
-    // FIXME: the order matters! first pitch, then roll. Also note the multiplying order.
-    mat4.multiply(orientation,orientation,Rx);
-    mat4.multiply(orientation, orientation,Ry);
-    vec4.scaleAndAdd(u,u,a,dt);
-    vec4.transformMat4(v,u,orientation);
-    vec4.add(position,position,v);
-
-    // update ribbon.
-    ribbonCount++;
-    if (ribbonCount>=ribbonInterval){
-        ribbonCount-=ribbonInterval;
-        updateRibbon();
+    if(!window.navMode && !window.pauseCond)
+    {
+        let dYaw=0,dPitch=omega[1]*dt,dRoll=omega[2]*dt;
+        let Ry=[],Rx=[];
+        mat4.fromYRotation(Ry,dPitch);
+        mat4.fromXRotation(Rx,dRoll);
+        // FIXME: the order matters! first pitch, then roll. Also note the multiplying order.
+        mat4.multiply(orientation,orientation,Rx);
+        mat4.multiply(orientation, orientation,Ry);
+        vec4.scaleAndAdd(u,u,a,dt); if(u[0] < 0) u[0] = 0.02;
+        vec4.transformMat4(v,u,orientation);
+        vec4.add(position,position,v);
+    
+        // update ribbon.
+        ribbonCount++;
+        if (ribbonCount>=ribbonInterval){
+            ribbonCount-=ribbonInterval;
+            updateRibbon();
+        }
     }
+
 },interval);
 
 // global variables.
-export {euler_matrix, orientation, position, ribbon , ribbonLength};
+export {euler_matrix, orientation, position, ribbon , ribbonLength, pitchUp, pitchDown, resetPitch};

@@ -78,7 +78,7 @@ const fs=`
         float x = v_position.x;
         float y = v_position.y;
         vec3 cloudEffect = clouds(v_position.x, v_position.y);
-        color = -0.4 * cloudEffect + vec3(106.0/255.0, 198.0/255.0, 211.0/255.0);
+        color = -0.5 * cloudEffect + vec3(106.0/255.0, 198.0/255.0, 211.0/255.0);
         gl_FragColor = vec4(color, 1.);
    }
 `

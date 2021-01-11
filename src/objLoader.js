@@ -27,6 +27,8 @@ function parseOBJ(text) {
     let groups = ['default'];
     let material = 'default';
     let object = 'default';
+    let min = [2000, 2000, 2000];
+    let max = [-2000, -2000, -2000];
   
     const noop = () => {};
   
@@ -53,6 +55,8 @@ function parseOBJ(text) {
         geometry = {
           // object,
           // groups,
+          min,
+          max,
           material,
           data: {
             vertices,
@@ -88,8 +92,35 @@ function parseOBJ(text) {
         if (parts.length > 3) {
           objPositions.push(parts.slice(0, 3).map(parseFloat));
           objColors.push(parts.slice(3).map(parseFloat));
+          var tempv = parts.slice(0, 3).map(parseFloat);
+          if(tempv[0] < min[0])
+            min[0] = tempv[0];
+          if(tempv[1] < min[1])
+            min[1] = tempv[1];
+          if(tempv[2] < min[2])
+            min[2] = tempv[2];
+          if(tempv[0] > max[0])
+            max[0] = tempv[0];
+          if(tempv[1] > max[1])
+            max[1] = tempv[1];
+          if(tempv[2] > max[2])
+            max[2] = tempv[2];
         } else {
           objPositions.push(parts.map(parseFloat));
+          // console.log(parts.map(parseFloat));
+          var tempv = parts.map(parseFloat);
+          if(tempv[0] < min[0])
+            min[0] = tempv[0];
+          if(tempv[1] < min[1])
+            min[1] = tempv[1];
+          if(tempv[2] < min[2])
+            min[2] = tempv[2];
+          if(tempv[0] > max[0])
+            max[0] = tempv[0];
+          if(tempv[1] > max[1])
+            max[1] = tempv[1];
+          if(tempv[2] > max[2])
+            max[2] = tempv[2];
         }
       },
       vn(parts) {
@@ -154,7 +185,8 @@ function parseOBJ(text) {
       geometry.data = Object.fromEntries(
           Object.entries(geometry.data).filter(([, array]) => array.length > 0));
     }
-  
+    // console.log(min);
+    // console.log(max);
     return {
       geometries,
       materialNames,
@@ -243,7 +275,13 @@ function parseOBJ(text) {
             ret[name] = mesh;
         }
         
-        if(i >= Object.keys(models).length - 1) callBack(ret);
+        if(i >= Object.keys(models).length - 1)
+        {
+          window.loadingResource = false;
+          document.getElementById('loading_box').style.visibility = "hidden";
+          document.getElementById('c').style.visibility = "visible";
+          callBack(ret);
+        }
         i++;
     });
   }
