@@ -65,10 +65,11 @@
                 <span class="nav-item is-menu-item menu-icon" onclick="return false;"></span>
 
                 <ul class="nav-menu-list">
-                    <li><button id="pauseButton" class="nav-item" onclick="showMenu();">Pause</button></li>
-                    <li><button id="OBJButton" class="nav-item" style="visibility: visible;">Export OBJ</button></li>
-                    <li><button id="lightButton" class="nav-item" style="visibility: visible;" onclick="editLight();">Edit Light</button></li>
+                    <li><button id="pauseButton" class="nav-item" onclick="pauseTime();">Pause</button></li>
                     <li><button id="navButton" class="nav-item" style="visibility: visible;" onclick="navigationModeOn();">Enable Navigation</button></li>
+                    <li><button id="lightButton" class="nav-item" style="visibility: visible;" onclick="editLight();">Edit Light</button></li>
+                    <li><button id="fogButton" class="nav-item" style="visibility: visible;" onclick="editFog();">Edit Fog</button></li>
+                    <li><button id="OBJButton" class="nav-item" style="visibility: visible;">Export OBJ</button></li>
                 </ul>
 
                 <ul class="nav-menu-list">
@@ -84,7 +85,8 @@
             window.pauseCond = false;
             var editLightCond = false;
             window.exportOBJCond = false;
-            var showMenu = function()
+            var editFogCond = false;
+            var pauseTime = function()
             {
                 window.pauseCond = !window.pauseCond;
                 item = document.getElementById('pauseButton');
@@ -101,21 +103,38 @@
             var editLight = function()
             {
                 editLightCond = !editLightCond;
-                var item = document.getElementById('lightButton');
-                var ui = document.getElementById('Light');
                 if(editLightCond)
                 {
-                    editOBJSizeCond = false;
-                    item.innerHTML = "Close";
-                    ui.style.visibility = "visible";
+                    editFogCond = false;
+                    document.getElementById('fogButton').innerHTML = "Edit Fog";
+                    document.getElementById('lightButton').innerHTML = "Close";
+                    document.getElementById('Fog').style.visibility = "hidden";
+                    document.getElementById('Light').style.visibility = "visible";
                 }
                 else
                 {
-                    item.innerHTML = "Light";
-                    ui.style.visibility = "hidden";
+                    document.getElementById('lightButton').innerHTML = "Edit Light";
+                    document.getElementById('Light').style.visibility = "hidden";
                 }
             }
-
+            
+            var editFog = function()
+            {
+                editFogCond = !editFogCond;
+                if(editFogCond)
+                {
+                    editLightCond = false;
+                    document.getElementById('lightButton').innerHTML = "Edit Light";
+                    document.getElementById('fogButton').innerHTML = "Close";
+                    document.getElementById('Light').style.visibility = "hidden";
+                    document.getElementById('Fog').style.visibility = "visible";
+                }
+                else
+                {
+                    document.getElementById('fogButton').innerHTML = "Edit Fog";
+                    document.getElementById('Fog').style.visibility = "hidden";
+                }
+            }
             
 
             navigationModeOn = function()
@@ -155,7 +174,8 @@
 
             <div id="uiContainer">
                 <div id="ui">
-                    <div id="Light" style="visibility: hidden;"></div>
+                    <div id="Light" style="position: absolute; top: 20px; right: 20px; visibility: hidden;"></div>
+                    <div id="Fog" style="position: absolute; top: 20px; right: 20px; visibility: hidden;"></div>
                 </div>
             </div>
 

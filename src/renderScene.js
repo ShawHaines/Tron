@@ -43,6 +43,7 @@ var renderScene = function(base_node, lights, myCamera){
                 // const bufferInfo = drawInfo.bufferInfo;
 
                 uniform.u_world = curNode.worldMatrix;
+                uniform.u_worldView = m4.multiply(view, curNode.worldMatrix);
                 uniform.u_worldViewProjection = m4.multiply(viewProjection, curNode.worldMatrix);
                 uniform.u_viewPos = myCamera.position;
                 //default lighting attributes

@@ -4,6 +4,7 @@ const vs = `
     attribute vec3 a_normal;
 
     uniform mat4 u_world;
+    uniform mat4 u_worldView;
     uniform mat4 u_worldViewProjection; //redundant for efficiency
     uniform mat4 u_worldInverseTranspose; //for calculating v_normal
     uniform mat4 u_textureMatrix; //for shadowsmapping texture.
@@ -14,6 +15,8 @@ const vs = `
     varying vec3 v_normal;
     varying vec3 v_fragPos;
 
+    varying vec3 v_viewWorldPosition;
+
     void main() {
         v_texcoord = a_texcoord;
         gl_Position = u_worldViewProjection * a_position;
@@ -22,6 +25,7 @@ const vs = `
         v_normal = mat3(u_worldInverseTranspose) * a_normal; //calculate v_normal
         // v_normal = a_normal; //calculate v_normal
         v_fragPos = (u_world * a_position).xyz; //calculate fragment position
+        v_viewWorldPosition = (u_worldView * a_position).xyz;
     }
     `;
 
@@ -33,12 +37,16 @@ varying vec4 v_projectedTexcoord; // for shadow mapping texture
 
 varying vec3 v_normal;
 varying vec3 v_fragPos;
+varying vec3 v_viewWorldPosition;
 
 uniform vec3 u_viewPos; // Viewing position from the eye, already been transformed.
 uniform vec4 u_objectColor;
 uniform sampler2D u_texture;
 uniform sampler2D u_projectedTexture;
 float u_bias=-0.001; //hard-written
+
+uniform vec4 u_fogColor;
+uniform float u_fogDensity;
 
 // the number of lights in the scene.
 uniform int u_lightNumber;
@@ -105,6 +113,14 @@ void main() {
     vec4 color = texColor + u_objectColor;
     result+=light*color;
 }
-gl_FragColor = result + vec4(u_emissiveMaterial, 1.0);
+
+    #define LOG2 1.442695
+    float fogDistance = length(v_viewWorldPosition);
+    float fogAmount = 1. - exp2(-u_fogDensity * u_fogDensity * fogDistance * fogDistance * LOG2);
+    fogAmount = clamp(fogAmount, 0., 1.);
+
+    gl_FragColor = mix(result + vec4(u_emissiveMaterial, 1.0), u_fogColor, fogAmount);
+
+// gl_FragColor = result + vec4(u_emissiveMaterial, 1.0);
 }`;
 export { vs, fs };

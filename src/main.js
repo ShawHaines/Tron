@@ -92,6 +92,8 @@ function webGLStart(meshes){
     setCameras();
     /** Set lights **/
     setLights();
+    /** Set fogs **/
+    assignFog2Nodes(nodes.base_node);
 
     requestAnimationFrame(main);
 }
@@ -184,7 +186,10 @@ var main = function(time){
 function update(time) {
     if(!window.pauseCond) updateModels(); //if pause, every model should not update
                                               //FIXME: plane's internal position should stop moving
+    /** Update sunlight **/
     updateSunLight();
+    /** Set fogs **/
+    assignFog2Nodes(nodes.base_node);
     /** Update Navigation Camera **/
     moveNavCamera(myCamera);
     /** Update world matrix for every node **/
@@ -279,6 +284,21 @@ function updateModels()
         m4.copy(world, tmp.localMatrix);
     });
 }
+
+var assignFog2Nodes = function(curNode)
+    {
+        if(curNode.type == "OBJECT")
+        {
+            for(var i = 0; i < curNode.drawInfo.groupNum; i++)
+                Object.assign(curNode.drawInfo.uniformsList[i], {
+                    u_fogDensity: window.fogDensity / 10000,
+                    u_fogColor: [0.8, 0.9, 1, 1]
+                });
+        }
+        curNode.children.forEach(function (child) {
+            assignFog2Nodes(child);
+        });
+    }
 
 
 
