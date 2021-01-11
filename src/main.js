@@ -142,11 +142,11 @@ function setCameras(){
 
     // camera that follows the fighter.
     let tailCamera=new Camera();
-    tailCamera.node.setParent(nodes.fighter_base);
+    tailCamera.node.setParent(nodes.sidekick);
     let tail=m4.identity();
-    m4.translate(tail,[-20,0,-3],tail);
-    m4.rotateY(tail,-Math.PI/2,tail);
-    m4.rotateZ(tail,Math.PI/2,tail);
+    m4.translate(tail,[0,3,20],tail);
+    // m4.rotateY(tail,-Math.PI/2,tail);
+    // m4.rotateZ(tail,Math.PI/2,tail);
     tailCamera.node.localMatrix=tail;
     cameras.tailCamera=tailCamera;
 }
@@ -235,7 +235,15 @@ function updateSunLight()
     m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
     m4.copy(world, nodes.sun_node.localMatrix);
 }
-
+// Ring buffer keeping track of the position and orientation.
+var record = {
+    position: [],
+    orientation: [],
+    pointer: 0,
+    size: 20,
+    // records whether the ring buffer has started over again.
+    full: false,
+}
 function updateModels()
 {
     /** Rotate the plane **/
@@ -252,7 +260,30 @@ function updateModels()
     let fighter = m4.translation(flight.position);
     m4.multiply(fighter, flight.orientation, fighter);
     nodes.fighter_base.localMatrix = fighter;
-
+    let sidekickPosition=m4.identity(),sidekickOrientation=m4.identity();
+    // write into the ring buffer.
+    if (!record.full){
+        // not full yet, just use the earliest possible value.
+        // FIXME: be careful about the shallow copy!
+        record.position.push(m4.copy(flight.position));
+        record.orientation.push(m4.copy(flight.orientation));
+        m4.copy(record.position[0],sidekickPosition);
+        m4.copy(record.orientation[0],sidekickOrientation);
+        record.pointer++;
+        if (record.pointer>=record.size){
+            record.full=true;
+            record.pointer-=record.size;
+        }
+    } else{
+        // already full, use the one that's going to be overwritten.
+        m4.copy(record.position[record.pointer],sidekickPosition);
+        m4.copy(record.orientation[record.pointer],sidekickOrientation);
+        record.position[record.pointer]=m4.copy(flight.position);
+        record.orientation[record.pointer]=m4.copy(flight.orientation);
+        record.pointer=(record.pointer+1)%record.size;
+    }
+    let sidekick=m4.lookAt(sidekickPosition,flight.position,[0,1,0]);
+    nodes.sidekick.localMatrix=sidekick;
     /** Update random objects **/
     //FIXME: need to improve the bounding with g_time
     nodes.random_nature_nodes.forEach(function (tmp) {

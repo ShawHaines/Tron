@@ -33,6 +33,7 @@ var initNodeSet = function(nodes)
     // fighter_base is the orientation reference frame, while the fighter needs to do some transformations to fit into the frame.
     nodes.fighter_base = new myNode();
     nodes.fighter = new myNode();
+    nodes.sidekick = new myNode();
 };
 
 /** create nodes for objects **/
@@ -48,6 +49,7 @@ function setFrameTree(nodes){
     });
     nodes.fighter_base.setParent(nodes.base_node);
     nodes.fighter.setParent(nodes.fighter_base);
+    nodes.sidekick.setParent(nodes.base_node);
     nodes.random_nature_nodes.forEach(function (tmp) {
         tmp.setParent(nodes.base_node);
     });
@@ -97,7 +99,8 @@ function setFrameTree(nodes){
 
     // initial position of the plane.
     nodes.fighter_base.localMatrix=m4.translation([0,5,0]);
-    
+    // sidekick, used by the camera.
+    nodes.sidekick.localMatrix = m4.identity();
     //Set local matrix of fighter.
     world = m4.rotationZ(Math.PI/2);
     m4.rotateX(world,Math.PI/2,world);
