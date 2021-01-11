@@ -130,15 +130,11 @@ function setLights(){
 function setCameras(){
     myCamera.node.setParent(nodes.base_node);
     // set aspect ratio according to the size of the canvas.
-    myCamera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-    myCamera.updateProjectionMatrix();
     cameras.myCamera=myCamera;
 
     // camera that follows the fighter.
     let tailCamera=new Camera();
     tailCamera.node.setParent(nodes.fighter_base);
-    tailCamera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-    tailCamera.updateProjectionMatrix();
     let tail=m4.identity();
     m4.translate(tail,[-20,0,-3],tail);
     m4.rotateY(tail,-Math.PI/2,tail);
@@ -178,7 +174,7 @@ function update(time) {
 
     /** Update world matrix for every node **/
     nodes.base_node.updateWorldMatrix();
-    updateCameras(cameras);
+    updateCameras(gl,cameras);
 }
 
 /********************************************
