@@ -18,6 +18,7 @@ import {initObjectList, bindObjectsWithMeshes} from './setObjects.js'
 import {initNodeSet, setFrameTree, linkObjects} from './setNodes.js'
 import {renderSky} from './renderSky.js'
 import {parseModel} from './objLoader.js'
+import {navMovePosFlags} from './navInteraction.js'
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
 if (!gl) console.log("Failed");
@@ -38,6 +39,7 @@ const depthFramebufferInfo = twgl.createFramebufferInfo(gl, attachments, depthTe
 console.log(depthFramebufferInfo);
 /** Some global variables **/
 var g_time = 0; /** global time (keep updated in `render()`) **/
+var g_time_interval = 0;
 var old_time = 0, new_time = 0;
 
 /** IMPORTANT THINGS **/
@@ -145,12 +147,24 @@ function setCameras(){
 }
 
 /********************************************
-* [Example]: Rotate the paper plane 60 times a second
+* main() function
 *********************************************/
 var main = function(time){
     time *= 0.001;
     new_time = time;
-    if(!window.pauseCond) g_time += new_time - old_time;
+    //Limited maximum FPS!
+    if(new_time - old_time < 1.0 / 60.0)
+    {
+        requestAnimationFrame(main);
+        return;
+    }
+
+    if(!window.pauseCond)
+    {
+        // g_time_interval = (new_time - old_time <= 0.1)?(new_time - old_time):0.1;
+        g_time_interval = new_time - old_time;
+        g_time += g_time_interval;
+    }
     old_time = new_time;
 
     update(time);
@@ -161,14 +175,50 @@ var main = function(time){
     requestAnimationFrame(main);
 };
 
+/********************************************
+* update() function
+*********************************************/
 function update(time) {
     if(!window.pauseCond) updateModels(); //if pause, every model should not update
                                               //FIXME: plane's internal position should stop moving
     updateSunLight();
+    /** Update Navigation Camera **/
+    moveNavCamera(myCamera);
     /** Update world matrix for every node **/
     nodes.base_node.updateWorldMatrix();
     updateCameras(gl, cameras);
 }
+
+/********************************************
+* render() function
+*********************************************/
+function render(time, camera) {
+    time *= 0.001;
+
+    twgl.resizeCanvasToDisplaySize(gl.canvas);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.CULL_FACE);
+    gl.depthFunc(gl.LESS);  // use the default depth test
+
+    // render the shadow map to texture.
+    // By default, only the shadow of light[0] is generated, and it should be a directional light.
+    twgl.bindFramebufferInfo(gl, depthFramebufferInfo);
+    gl.clearColor(0,0,0,1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.useProgram(shadowProgramInfo.program);
+    renderShadow(nodes.base_node, lights);
+
+    // switch framebuffer back to canvas.
+    twgl.bindFramebufferInfo(gl);
+    gl.clearColor(0.1, 0.8, 0.9, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    renderScene(nodes.base_node, lights, camera);
+    gl.depthFunc(gl.LEQUAL);
+    renderSky(camera, time);
+}
+
+
 
 function updateSunLight()
 {
@@ -198,10 +248,15 @@ function updateModels()
     /** Update random objects **/
     //FIXME: need to improve the bounding with g_time
     nodes.random_nature_nodes.forEach(function (tmp) {
-        tmp.xRot = tmp.xRotInit + tmp.xRotSpeed * g_time;
-        tmp.yRot = tmp.yRotInit + tmp.yRotSpeed * g_time;
-        tmp.zRot = tmp.zRotInit + tmp.zRotSpeed * g_time;
-        tmp.y = tmp.yInit + tmp.ySpeed * g_time;
+        // tmp.xRot = tmp.xRotInit + tmp.xRotSpeed * g_time;
+        // tmp.yRot = tmp.yRotInit + tmp.yRotSpeed * g_time;
+        // tmp.zRot = tmp.zRotInit + tmp.zRotSpeed * g_time;
+        // tmp.y = tmp.yInit + tmp.ySpeed * g_time;
+
+        tmp.xRot += tmp.xRotSpeed * g_time_interval;
+        tmp.yRot += tmp.yRotSpeed * g_time_interval;
+        tmp.zRot += tmp.zRotSpeed * g_time_interval;
+        tmp.y += tmp.ySpeed * g_time_interval;
 
         while(tmp.xRot > 360) tmp.xRot -= 360;
         while(tmp.yRot > 360) tmp.yRot -= 360;
@@ -209,16 +264,9 @@ function updateModels()
         while(tmp.xRot < 0) tmp.xRot += 360;
         while(tmp.yRot < 0) tmp.yRot += 360;
         while(tmp.zRot < 0) tmp.zRot += 360;
-        while(tmp.y > 30)
-        {
-            tmp.yInit -= 30;
-            tmp.y -= 30;
-        }
-        while(tmp.y < 0)
-        {
-            tmp.yInit += 30;
-            tmp.y += 30;
-        }
+        while(tmp.y > 30) tmp.y -= 30;
+        while(tmp.y < 0) tmp.y += 30;
+        
         var world = m4.identity();
         world = m4.multiply(world, m4.translation([tmp.x, tmp.y, tmp.z]));
         world = m4.multiply(world, m4.rotateX(world, tmp.xRot / 180 * Math.PI));
@@ -229,33 +277,27 @@ function updateModels()
     });
 }
 
-/********************************************
-* Render Function
-*********************************************/
-function render(time, camera) {
-    time *= 0.001;
-
-    twgl.resizeCanvasToDisplaySize(gl.canvas);
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.CULL_FACE);
-    gl.depthFunc(gl.LESS);  // use the default depth test
-
-    // render the shadow map to texture.
-    // By default, only the shadow of light[0] is generated, and it should be a directional light.
-    twgl.bindFramebufferInfo(gl, depthFramebufferInfo);
-    gl.clearColor(0,0,0,1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.useProgram(shadowProgramInfo.program);
-    renderShadow(nodes.base_node, lights);
-
-    // switch framebuffer back to canvas.
-    twgl.bindFramebufferInfo(gl);
-    gl.clearColor(0.1, 0.8, 0.9, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    renderScene(nodes.base_node, lights, camera);
-    gl.depthFunc(gl.LEQUAL);
-    renderSky(camera, time);
+function moveNavCamera(camera)
+{
+    const FACTOR = 20;
+    //only enabled when `navMode` is on
+    if(window.navMode){
+        //joystick
+        if(joystick.right()) {
+            camera.movePos(FACTOR * g_time_interval, 0, 0)
+        }
+        if(joystick.left()) {
+            camera.movePos(-FACTOR  * g_time_interval, 0, 0)
+        }
+        if(joystick.up()) {
+            camera.movePos(0, 0, -FACTOR * g_time_interval)
+        }
+        if(joystick.down()) {
+            camera.movePos(0, 0, -FACTOR * g_time_interval)
+        }
+        //keyboard
+        camera.movePos(FACTOR * navMovePosFlags[0] * g_time_interval, FACTOR * navMovePosFlags[1] * g_time_interval, FACTOR * navMovePosFlags[2] * g_time_interval);
+    }
 }
 
 
