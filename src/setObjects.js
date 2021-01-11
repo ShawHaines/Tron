@@ -106,7 +106,7 @@ var bindObjectsWithMeshes = function(objects, meshes, textures, programInfo, gl)
         curObject.bufferInfoByMaterial = curObject_bufferInfoByMaterial; 
         // console.log(curObject);
     }
-    bind("NaturePack_Part1", NaturePack_Part1);
+    // bind("NaturePack_Part1", NaturePack_Part1);
     // NaturePack_Part1.objectColor = [1.0, 1.0, 1.0, 1.0];    //(optional)If materials are provided (or enabled)
     bind("viking_room", viking_room);
     bind("paper_plane", paper_plane);

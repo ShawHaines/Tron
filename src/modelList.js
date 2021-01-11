@@ -158,11 +158,11 @@ const models = [
         obj: './resource/rff.obj',
         mtl: './resource/rff.mtl',
     },
-    {
-        name: 'NaturePack_Part1',
-        obj: './resource/NaturePack_Part1.obj',
-        mtl: './resource/NaturePack_Part1.mtl',
-    },
+    // {
+    //     name: 'NaturePack_Part1',
+    //     obj: './resource/NaturePack_Part1.obj',
+    //     mtl: './resource/NaturePack_Part1.mtl',
+    // },
     {
         name: 'arch1',
         obj: './resource/NaturePack/arch1.obj',
