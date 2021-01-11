@@ -32,7 +32,7 @@ const amax = 0.1;
 /**
  * time interval in miliseconds.
  */
-var interval = 30;
+var interval = 10;
 
 
 /** 
