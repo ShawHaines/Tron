@@ -99,7 +99,7 @@ function setFrameTree(nodes){
     //Set local matrix of fighter.
     world = m4.rotationZ(-Math.PI/2);
     m4.rotateX(world,-Math.PI/2,world);
-    // m4.scale(world,[5,5,5],world);
+    m4.scale(world, [0.01, 0.01, 0.01],world);
     m4.copy(world, nodes.fighter.localMatrix);
 
     nodes.random_nature_nodes.forEach(function (tmp) {
@@ -129,7 +129,7 @@ function linkObjects(nodes, objects){
         setNodeAsObject(tmp, objects.naturePack[Math.floor(Math.random() * 142)]);
     });
     setNodeAsObject(nodes.mountain_node, objects.mountain);
-    setNodeAsObject(nodes.fighter,objects.fighter);
+    setNodeAsObject(nodes.fighter,objects.paper_plane);
 }
 
 /**
