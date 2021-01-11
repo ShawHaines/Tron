@@ -144,9 +144,9 @@ function setCameras(){
     let tailCamera=new Camera();
     tailCamera.node.setParent(nodes.sidekick);
     let tail=m4.identity();
-    m4.translate(tail,[-20,0,-3],tail);
-    m4.rotateY(tail,-Math.PI/2,tail);
-    m4.rotateZ(tail,Math.PI/2,tail);
+    m4.translate(tail,[0,3,20],tail);
+    // m4.rotateY(tail,-Math.PI/2,tail);
+    // m4.rotateZ(tail,Math.PI/2,tail);
     tailCamera.node.localMatrix=tail;
     cameras.tailCamera=tailCamera;
 }
@@ -282,8 +282,7 @@ function updateModels()
         record.orientation[record.pointer]=m4.copy(flight.orientation);
         record.pointer=(record.pointer+1)%record.size;
     }
-    let sidekick=m4.translation(sidekickPosition);
-    m4.multiply(sidekick,sidekickOrientation,sidekick);
+    let sidekick=m4.lookAt(sidekickPosition,flight.position,[0,1,0]);
     nodes.sidekick.localMatrix=sidekick;
     /** Update random objects **/
     //FIXME: need to improve the bounding with g_time
