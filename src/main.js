@@ -5,7 +5,7 @@ import * as twgl from "../modules/twgl/twgl-full.module.js";
 import {myNode} from "./myNode.js";
 import {myObject} from "./myObject.js";
 import {Camera,updateCameras} from "./camera.js";
-import {Light, pack} from "./light.js";
+import {Light, pack, updateLights} from "./light.js";
 // import * as texture_shader from "../pages/Preview/src/texture-shader.js";
 import * as texture_shader from "../pages/Preview/src/texture-shader-with-shadow.js";
 import * as shadow_shader from '../pages/Preview/src/shadow-shader.js';
@@ -224,6 +224,27 @@ function render(time, camera) {
     renderScene(nodes.base_node, lights, camera);
     gl.depthFunc(gl.LEQUAL);
     renderSky(camera, time);
+    // draw ribbon.
+    if (flight.ribbonLength > 1) {
+        const projection = myCamera.projection;
+        const view = myCamera.viewMatrix;
+        const viewProjection = m4.multiply(projection, view);
+        let ribbonBuffer = twgl.createBufferInfoFromArrays(gl, flight.ribbon);
+        twgl.setBuffersAndAttributes(gl, programInfo, ribbonBuffer);
+        let uniform = {};
+        uniform.u_world = m4.identity();
+        uniform.u_worldViewProjection = viewProjection;
+        uniform.u_viewPos = myCamera.position;
+        //default lighting attributes
+        uniform.u_worldInverseTranspose = m4.identity();
+        uniform.u_lightPos = updateLights(lights);
+        // uniform.u_textureMatrix = textureMatrix;
+        uniform.u_projectedTexture = depthFramebufferInfo.attachments[0];
+        gl.useProgram(programInfo.program);
+        twgl.setUniforms(programInfo, uniform);
+        twgl.drawBufferInfo(gl, ribbonBuffer, gl.TRIANGLES, ribbonBuffer.numelements);
+    }
+
 }
 
 
