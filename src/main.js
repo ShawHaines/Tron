@@ -11,7 +11,7 @@ import * as texture_shader from "../pages/Preview/src/texture-shader-with-shadow
 import * as shadow_shader from '../pages/Preview/src/shadow-shader.js';
 import * as sky_shader from "../pages/Preview/src/sky_shader.js";
 import * as transparent_shader from "../pages/Preview/src/transparent-shader.js";
-import * as flight from "../pages/Flight/flight.js";
+import * as flight from "./flight.js";
 import {models, naturePackModelNames} from "./modelList.js"
 import {renderScene} from './renderScene.js';
 import { renderShadow } from "./renderShadow.js";
@@ -46,6 +46,9 @@ console.log(depthFramebufferInfo);
 /** Some global variables **/
 var g_time = 0; /** global time (keep updated in `render()`) **/
 var g_time_interval = 0;
+/**
+ * Keeps track of the running time and decides whether to render and update or not
+ */
 var old_time = 0, new_time = 0;
 
 /** IMPORTANT THINGS **/
@@ -161,13 +164,13 @@ function setCameras(){
 var main = function(time){
     time *= 0.001;
     new_time = time;
-    //Limited maximum FPS!
+    //Limit on maximum FPS. If the render speed is too fast, skip this frame.
     if(new_time - old_time < 1.0 / 60.0)
     {
         requestAnimationFrame(main);
         return;
     }
-
+    // set globally by ui. If paused, the movements of the objects(which is defined in update()) will be frozen.
     if(!window.pauseCond)
     {
         // g_time_interval = (new_time - old_time <= 0.1)?(new_time - old_time):0.1;
@@ -190,7 +193,7 @@ var main = function(time){
 function update(time) {
     if(!window.pauseCond) updateModels(); //if pause, every model should not update
                                               //FIXME: plane's internal position should stop moving
-    /** Update sunlight **/
+    /** sliders to adjust **/
     sliderSunlight();
     sliderPerspective();
     /** Set fogs **/

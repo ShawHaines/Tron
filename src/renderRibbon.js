@@ -3,7 +3,7 @@ import * as twgl from "../modules/twgl/twgl-full.module.js";
 import {gl} from "./main.js";
 import {Camera} from "./camera.js";
 import {myNode} from "./myNode.js";
-import * as flight from "../pages/Flight/flight.js";
+import * as flight from "./flight.js";
 const m4=twgl.m4;
 /**
  * renderRibbon.
