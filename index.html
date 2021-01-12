@@ -19,6 +19,12 @@
         body {
             background-color: "black";
             overflow: hidden;
+            -webkit-touch-callout:none;/*系统默认菜单被禁用*/
+            -webkit-user-select:none;/*webkit浏览器*/
+            -khtml-user-select:none;/*早起浏览器*/
+            -moz-user-select:none;/*火狐浏览器*/
+            -ms-user-select:none;/*IE浏览器*/
+            user-select:none;/*用户是否能够选中文本*/
         }
         #loading_box{
             width:400;
@@ -81,6 +87,8 @@
                     <li><button id="OBJButton" class="nav-item" style="visibility: visible;">Export OBJ</button></li>
                     <li><button id="joystickShowButton" class="nav-item" style="visibility: visible;" >Hide Joystick</button></li>
                     <li><button id="randomRibbonButton" class="nav-item" style="visibility: visible;" onclick="randomRibbonColor();">Random Ribbon Color</button></li>
+                    <li><button id="helpButton" class="nav-item" style="visibility: visible;" onclick="document.getElementById('help').style.visibility = 'visible';">Help</button></li>
+                    <li><button id="aboutButton" class="nav-item" style="visibility: visible;" onclick="document.getElementById('about').style.visibility = 'visible';">About</button></li>
                 </ul>
 
                 <ul class="nav-menu-list">
@@ -181,6 +189,22 @@
                         // document.getElementById('joystickShowButton').innerHTML = "Hide Joystick";
                         // document.getElementById('joy_container').style.visibility = "visible";
                     }
+
+                    function y_ipad(){
+                        var ua = navigator.userAgent.toLowerCase();
+                        var s;
+                        s = ua.match(/iPad/i);
+
+                        if(s=="ipad")
+                        {
+                        return true;
+                        }
+                        else{
+                        return false;
+                        }
+
+                    }
+                    window.isIPAD = y_ipad();
                     
             </script>
 
@@ -192,6 +216,56 @@
                     <div id="PerspectiveY" style="position: absolute; top: 80px; right: 20px; visibility: hidden;"></div>
                 </div>
             </div>
+
+            <div id="help" style="height: 300px; width: 500px; position: absolute; left: 50%; top: 50%; margin-top:-150px; margin-left:-250px; background-color: rgb(30, 39, 56); border: 5px rgb(121, 251, 253) solid;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: white;overflow:scroll; visibility: hidden">
+               <p style="text-align: center; font-size: 40px">
+                   Help
+               </p>
+               <div style="margin-left: 10%">
+                   <p style="font-size: 20px">Fly:</p>
+                   <p>* Arrow key || Virtual joystick
+                   <br/>&nbsp&nbsp&nbsp&nbsp-- Control the plane's direction </p>
+                   <p>* 'Z''X' || hold touch on right-up/right-down side
+                   <br/>&nbsp&nbsp&nbsp&nbsp-- Speed up/down</p>
+                   <p style="font-size: 20px">Navigate:</p>
+                   <p>* 'W''A''S''D' || Virtual joystick -- Control navigation move</p>
+                   <p>* Drag -- Control navigation sight<p/>
+                   <p style="font-size: 20px">Button</p>
+                   <p>* Pause -- Pause the time</p>
+                   <p>* Enable/Disable Navigation -- Change between modes</p>
+                   <p>* Edit light -- Edit the sun light's angle</p>
+                   <p>* Edit Fog -- Edit the fog's density</p>
+                   <p>* Edit Perspective -- Edit the perspective in fly mode</p>
+                   <p>* Export OBJ -- Export the scene as an OBJ file!</p>
+                   <p>* Hide Joystick -- Hide the virtual joystick</p>
+                   <p>* Random Ribbon Color -- Change the ribbon's color in fly mode</p>
+                   <p>* Help -- That's me:)</p>
+                   <p>* About -- About this demo and us</p>
+               </div>
+               <br/><br/>
+               <div style="margin: 0 auto; text-align: center">
+                   <button onclick="document.getElementById('help').style.visibility='hidden';"> Close</button>
+               </div>
+               <br/><br/>
+           </div>
+
+           <div id="about" style="height: 300px; width: 500px; position: absolute; left: 50%; top: 50%; margin-top:-150px; margin-left:-250px; background-color: rgb(30, 39, 56); border: 5px rgb(121, 251, 253) solid;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: white;overflow:scroll; visibility: hidden">
+               <p style="text-align: center; font-size: 40px">
+                   About
+               </p>
+               <div style="margin-left: 5%">
+                   <p> A tiny webgl 3D engine demo for Zhejiang University Computer Graphics course, developed by</p>
+               </div>
+               <div style="margin: 0 auto; text-align: center"><a style="font-size: 25px; color: white" href="http://vtu.life">@Vitus</a>
+                   &nbsp&nbsp&nbsp&nbsp<a style="font-size: 25px; color: white" href="https://github.com/ShawHaines">@ShawHaines</a>
+                   &nbsp&nbsp&nbsp&nbsp<a style="font-size: 25px; color: white" href="https://github.com/zjulzhhh">@LZH</a>
+                   <br/><br/>
+                   <button onclick="document.getElementById('about').style.visibility='hidden';"> Close</button>
+                   <br/><br/>
+               </div>
+           </div>
 
 
             <!-- <div style="position: absolute; right: 3%; bottom: 10%;">
