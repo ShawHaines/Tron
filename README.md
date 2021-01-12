@@ -5,23 +5,23 @@ CG Project, inspired by the film Tron.
 ## Features
 
 - [ ] WebGL2 Support
-  - [ ] Screenshot
-  - [ ] Texture
+  - [ ] ~~Screenshot~~
+  - [x] Texture
   - [x] Lighting
-  - [ ] Music
+  - [ ] ~~Music~~
 - [ ] Interactive Scene Editor
-  - [ ] Import .obj files
-  - [ ] Export .obj files
-  - [ ] blender
+  - [x] Import .obj files
+  - [x] Export .obj files
+  - [ ] ~~blender~~
 - [ ] Collision Detection
   - [ ] AABB Box
   - [ ] Dynamic Update
-- [ ] Particle Effect
+- [ ] ~~Particle Effect~~
 - [ ] Control System
-  - [ ] Full roll, pitch, yawn
+  - [x] Full roll, pitch, ~~yaw~~
   - [ ] Controller Support
-- [ ] Viewing Angle
-- [ ] Light Ribbon
-- [ ] Interaction callback
+- [x] Viewing Angle
+- [x] Light Ribbon
+- [x] Interaction callback
 - [ ] Multiple players
 
