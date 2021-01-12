@@ -5,18 +5,21 @@ import * as twgl from "../modules/twgl/twgl-full.module.js";
 import {myNode} from "./myNode.js";
 import {myObject} from "./myObject.js";
 import {Camera,updateCameras} from "./camera.js";
-import {Light, pack} from "./light.js";
+import {Light, pack, updateLights} from "./light.js";
 // import * as texture_shader from "../pages/Preview/src/texture-shader.js";
 import * as texture_shader from "../pages/Preview/src/texture-shader-with-shadow.js";
 import * as shadow_shader from '../pages/Preview/src/shadow-shader.js';
 import * as sky_shader from "../pages/Preview/src/sky_shader.js";
+import * as transparent_shader from "../pages/Preview/src/transparent-shader.js";
 import * as flight from "../pages/Flight/flight.js";
 import {models, naturePackModelNames} from "./modelList.js"
 import {renderScene} from './renderScene.js';
 import { renderShadow } from "./renderShadow.js";
+import {renderSky} from './renderSky.js'
+import { renderRibbon } from "./renderRibbon.js";
+
 import {initObjectList, bindObjectsWithMeshes} from './setObjects.js'
 import {initNodeSet, setFrameTree, linkObjects} from './setNodes.js'
-import {renderSky} from './renderSky.js'
 import {parseModel} from './objLoader.js'
 import {moveNavCamera} from './navInteraction.js'
 import {bindOBJExportInfo2Nodes} from './objExport.js'
@@ -31,6 +34,7 @@ if (!ext) {
 const programInfo = twgl.createProgramInfo(gl, [texture_shader.vs, texture_shader.fs]);
 const skyProgramInfo = twgl.createProgramInfo(gl, [sky_shader.vs, sky_shader.fs]);
 const shadowProgramInfo = twgl.createProgramInfo(gl, [shadow_shader.shadow_vs, shadow_shader.shadow_fs]);
+const transparentProgramInfo=twgl.createProgramInfo(gl,[transparent_shader.vs,transparent_shader.fs]);
 const depthTextureSize = 1024;
 // set the textures as attachments for the framebuffer. See the comments in preview.js
 const attachments = [
@@ -223,7 +227,9 @@ function render(time, camera) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     renderScene(nodes.base_node, lights, camera);
     gl.depthFunc(gl.LEQUAL);
-    renderSky(camera, time);
+    renderSky(camera, time*1000);
+    // draw ribbon.
+    renderRibbon(lights,camera,transparentProgramInfo);
 }
 
 
@@ -295,7 +301,7 @@ function updateModels()
         tmp.xRot += tmp.xRotSpeed * g_time_interval;
         tmp.yRot += tmp.yRotSpeed * g_time_interval;
         tmp.zRot += tmp.zRotSpeed * g_time_interval;
-        tmp.y += tmp.ySpeed * g_time_interval;
+        // tmp.y += tmp.ySpeed * g_time_interval;
 
         while(tmp.xRot > 360) tmp.xRot -= 360;
         while(tmp.yRot > 360) tmp.yRot -= 360;
@@ -303,8 +309,8 @@ function updateModels()
         while(tmp.xRot < 0) tmp.xRot += 360;
         while(tmp.yRot < 0) tmp.yRot += 360;
         while(tmp.zRot < 0) tmp.zRot += 360;
-        while(tmp.y > 30) tmp.y -= 30;
-        while(tmp.y < 0) tmp.y += 30;
+        // while(tmp.y > 100) tmp.y -= 100;
+        // while(tmp.y < 0) tmp.y += 100;
         
         var world = m4.identity();
         world = m4.multiply(world, m4.translation([tmp.x, tmp.y, tmp.z]));
