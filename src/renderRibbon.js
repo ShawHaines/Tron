@@ -11,7 +11,7 @@ const m4=twgl.m4;
  * @param {Camera} cam
  * @param {twgl.ProgramInfo} programInfo
  */
-var renderRibbon = function (lights, camera, programInfo) {
+var renderRibbon = function (lights, camera, programInfo, ribbonColor) {
     // draw ribbon.
     if (flight.ribbonLength > 1) {
         // draw the transparent objects.
@@ -32,7 +32,7 @@ var renderRibbon = function (lights, camera, programInfo) {
         //default lighting attributes
         uniform.u_worldInverseTranspose = m4.identity();
         uniform.u_lightPos = updateLights(lights);
-        uniform.u_glowColor = [1, 0.5, 0];
+        uniform.u_glowColor = ribbonColor;
         uniform.u_shininess = 5.0;
         uniform.u_bias = 0.95;
         uniform.u_scale = -0.6;

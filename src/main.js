@@ -230,7 +230,7 @@ function render(time, camera) {
     gl.depthFunc(gl.LEQUAL);
     renderSky(camera, time*1000);
     // draw ribbon.
-    renderRibbon(lights,camera,transparentProgramInfo);
+    renderRibbon(lights,camera,transparentProgramInfo,window.ribbonColor);
 }
 
 
@@ -257,8 +257,7 @@ var record = {
     // records whether the ring buffer has started over again.
     full: false,
 }
-function updateModels()
-{
+function updateModels(){
     /** Rotate the plane **/
     var world = m4.identity();
     world = m4.multiply(world, m4.translation([0, 14, 45]));

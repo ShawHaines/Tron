@@ -80,6 +80,7 @@
                     <li><button id="perspectiveButton" class="nav-item" style="visibility: visible;" >Edit Perspective</button></li>
                     <li><button id="OBJButton" class="nav-item" style="visibility: visible;">Export OBJ</button></li>
                     <li><button id="joystickShowButton" class="nav-item" style="visibility: visible;" >Hide Joystick</button></li>
+                    <li><button id="randomRibbonButton" class="nav-item" style="visibility: visible;" onclick="randomRibbonColor();">Random Ribbon Color</button></li>
                 </ul>
 
                 <ul class="nav-menu-list">
@@ -95,6 +96,8 @@
             window.loadingResource = true;
             window.navMode = false;
             window.pauseCond = false;
+            // orange by default.
+            window.ribbonColor=[1,0.5,0];
             const buttons={
                 pause: document.getElementById("pauseButton"),
                 nav  : document.getElementById("navButton"),
@@ -133,6 +136,10 @@
                     buttons[button].update();
                 }
             };
+
+            function randomRibbonColor(){
+                window.ribbonColor=[Math.random(),Math.random(),Math.random()];
+            }
         </script>
 
         <!-- <div  style="font-size: 40px; color: green; visibility: none;">  -->
