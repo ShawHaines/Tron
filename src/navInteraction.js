@@ -2,7 +2,7 @@
 * Interaction Control
 *********************************************/
 import {myCamera, g_time_interval} from "./main.js";
-import {pitchUp, pitchDown, resetPitch} from "../pages/Flight/flight.js"
+import {pitchUp, pitchDown, resetPitch} from "./flight.js"
 import {gl} from "./main.js"
 
 var navMovePosFlags = [0, 0, 0];
@@ -127,11 +127,17 @@ document.getElementById("c").ontouchstart = function(e) {
         touchY = e.changedTouches[0].pageY;
     }
     else
-    {
+    {   
         var _x = e.changedTouches[0].pageX;
         var _y = e.changedTouches[0].pageY;
-        if(_x > gl.canvas.width / 2 && _y > gl.canvas.height / 2) pitchDown();
-        else if(_x > gl.canvas.width / 2 && _y < gl.canvas.height / 2) pitchUp();
+        if(_x > gl.canvas.width / 2 && _y > gl.canvas.height / 2)
+        {
+            pitchDown();
+        } 
+        else if(_x > gl.canvas.width / 2 && _y < gl.canvas.height / 2)
+        {
+            pitchUp();
+        }
     }
 }
 document.getElementById("c").ontouchend = function(e) {
