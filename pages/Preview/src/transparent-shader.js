@@ -23,14 +23,15 @@ void main()
 const fs=`
 precision mediump float;
 uniform vec3 u_glowColor;
-float b= 0.95; //bias
-float p= 5.0; //power
-float s= -0.6; //scale
+uniform float u_bias; //bias
+uniform float u_shininess; //power
+uniform float u_scale; //scale
+
 varying vec3 v_normal;
 varying vec3 v_viewWorldPosition;
 void main() 
 {
-    float a = pow( b + s * abs(dot(v_normal, v_viewWorldPosition)), p );
+    float a = pow( u_bias + u_scale * abs(dot(v_normal, v_viewWorldPosition)), u_shininess );
     gl_FragColor = vec4(u_glowColor, a);
 }
 `
