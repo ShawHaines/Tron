@@ -27,6 +27,10 @@ var v = vec4.create();
  * */
 var a = vec4.create();
 const amax = 0.1;
+/**
+ * the friction that makes you decelerate when you don't hit the throttle.
+ */
+const aFriction=-0.005;
 
 /** 
  * A transformation matrix that represents the orientation from world frame to self frame.
@@ -214,14 +218,14 @@ document.addEventListener("keyup",function(event){
     }
 })
 
-var speedUp = function () { a[0] = amax; };
-var speedDown = function () { a[0] = -amax; };
+var speedUp = function () { a[0] = amax+aFriction; };
+var speedDown = function () { a[0] = -amax+aFriction; };
 var pitchUp = function() { omega[1] = reversePitch? omegaMax:-omegaMax; };
 var pitchDown = function() { omega[1] = reversePitch? -omegaMax:omegaMax;}; 
 var rollLeft = function() {omega[2] = -omegaMax; };
 var rollRight = function() {omega[2] = omegaMax; };
 
-var resetAcceleration = function(){ a[0]=0 };
+var resetAcceleration = function(){ a[0]=aFriction };
 var resetPitch = function(){ omega[1] = 0};
 var resetRoll = function(){omega[2]=0};
 
