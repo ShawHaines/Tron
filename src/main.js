@@ -15,9 +15,11 @@ import * as flight from "../pages/Flight/flight.js";
 import {models, naturePackModelNames} from "./modelList.js"
 import {renderScene} from './renderScene.js';
 import { renderShadow } from "./renderShadow.js";
+import {renderSky} from './renderSky.js'
+import { renderRibbon } from "./renderRibbon.js";
+
 import {initObjectList, bindObjectsWithMeshes} from './setObjects.js'
 import {initNodeSet, setFrameTree, linkObjects} from './setNodes.js'
-import {renderSky} from './renderSky.js'
 import {parseModel} from './objLoader.js'
 import {moveNavCamera} from './navInteraction.js'
 import {bindOBJExportInfo2Nodes} from './objExport.js'
@@ -227,35 +229,7 @@ function render(time, camera) {
     gl.depthFunc(gl.LEQUAL);
     renderSky(camera, time*1000);
     // draw ribbon.
-    if (flight.ribbonLength > 1) {
-        // draw the transparent objects.
-        gl.enable(gl.BLEND); // blending
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        gl.depthMask(false); //lock the depth writing
-        let cam=cameras.tailCamera;
-        const projection = cam.projection;
-        const view = cam.viewMatrix;
-        const viewProjection = m4.multiply(projection, view);
-        let ribbonBufferInfo = twgl.createBufferInfoFromArrays(gl, flight.ribbon);
-        twgl.setBuffersAndAttributes(gl, transparentProgramInfo, ribbonBufferInfo);
-        let uniform = {};
-        uniform.u_world = m4.identity();
-        uniform.u_worldView=view;
-        uniform.u_worldViewProjection = viewProjection;
-        uniform.u_viewPos = cam.position;
-        //default lighting attributes
-        uniform.u_worldInverseTranspose = m4.identity();
-        uniform.u_lightPos = updateLights(lights);
-        // uniform.u_textureMatrix = textureMatrix;
-        uniform.u_projectedTexture = depthFramebufferInfo.attachments[0];
-        uniform.u_glowColor=[1,0,0];
-        gl.useProgram(transparentProgramInfo.program);
-        twgl.setUniforms(transparentProgramInfo, uniform);
-        twgl.drawBufferInfo(gl, ribbonBufferInfo, gl.TRIANGLES, ribbonBufferInfo.numelements);
-        gl.depthMask(true);
-        gl.disable(gl.BLEND);
-    }
-
+    renderRibbon(lights,camera,transparentProgramInfo);
 }
 
 

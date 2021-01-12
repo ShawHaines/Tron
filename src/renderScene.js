@@ -1,8 +1,7 @@
 import { updateLights,Light } from './light.js';
-import {twgl, m4, gl} from './main.js'
+import { twgl, m4, gl, depthFramebufferInfo} from './main.js'
 import {Camera} from './camera.js';
 import { myNode } from './myNode.js';
-import {depthFramebufferInfo} from './main.js';
 /**
  * renderScene.
  * @param {myNode} base_node
