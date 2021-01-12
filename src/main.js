@@ -191,7 +191,8 @@ function update(time) {
     if(!window.pauseCond) updateModels(); //if pause, every model should not update
                                               //FIXME: plane's internal position should stop moving
     /** Update sunlight **/
-    updateSunLight();
+    sliderSunlight();
+    sliderPerspective();
     /** Set fogs **/
     assignFog2Nodes(nodes.base_node);
     /** Update Navigation Camera **/
@@ -234,13 +235,19 @@ function render(time, camera) {
 
 
 
-function updateSunLight()
-{
+function sliderSunlight(){
     /** Update the sun light position **/
     var world=m4.identity();
     m4.rotateX(world, -(window.sunAngle / 180)* Math.PI, world);
     m4.copy(world, nodes.sun_node.localMatrix);
 }
+
+function sliderPerspective(){
+    var tail=m4.identity();
+    m4.translate(tail,[0,window.yValue, window.zValue],tail);
+    cameras.tailCamera.node.localMatrix=tail;
+}
+
 // Ring buffer keeping track of the position and orientation.
 var record = {
     position: [],
@@ -264,6 +271,7 @@ function updateModels()
 
     // fighter position update.
     let fighter = m4.translation(flight.position);
+    // m4.rotateX(fighter,Math.PI/2,fighter);
     m4.multiply(fighter, flight.orientation, fighter);
     nodes.fighter_base.localMatrix = fighter;
     let sidekickPosition=m4.identity(),sidekickOrientation=m4.identity();

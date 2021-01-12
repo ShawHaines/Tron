@@ -73,12 +73,13 @@
                 <span class="nav-item is-menu-item menu-icon" onclick="return false;"></span>
 
                 <ul class="nav-menu-list">
-                    <li><button id="pauseButton" class="nav-item" onclick="pauseTime();">Pause</button></li>
-                    <li><button id="navButton" class="nav-item" style="visibility: visible;" onclick="navigationModeOn();">Enable Navigation</button></li>
-                    <li><button id="lightButton" class="nav-item" style="visibility: visible;" onclick="editLight();">Edit Light</button></li>
-                    <li><button id="fogButton" class="nav-item" style="visibility: visible;" onclick="editFog();">Edit Fog</button></li>
+                    <li><button id="pauseButton" class="nav-item">Pause</button></li>
+                    <li><button id="navButton" class="nav-item" style="visibility: visible;" >Enable Navigation</button></li>
+                    <li><button id="lightButton" class="nav-item" style="visibility: visible;" >Edit Light</button></li>
+                    <li><button id="fogButton" class="nav-item" style="visibility: visible;" >Edit Fog</button></li>
+                    <li><button id="perspectiveButton" class="nav-item" style="visibility: visible;" >Edit Perspective</button></li>
                     <li><button id="OBJButton" class="nav-item" style="visibility: visible;">Export OBJ</button></li>
-                    <li><button id="joystickShowButton" class="nav-item" style="visibility: visible;" onclick="joystickShow();">Hide Joystick</button></li>
+                    <li><button id="joystickShowButton" class="nav-item" style="visibility: visible;" >Hide Joystick</button></li>
                 </ul>
 
                 <ul class="nav-menu-list">
@@ -94,87 +95,44 @@
             window.loadingResource = true;
             window.navMode = false;
             window.pauseCond = false;
-            var editLightCond = false;
-            window.exportOBJCond = false;
-            var editFogCond = false;
-            var joystickShowCond = false;
+            const buttons={
+                pause: document.getElementById("pauseButton"),
+                nav  : document.getElementById("navButton"),
+                light  : document.getElementById("lightButton"),
+                fog  : document.getElementById("fogButton"),
+                perspective  : document.getElementById("perspectiveButton"),
+                joystickDisable  : document.getElementById("joystickShowButton"),
+            }
+            // insert a state variable and an onclick function into each of the button.
+            for (let each in buttons){
+                buttons[each].state=false;
+                buttons[each].onclick = function () {
+                    this.state = !this.state;
+                    this.update();
+                }
+            }
+            console.log(buttons);
+            buttons.pause.update=function(){this.innerHTML=!this.state?"Pause":"Continue"; window.pauseCond = this.state;};
+            buttons.nav.update  =function(){this.innerHTML=!this.state?"Enable Navigation":"Disable Navigation";window.navMode = this.state;};
+            buttons.light.update=function(){this.innerHTML=!this.state?"Edit Light":"Close"; document.getElementById('Light').style.visibility = this.state ? "visible" : "hidden";
+                    if (this.state) resetStates(this);};
+            buttons.fog.update  =function(){this.innerHTML=!this.state?"Edit Fog":"Close"; document.getElementById('Fog').style.visibility = this.state?"visible":"hidden";
+                if (this.state) resetStates(this);};
+            buttons.perspective.update=function(){this.innerHTML=!this.state?"Edit Perspective":"Close"; document.getElementById('PerspectiveZ').style.visibility=this.state?"visible":"hidden";
+            document.getElementById('PerspectiveY').style.visibility = this.state ? "visible" : "hidden";
+                if (this.state) resetStates(this);};
+            buttons.joystickDisable.update=function(){this.innerHTML=!this.state?"Hide Joystick":"Show Joystick"; document.getElementById('joy_container').style.visibility = this.state ? "hidden" : "visible";
+                    if (this.state) resetStates(this);};
 
-            var pauseTime = function()
-            {
-                window.pauseCond = !window.pauseCond;
-                item = document.getElementById('pauseButton');
-                if(window.pauseCond)
-                {
-                    item.innerHTML = "Continue";
+            const sliders=["light","fog","perspective"];
+            // resets all the conditions in states to flag. There's only one place to display the slider.
+            var resetStates = function(skip){
+                for (let button of sliders){
+                    if (buttons[button]==skip) continue;
+                    buttons[button].state=false;
+                    buttons[button].update();
                 }
-                else
-                {
-                    item.innerHTML = "Pause";
-                }
-            }
-
-            var editLight = function()
-            {
-                editLightCond = !editLightCond;
-                if(editLightCond)
-                {
-                    editFogCond = false;
-                    document.getElementById('fogButton').innerHTML = "Edit Fog";
-                    document.getElementById('lightButton').innerHTML = "Close";
-                    document.getElementById('Fog').style.visibility = "hidden";
-                    document.getElementById('Light').style.visibility = "visible";
-                }
-                else
-                {
-                    document.getElementById('lightButton').innerHTML = "Edit Light";
-                    document.getElementById('Light').style.visibility = "hidden";
-                }
-            }
-            
-            var editFog = function()
-            {
-                editFogCond = !editFogCond;
-                if(editFogCond)
-                {
-                    editLightCond = false;
-                    document.getElementById('lightButton').innerHTML = "Edit Light";
-                    document.getElementById('fogButton').innerHTML = "Close";
-                    document.getElementById('Light').style.visibility = "hidden";
-                    document.getElementById('Fog').style.visibility = "visible";
-                }
-                else
-                {
-                    document.getElementById('fogButton').innerHTML = "Edit Fog";
-                    document.getElementById('Fog').style.visibility = "hidden";
-                }
-            }
-
-            var joystickShow = function()
-            {
-                joystickShowCond = !joystickShowCond;
-                if(joystickShowCond)
-                {
-                    editLightCond = false;
-                    document.getElementById('joystickShowButton').innerHTML = "Hide Joystick";
-                    document.getElementById('joy_container').style.visibility = "visible";
-                }
-                else
-                {
-                    document.getElementById('joystickShowButton').innerHTML = "Show Joystick";
-                    document.getElementById('joy_container').style.visibility = "hidden";
-                }
-            }
-            
-
-            navigationModeOn = function()
-            {
-                item = document.getElementById('navButton');
-                window.navMode = !window.navMode;
-                if(window.navMode)
-                    item.innerHTML = "Disable Navigation";
-                else
-                    item.innerHTML = "Enable Navigation";
-            }
+            };
         </script>
 
         <!-- <div  style="font-size: 40px; color: green; visibility: none;">  -->
@@ -202,6 +160,7 @@
                         biasX: BX,
                         biasY: BY
                     });
+
                     console.log(VirtualJoystick.touchScreenAvailable());
                     if(!VirtualJoystick.touchScreenAvailable())
                     {
@@ -209,9 +168,7 @@
                         // joystickShowCond = false;
                         // document.getElementById('joystickShowButton').innerHTML = "Show Joystick";
                         // document.getElementById('joy_container').style.visibility = "hidden";
-                    }
-                    else
-                    {
+                    }else{
                         window.touchSupport = true;
                         // joystickShowCond = true;
                         // document.getElementById('joystickShowButton').innerHTML = "Hide Joystick";
@@ -224,6 +181,8 @@
                 <div id="ui">
                     <div id="Light" style="position: absolute; top: 20px; right: 20px; visibility: hidden;"></div>
                     <div id="Fog" style="position: absolute; top: 20px; right: 20px; visibility: hidden;"></div>
+                    <div id="PerspectiveZ" style="position: absolute; top: 20px; right: 20px; visibility: hidden;"></div>
+                    <div id="PerspectiveY" style="position: absolute; top: 80px; right: 20px; visibility: hidden;"></div>
                 </div>
             </div>
 
