@@ -38,7 +38,8 @@ var interval = 10;
 /** 
  * A transformation matrix that represents the orientation from world frame to self frame.
  * @type {mat4} */
-var orientation=mat4.create();
+// var orientation=mat4.create();
+var orientation=mat4.fromXRotation([],Math.PI/2);
 
 /**
  * Euler Angle, three components are (in order) yaw, pitch, roll.
