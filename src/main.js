@@ -44,7 +44,7 @@ const attachments = [
 const depthFramebufferInfo = twgl.createFramebufferInfo(gl, attachments, depthTextureSize, depthTextureSize);
 console.log(depthFramebufferInfo);
 /** Some global variables **/
-var g_time = 0; /** global time (keep updated in `render()`) **/
+var g_time = 0; /** global time (keep updated in `render()`), unit is seconds **/
 var g_time_interval = 0;
 /**
  * Keeps track of the running time and decides whether to render and update or not
@@ -261,7 +261,7 @@ var record = {
     full: false,
 }
 function updateModels(){
-    /** Rotate the plane **/
+    /** Rotate the paper plane **/
     var world = m4.identity();
     world = m4.multiply(world, m4.translation([0, 14, 45]));
     world = m4.multiply(world, m4.rotationX(1.1 * g_time));
@@ -271,6 +271,7 @@ function updateModels(){
     m4.scale(world, [0.02, 0.02, 0.02], world);
     m4.copy(world, nodes.paper_plane_node.localMatrix);
 
+    flight.updateFlight(g_time_interval);
     // fighter position update.
     let fighter = m4.translation(flight.position);
     // m4.rotateX(fighter,Math.PI/2,fighter);

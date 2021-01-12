@@ -28,12 +28,6 @@ var v = vec4.create();
 var a = vec4.create();
 const amax = 0.1;
 
-/**
- * time interval in miliseconds.
- */
-var interval = 10;
-
-
 /** 
  * A transformation matrix that represents the orientation from world frame to self frame.
  * @type {mat4} */
@@ -231,11 +225,13 @@ var resetAcceleration = function(){ a[0]=0 };
 var resetPitch = function(){ omega[1] = 0};
 var resetRoll = function(){omega[2]=0};
 
-// update the plane's orientation and position information.
-setInterval(function(){
+/**
+ * update the plane's orientation and position information. Synchronized by main() in main.js
+ * @param {number} interval in seconds
+ */
+function updateFlight(interval){
     // TODO: Introduce improved Euler's method, or R-K method.
-    let dt=interval/1000;
-
+    let dt=interval;
     if(!window.navMode)
     {
         //joystick
@@ -283,7 +279,7 @@ setInterval(function(){
         }
     }
 
-},interval);
+}
 
 // global variables.
-export {euler_matrix, orientation, position, ribbon , ribbonLength, pitchUp, pitchDown, resetPitch};
+export {euler_matrix, orientation, position, ribbon , ribbonLength, updateFlight, pitchUp, pitchDown, resetPitch};
