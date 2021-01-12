@@ -151,8 +151,12 @@ function linkObjects(nodes, objects){
     // setNodeAsObject(nodes.NaturePack_Part1_node, objects.NaturePack_Part1)
     setNodeAsObject(nodes.paper_plane_node, objects.paper_plane)
     // setNodeAsObject(nodes.viking_room_node, objects.viking_room)
+    var i = 0;
     nodes.random_nature_nodes.forEach(function (tmp) {
-        setNodeAsObject(tmp, objects.naturePack[Math.floor(Math.random() * 142)]);
+        if(i < RANDOM_NATURE_NUM - 1) setNodeAsObject(tmp, objects.naturePack[Math.floor(Math.random() * 142)]);
+        else 
+            setNodeAsObject(tmp, objects.viking_room);
+        i++;
     });
     setNodeAsObject(nodes.mountain_node, objects.mountain);
     setNodeAsObject(nodes.fighter,objects.paper_plane);
