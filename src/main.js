@@ -231,7 +231,7 @@ function render(time, camera) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     renderScene(nodes.base_node, lights, camera);
     gl.depthFunc(gl.LEQUAL);
-    renderSky(camera, time*1000);
+    if(!window.isIPAD) renderSky(camera, time*1000);
     // draw ribbon.
     renderRibbon(lights,camera,transparentProgramInfo,window.ribbonColor);
 }
@@ -338,10 +338,19 @@ var assignFog2Nodes = function(curNode)
         if(curNode.type == "OBJECT")
         {
             for(var i = 0; i < curNode.drawInfo.groupNum; i++)
-                Object.assign(curNode.drawInfo.uniformsList[i], {
-                    u_fogDensity: window.fogDensity / 10000,
-                    u_fogColor: [0.8, 0.9, 1, 1]
-                });
+            {
+                if(!window.isIPAD) 
+                    Object.assign(curNode.drawInfo.uniformsList[i], {
+                        u_fogDensity: window.fogDensity / 10000,
+                        u_fogColor: [0.8, 0.9, 1, 1]
+                    });
+                else
+                    Object.assign(curNode.drawInfo.uniformsList[i], {
+                        u_fogDensity: 0,
+                        u_fogColor: [0.8, 0.9, 1, 1]
+                    });
+            }
+                
         }
         curNode.children.forEach(function (child) {
             assignFog2Nodes(child);
