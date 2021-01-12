@@ -32,7 +32,7 @@ var renderRibbon = function (lights, camera, programInfo) {
         //default lighting attributes
         uniform.u_worldInverseTranspose = m4.identity();
         uniform.u_lightPos = updateLights(lights);
-        uniform.u_glowColor = [0, 1, 1];
+        uniform.u_glowColor = [1, 0.5, 0];
         uniform.u_shininess = 5.0;
         uniform.u_bias = 0.95;
         uniform.u_scale = -0.6;
