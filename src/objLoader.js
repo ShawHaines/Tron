@@ -27,9 +27,16 @@ function parseOBJ(text) {
     let groups = ['default'];
     let material = 'default';
     let object = 'default';
-    let min = [2000, 2000, 2000];
-    let max = [-2000, -2000, -2000];
-  
+    // records the Axis Aligned Bounding Box.
+    const MaxSize=200000;
+    let min = [MaxSize, MaxSize, MaxSize];
+    let max = [-MaxSize, -MaxSize, -MaxSize];
+    /* the geometrical center of the AABB*/
+    let centroid = [0,0,0];
+    /* the sidelengths of bounding Box.*/
+    let boundingBox = [MaxSize,MaxSize,MaxSize];
+    /* the radius of the circumsphere.*/
+    let radius=0;
     const noop = () => {};
   
     function newGeometry() {
@@ -57,6 +64,8 @@ function parseOBJ(text) {
           // groups,
           min,
           max,
+          centroid,
+          boundingBox,
           material,
           data: {
             vertices,
@@ -66,6 +75,7 @@ function parseOBJ(text) {
           },
         };
         geometries.push(geometry);
+        // console.log("geometry",geometry);
       }
     }
   
@@ -185,8 +195,13 @@ function parseOBJ(text) {
       geometry.data = Object.fromEntries(
           Object.entries(geometry.data).filter(([, array]) => array.length > 0));
     }
-    // console.log(min);
-    // console.log(max);
+    for (let i=0;i<3;i++){
+      centroid[i]=(min[i]+max[i])/2;
+      boundingBox[i]=max[i]-min[i];
+      radius += (boundingBox[i] / 2) * (boundingBox[i] / 2);
+    }
+    radius=Math.sqrt(radius);
+    // console.log("min,max,centroid,boundingBox",min,max,centroid,boundingBox);
     return {
       geometries,
       materialNames,
