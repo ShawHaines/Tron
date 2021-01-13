@@ -1,6 +1,8 @@
 # Tron
 
-CG Project, inspired by the film Tron.
+CG Project, inspired by the film Tron, based on WebGL.
+
+![](image/Screenshot.png)
 
 ## Features
 
