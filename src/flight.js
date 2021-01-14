@@ -9,7 +9,7 @@ import { mat4, vec3, vec4 } from "../modules/gl-matrix/src/index.js"
  * w=1 means point.
  * @type {vec4}
  */
-var position=vec4.fromValues(0,0,0,1);
+var position=vec4.fromValues(0,0,50,1);
 /**
  * the velocity in self frame. w=0 means vector instead of point.
  * @type {vec4}

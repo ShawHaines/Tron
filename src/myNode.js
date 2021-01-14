@@ -4,6 +4,9 @@
 import {m4} from "../modules/twgl/twgl-full.module.js";
 class myNode {
   constructor() {
+    /**
+     * @type {[myNode]}
+     */
     this.children = [];
     this.localMatrix = m4.identity();
     this.worldMatrix = m4.identity();

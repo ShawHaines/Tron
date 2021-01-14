@@ -257,7 +257,7 @@ function createBoundingBoxCore(curNode)
 {
     if(curNode.hasBoxInfo)
     {
-        console.log("creating bounding box...")
+        // console.log("creating bounding box...")
         
         for(var i = 0; i < curNode.drawInfo.groupNum; i++)
         {
@@ -452,7 +452,7 @@ function createBoundingBoxCore(curNode)
 
             tmp.localMatrix = m4.translation([curNode.boxInfo[i].centroid[0], curNode.boxInfo[i].centroid[1], curNode.boxInfo[i].centroid[2]]);
             tmp.setParent(curNode);
-            console.log(tmp);
+            // console.log(tmp);
         }
         
         
