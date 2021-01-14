@@ -23,7 +23,7 @@ var bindOBJExportInfo2Nodes = function(curNode, meshes)
     {
         curNode.objExportFlag = true;
         curNode.objExportInfo = meshes[curNode.bindObjectName];
-        console.log("OBJ export info bound successfully!", curNode);
+        // console.log("OBJ export info bound successfully!", curNode);
     }
     
     curNode.children.forEach(child => {

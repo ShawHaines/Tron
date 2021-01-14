@@ -6,6 +6,7 @@ class myObject {
         //More details
         this.objectColor = [0, 0, 0, 0];
         this.useMTL = false;
+        this.boxInfo = [];
     }
 }
 

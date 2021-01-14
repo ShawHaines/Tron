@@ -1,8 +1,12 @@
 import {myNode} from './myNode.js'
-import {m4, naturePackModelNames} from './main.js'
+import {m4, naturePackModelNames, twgl, gl, transparentProgramInfo} from './main.js'
 
-const RANDOM_NATURE_NUM = 100;
+const RANDOM_NATURE_NUM = 50;
 
+/**
+ * Initialize node set customarily
+ * @param {myNode []} nodes an empty array/set/list
+ */
 var initNodeSet = function(nodes)
 {
     var base_node = new myNode();
@@ -36,7 +40,10 @@ var initNodeSet = function(nodes)
     nodes.sidekick = new myNode();
 };
 
-/** create nodes for objects **/
+/**
+ * Set the nodes' frame tree
+ * @param {myNode} nodes a node array/set/list already initialized
+ */
 function setFrameTree(nodes){
 
     /** Set relationship of the scene graph **/
@@ -131,8 +138,9 @@ function setFrameTree(nodes){
         world = m4.multiply(world, m4.rotateX(world, tmp.xRot / 180 * Math.PI));
         world = m4.multiply(world, m4.rotateY(world, tmp.yRot / 180 * Math.PI));
         world = m4.multiply(world, m4.rotateZ(world, tmp.zRot / 180 * Math.PI));
-        // m4.scale(world, [5, 5, 5], world);
-        m4.copy(world, tmp.localMatrix);
+        // m4.copy(world, tmp.localMatrix);
+
+        m4.copy(m4.identity(), tmp.localMatrix); //debug
     });
     
     world = m4.identity();
@@ -143,8 +151,8 @@ function setFrameTree(nodes){
 
 /**
  * Here you should manually link some nodes to objects
- * @param{nodes}: all nodes(:{})
- * @param{objects}: all objects(:{})
+ * @param {nodes []}: all nodes(:{})
+ * @param {objects}: all objects(:{})
 **/
 function linkObjects(nodes, objects){
     /** link nodes you want to draw with actual objects **/
@@ -179,6 +187,7 @@ function setNodeAsObject(curNode, curObject)
         bufferInfoList: [],
         uniformsList: [],
     };
+    curNode.boxInfo = [];
 
     var curNodeDrawInfo = curNode.drawInfo;
     
@@ -196,12 +205,17 @@ function setNodeAsObject(curNode, curObject)
             uniform.u_texture = curObject.textures;
             if(curObject.objectColor) uniform.u_objectColor = curObject.objectColor;
             if(curObject.materialsByIndex[i].ambient) uniform.u_ambientMaterial = curObject.materialsByIndex[i].ambient;
-            // uniform.u_ambientMaterial = [0, 0, 0];
             if(curObject.materialsByIndex[i].diffuse) uniform.u_diffuseMaterial = curObject.materialsByIndex[i].diffuse;
             if(curObject.materialsByIndex[i].specular) uniform.u_specularMaterial = curObject.materialsByIndex[i].specular;
             if(curObject.materialsByIndex[i].emissive) uniform.u_emissiveMaterial = curObject.materialsByIndex[i].emissive;
             uniform.u_shininess = 23.0;
             curNodeDrawInfo.uniformsList.push(uniform);
+            //Set box info
+            if(curObject.hasBoxInfo)
+            {
+                curNode.hasBoxInfo = curObject.hasBoxInfo;
+                curNode.boxInfo.push(curObject.boxInfo[i]);
+            }
         }
     }
     else {
@@ -218,10 +232,240 @@ function setNodeAsObject(curNode, curObject)
         uniform.u_ambientStrength = 0.3;
         uniform.u_shininess = 32.0;
         curNodeDrawInfo.uniformsList.push(uniform);
+        //Set box info
+        if(curObject.hasBoxInfo)
+        {
+            curNode.hasBoxInfo = curObject.hasBoxInfo;
+            curNode.boxInfo.push(curObject.boxInfo[0]);
+        }   
     }
 }
 
-export {initNodeSet, setFrameTree, linkObjects}
+/**
+ * Create bounding box nodes to draw (for debug?)
+ * A bounding box is binded as a new node directly to the box-owner-node
+ * @param {myNode} curNode a root of the node tree
+ * @param {myNode []} nodes the node set
+ */
+function createBoundingBox(curNode, nodes)
+{
+    // nodes.boundingBox = [];
+    createBoundingBoxCore(curNode);
+}
+
+function createBoundingBoxCore(curNode)
+{
+    if(curNode.hasBoxInfo)
+    {
+        console.log("creating bounding box...")
+        
+        for(var i = 0; i < curNode.drawInfo.groupNum; i++)
+        {
+            var tmp = new myNode();
+            tmp.type = "BOUNDINGBOX";
+            tmp.drawInfo = {
+                groupNum: 1,
+                programInfoList: [],
+                bufferInfoList: [],
+                uniformsList: [],
+            };
+            
+            tmp.drawInfo.programInfoList.push(curNode.drawInfo.programInfoList[i]);
+            // tmp.drawInfo.programInfoList.push(transparentProgramInfo);
+            // tmp.drawInfo.uniformsList.push(curNode.drawInfo.uniformsList[i]);
+
+            var tmpBufferArrayInfo = [];
+            const boxWidth = curNode.boxInfo[i].boundingBox[0];
+            const boxHeight = curNode.boxInfo[i].boundingBox[1];
+            const boxDepth = curNode.boxInfo[i].boundingBox[2];
+            tmpBufferArrayInfo.a_position = [
+                -boxWidth/2, -boxHeight/2, boxDepth/2,
+                boxWidth/2, -boxHeight/2, boxDepth/2,
+                boxWidth/2, -boxHeight/2, boxDepth/2,
+                boxWidth/2, boxHeight/2, boxDepth/2,
+                boxWidth/2, boxHeight/2, boxDepth/2,
+                -boxWidth/2, boxHeight/2, boxDepth/2,
+                -boxWidth/2, boxHeight/2, boxDepth/2,
+                -boxWidth/2, -boxHeight/2, boxDepth/2,
+
+                -boxWidth/2, -boxHeight/2, boxDepth/2,
+                -boxWidth/2, -boxHeight/2, -boxDepth/2,
+
+                -boxWidth/2, -boxHeight/2, -boxDepth/2,
+                boxWidth/2, -boxHeight/2, -boxDepth/2,
+                boxWidth/2, -boxHeight/2, -boxDepth/2,
+                boxWidth/2, boxHeight/2, -boxDepth/2,
+                boxWidth/2, boxHeight/2, -boxDepth/2,
+                -boxWidth/2, boxHeight/2, -boxDepth/2,
+                -boxWidth/2, boxHeight/2, -boxDepth/2,
+                -boxWidth/2, -boxHeight/2, -boxDepth/2,
+
+                -boxWidth/2, -boxHeight/2, -boxDepth/2,
+                -boxWidth/2, boxHeight/2, -boxDepth/2,
+                -boxWidth/2, boxHeight/2, -boxDepth/2,
+                -boxWidth/2, boxHeight/2, boxDepth/2,
+                
+                -boxWidth/2, boxHeight/2, boxDepth/2,
+                boxWidth/2, boxHeight/2, boxDepth/2,
+                boxWidth/2, boxHeight/2, boxDepth/2,
+                boxWidth/2, boxHeight/2, -boxDepth/2,
+                
+                boxWidth/2, boxHeight/2, -boxDepth/2,
+                boxWidth/2, -boxHeight/2, -boxDepth/2,
+                boxWidth/2, -boxHeight/2, -boxDepth/2,
+                boxWidth/2, -boxHeight/2, boxDepth/2,
+
+                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, -boxHeight/2, boxDepth/2,
+                // -boxWidth/2, boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, boxHeight/2, boxDepth/2,
+
+                // boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+                // boxWidth/2, boxHeight/2, -boxDepth/2,
+                // boxWidth/2, boxHeight/2, boxDepth/2,
+
+                // boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // boxWidth/2, boxHeight/2, -boxDepth/2,
+                // boxWidth/2, boxHeight/2, -boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,                
+                // boxWidth/2, boxHeight/2, boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+                // boxWidth/2, boxHeight/2, -boxDepth/2,
+
+                // -boxWidth/2, -boxHeight/2, boxDepth/2,
+                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+                // boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
+
+                // -boxWidth/2, boxHeight/2, boxDepth/2,
+                // boxWidth/2, boxHeight/2, boxDepth/2,
+                // boxWidth/2, boxHeight/2, boxDepth/2,
+                // -boxWidth/2, boxHeight/2, -boxDepth/2,
+                // boxWidth/2, boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, boxHeight/2, -boxDepth/2,
+                // boxWidth/2, boxHeight/2, boxDepth/2,
+
+                // -boxWidth/2, -boxHeight/2, boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+                // -boxWidth/2, boxHeight/2, boxDepth/2,
+                // boxWidth/2, boxHeight/2, boxDepth/2,
+                // -boxWidth/2, boxHeight/2, boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+
+                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, boxHeight/2, -boxDepth/2,
+                // boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // boxWidth/2, boxHeight/2, -boxDepth/2,
+                // boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, boxHeight/2, -boxDepth/2,
+
+                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, -boxHeight/2, boxDepth/2,
+                // -boxWidth/2, boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, boxHeight/2, boxDepth/2,
+                // -boxWidth/2, boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, -boxHeight/2, boxDepth/2,
+
+                // boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // boxWidth/2, boxHeight/2, -boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,                
+                // boxWidth/2, boxHeight/2, boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+                // boxWidth/2, boxHeight/2, -boxDepth/2,
+
+                // -boxWidth/2, -boxHeight/2, boxDepth/2,
+                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+                // boxWidth/2, -boxHeight/2, -boxDepth/2,
+                // boxWidth/2, -boxHeight/2, boxDepth/2,
+                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
+
+                // -boxWidth/2, boxHeight/2, boxDepth/2,
+                // boxWidth/2, boxHeight/2, boxDepth/2,
+                // -boxWidth/2, boxHeight/2, -boxDepth/2,
+                // boxWidth/2, boxHeight/2, -boxDepth/2,
+                // -boxWidth/2, boxHeight/2, -boxDepth/2,
+                // boxWidth/2, boxHeight/2, boxDepth/2,
+                
+            ];
+            // tmpBufferArrayInfo.a_normal = [
+            //     0, 0, 1,
+            //     0, 0, 1,
+            //     0, 0, 1,
+            //     0, 0, 1,
+            //     0, 0, 1,
+            //     0, 0, 1,
+            //     0, 0, -1,
+            //     0, 0, -1,
+            //     0, 0, -1,
+            //     0, 0, -1,
+            //     0, 0, -1,
+            //     0, 0, -1,
+                
+            //     -1, 0, 0,
+            //     -1, 0, 0,
+            //     -1, 0, 0,
+            //     -1, 0, 0,
+            //     -1, 0, 0,
+            //     -1, 0, 0,
+            //     1, 0, 0,
+            //     1, 0, 0,
+            //     1, 0, 0,
+            //     1, 0, 0,
+            //     1, 0, 0,
+            //     1, 0, 0,
+
+            //     // 0, -1, 0,
+            //     // 0, -1, 0,
+            //     // 0, -1, 0,
+            //     // 0, -1, 0,
+            //     // 0, -1, 0,
+            //     // 0, -1, 0,
+            //     // 0, 1, 0,
+            //     // 0, 1, 0,
+            //     // 0, 1, 0,
+            //     // 0, 1, 0,
+            //     // 0, 1, 0,
+            //     // 0, 1, 0,
+            // ];
+            const tmpBufferInfo = twgl.createBufferInfoFromArrays(gl, tmpBufferArrayInfo);
+            tmp.drawInfo.bufferInfoList.push(tmpBufferInfo);
+
+            var uniform = {};
+            uniform.u_objectColor = [1, 1, 1, 1];
+            uniform.u_ambientMaterial = [0.3, 0.3, 0.3];
+            uniform.u_diffuseMaterial = [1.0, 0.3, 0.3];
+            uniform.u_specularMaterial = [0.05, 0.05, 0.05];
+            uniform.u_emissiveMaterial = [0, 0, 0];
+            uniform.u_ambientStrength = 0.3;
+            uniform.u_shininess = 32.0;
+            tmp.drawInfo.uniformsList.push(uniform);
+            
+            
+
+            // tmp.localMatrix = m4.translation([curNode.boxInfo[i].centroid[0], curNode.boxInfo[i].centroid[1], curNode.boxInfo[i].centroid[2]]);
+            tmp.setParent(curNode);
+            console.log(tmp);
+        }
+        
+        
+        // nodes.push(tmp);
+        // console.log(curNode);
+        
+    }
+    curNode.children.forEach(child => {
+        createBoundingBoxCore(child);
+    });
+}
+
+export {initNodeSet, setFrameTree, linkObjects, createBoundingBox}
 
 
 

@@ -88,6 +88,7 @@ var bindObjectsWithMeshes = function(objects, meshes, textures, programInfo, gl)
         const curObject_bufferInfoByMaterial = []; //an array of indices arrays info
         curObject.materialsByIndex = [];
         curObject.geoNum = 0;
+        curObject.boxInfo = [];
         meshes[curObjectName].geometries.forEach(function(object) {
             const curObject_bufferArrayByMaterial = {};
             curObject_bufferArrayByMaterial.a_position = object.data.vertices;
@@ -101,6 +102,12 @@ var bindObjectsWithMeshes = function(objects, meshes, textures, programInfo, gl)
                 const name = object.material;
                 curObject.materialsByIndex.push(meshes[curObjectName].materials[name]);
             }
+            //add box info
+            curObject.hasBoxInfo = true;
+            curObject.boxInfo.push({
+                centroid: object.boundingBox,
+                boundingBox: object.boundingBox,
+            });
             curObject.geoNum++;
         });
         //add

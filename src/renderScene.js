@@ -2,6 +2,7 @@ import { updateLights,Light } from './light.js';
 import { twgl, m4, gl, depthFramebufferInfo} from './main.js'
 import {Camera} from './camera.js';
 import { myNode } from './myNode.js';
+import { attributes } from '../modules/twgl/twgl-full.module.js';
 /**
  * renderScene.
  * @param {myNode} base_node
@@ -26,7 +27,7 @@ var renderScene = function(base_node, lights, myCamera){
     drawNode(base_node, viewProjection);
 
     function drawNode(curNode) {
-        if (curNode.type == "OBJECT") {
+        if (curNode.type == "OBJECT" || curNode.type == "BOUNDINGBOX") {
             let drawInfo = curNode.drawInfo; //debug
             // console.log(curNode)
             for (var i = 0; i < drawInfo.groupNum; i++) //traverse curNode's draw info
@@ -56,6 +57,8 @@ var renderScene = function(base_node, lights, myCamera){
                 twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
                 // **draw**
                 twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES);
+                if(curNode.type == "OBJECT") twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES);
+                else twgl.drawBufferInfo(gl, bufferInfo, gl.LINES)
             }
         }
         curNode.children.forEach(function (child) {
