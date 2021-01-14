@@ -12,13 +12,13 @@ const m4=twgl.m4;
 function collisionTest(n1,n2){
     if (!(n1.hasBoxInfo&&n2.hasBoxInfo)) return false;
     // Important! otherwise it always collides with itself.
-    if (n1 == n2) return false;
+    if (n1==n2) return false;
     /* centroid 1 */
-    let c1=vec3.clone(n1.boxInfo[0].centroid);
+    let c=n1.boxInfo[0].centroid;
+    let c1=vec4.fromValues(c[0],c[1],c[2],1);
+    let b=n1.boxInfo[0].boundingBox;
     /* the diagonal line of bounding box 1*/
-    let b1=vec3.clone(n1.boxInfo[0].boundingBox);
-    // point and vector respectively.
-    c1[3]=1;b1[3]=0;
+    let b1=vec4.fromValues(b[0],b[1],b[2],0);
     // transform into the world frame.
     vec4.transformMat4(c1,c1,n1.worldMatrix);
     vec4.transformMat4(b1,b1,n1.worldMatrix);
@@ -26,15 +26,18 @@ function collisionTest(n1,n2){
     let r1=vec4.length(b1)/2;
 
     // repeats on n2.
-    let c2 = vec3.clone(n2.boxInfo[0].centroid);
-    let b2 = vec3.clone(n2.boxInfo[0].boundingBox);
-    c2[3] = 1; b2[3] = 0;
+    c = n2.boxInfo[0].centroid;
+    b = n2.boxInfo[0].boundingBox;
+    let c2 = vec4.fromValues(c[0], c[1], c[2], 1);
+    let b2 = vec4.fromValues(b[0], b[1], b[2], 0);
     vec4.transformMat4(c2, c2, n2.worldMatrix);
     vec4.transformMat4(b2, b2, n2.worldMatrix);
     let r2 = vec4.length(b2) / 2;
 
     // rough estimation based on the circumsphere.
     if (vec3.distance(c1,c2)>r1+r2) return false;
+    console.log("collision point:",n1, n2);
+    console.log(c1,c2,r1,r2);
     return true;
 }
 

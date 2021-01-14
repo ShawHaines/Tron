@@ -196,7 +196,7 @@ document.addEventListener("keydown", function (event) {
             rollRight(); keyState.rollRight = true;
             break;
         default:
-            console.log(event);
+            // console.log(event);
             break;
     }
 });
@@ -213,7 +213,7 @@ document.addEventListener("keyup",function(event){
             resetRoll(); keyState.rollLeft = false; keyState.rollRight = false;
             break;
         default:
-            console.log(event);
+            // console.log(event);
             break;
     }
 })

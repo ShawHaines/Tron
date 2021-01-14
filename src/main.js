@@ -334,8 +334,10 @@ function updateModels(){
     //     m4.scale(world, [5, 5, 5], world);
     //     m4.copy(world, tmp.localMatrix);
     // });
-    if (window.collisionTest) //set globally in index.html
-        if (collisionWithAll(nodes.fighter,nodes.base_node)) alert("You hit something!");
+    if (window.collisionTest){ //set globally in index.html
+        collisionWithAll(nodes.fighter,nodes.base_node);
+        // if (collisionWithAll(nodes.fighter,nodes.base_node)) alert("You hit something!");
+    }
 }
 
 var assignFog2Nodes = function(curNode)
