@@ -55,6 +55,35 @@ var omegaMax=Math.PI;
  * if true, reverse the Pitch axis.
  */
 var reversePitch=true;
+
+/**
+ * reset the conditions all to intial values.
+ */
+function resetAll(){
+    position=vec4.fromValues(0,0,50,1);
+    mat4.fromXRotation(orientation,Math.PI/2);
+    sidekickPosition=vec4.clone(position);
+    sidekickOrientation=mat4.clone(sidekickOrientation);
+    u=vec4.fromValues(0.01,0,0,0);
+    omega=vec3.fromValues(0,0,0);
+    record = {
+        position: [],
+        orientation: [],
+        pointer: 0,
+        size: 20,
+        // records whether the ring buffer has started over again.
+        full: false,
+    };
+    ribbon = {
+        a_position: [],
+        a_normal: [],
+        indices: [],
+        length: 0,
+    };
+    ribbonCount = 0;
+    ribbonLength = 0;
+}
+
 /**
  *Returns the 4*4 Euler Matrix of euler angle yaw, pitch, yaw.
  * @param {number} yaw
@@ -286,7 +315,6 @@ function updateFlight(interval){
     }
 }
 
-
 // Ring buffer keeping track of the position and orientation.
 var record = {
     position: [],
@@ -319,5 +347,6 @@ function updateSidekick(){
         record.pointer = (record.pointer + 1) % record.size;
     }
 }
+resetAll();
 // global variables.
-export {euler_matrix, orientation, position,sidekickOrientation,sidekickPosition, ribbon , ribbonLength, updateFlight, pitchUp, pitchDown, resetPitch};
+export {euler_matrix, orientation, position,sidekickOrientation,sidekickPosition, ribbon , ribbonLength, updateFlight, pitchUp, pitchDown, resetPitch, resetAll};

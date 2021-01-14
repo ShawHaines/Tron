@@ -308,34 +308,33 @@ function updateModels(){
         if (collisionWithAll(nodes.fighter,nodes.base_node)){
             alert("You hit something...");
             // respawn.
-            
+            flight.resetAll();
         }
     }
 }
 
-var assignFog2Nodes = function(curNode)
+var assignFog2Nodes = function(curNode){
+    if(curNode.type == "OBJECT")
     {
-        if(curNode.type == "OBJECT")
+        for(var i = 0; i < curNode.drawInfo.groupNum; i++)
         {
-            for(var i = 0; i < curNode.drawInfo.groupNum; i++)
-            {
-                if(!window.isIPAD) 
-                    Object.assign(curNode.drawInfo.uniformsList[i], {
-                        u_fogDensity: window.fogDensity / 10000,
-                        u_fogColor: [0.8, 0.9, 1, 1]
-                    });
-                else
-                    Object.assign(curNode.drawInfo.uniformsList[i], {
-                        u_fogDensity: 0,
-                        u_fogColor: [0.8, 0.9, 1, 1]
-                    });
-            }
-                
+            if(!window.isIPAD) 
+                Object.assign(curNode.drawInfo.uniformsList[i], {
+                    u_fogDensity: window.fogDensity / 10000,
+                    u_fogColor: [0.8, 0.9, 1, 1]
+                });
+            else
+                Object.assign(curNode.drawInfo.uniformsList[i], {
+                    u_fogDensity: 0,
+                    u_fogColor: [0.8, 0.9, 1, 1]
+                });
         }
-        curNode.children.forEach(function (child) {
-            assignFog2Nodes(child);
-        });
+            
     }
+    curNode.children.forEach(function (child) {
+        assignFog2Nodes(child);
+    });
+}
 
 
 
