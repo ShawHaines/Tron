@@ -58,7 +58,7 @@ var renderScene = function(base_node, lights, myCamera){
                 // **draw**
                 twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES);
                 if(curNode.type == "OBJECT") twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES);
-                else twgl.drawBufferInfo(gl, bufferInfo, gl.LINES)
+                else if (window.wireFrame) twgl.drawBufferInfo(gl, bufferInfo, gl.LINES);
             }
         }
         curNode.children.forEach(function (child) {

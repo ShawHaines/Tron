@@ -80,6 +80,8 @@
                 <ul class="nav-menu-list">
                     <li><button id="pauseButton" class="nav-item">Pause</button></li>
                     <li><button id="navButton" class="nav-item" style="visibility: visible;" >Enable Navigation</button></li>
+                    <li><button id="wireFrameButton" class="nav-item" style="visibility: visible;" >Display Wire Frame</button></li>
+                    <li><button id="collisionTestButton" class="nav-item" style="visibility: visible;" >Enable Collision Test</button></li>
                     <li><button id="lightButton" class="nav-item" style="visibility: visible;" >Edit Light</button></li>
                     <li><button id="fogButton" class="nav-item" style="visibility: visible;" >Edit Fog</button></li>
                     <li><button id="perspectiveButton" class="nav-item" style="visibility: visible;" >Edit Perspective</button></li>
@@ -103,9 +105,13 @@
             window.loadingResource = true;
             window.navMode = false;
             window.pauseCond = false;
+            window.wireFrame = false;
+            window.collisionTest = false;
             // orange by default.
             window.ribbonColor=[1,0.5,0];
             const buttons={
+                wireFrame: document.getElementById("wireFrameButton"),
+                collisionTest: document.getElementById("collisionTestButton"),
                 pause: document.getElementById("pauseButton"),
                 nav  : document.getElementById("navButton"),
                 light  : document.getElementById("lightButton"),
@@ -124,6 +130,8 @@
             console.log(buttons);
             buttons.pause.update=function(){this.innerHTML=!this.state?"Pause":"Continue"; window.pauseCond = this.state;};
             buttons.nav.update  =function(){this.innerHTML=!this.state?"Enable Navigation":"Disable Navigation";window.navMode = this.state;};
+            buttons.wireFrame.update  =function(){this.innerHTML=!this.state?"Display Wire Frame":"Hide Wire Frame";window.wireFrame = this.state;};
+            buttons.collisionTest.update  =function(){this.innerHTML=!this.state?"Enable Collision Test":"Disable Collision Test";window.collisionTest = this.state;};
             buttons.light.update=function(){this.innerHTML=!this.state?"Edit Light":"Close"; document.getElementById('Light').style.visibility = this.state ? "visible" : "hidden";
                     if (this.state) resetStates(this);};
             buttons.fog.update  =function(){this.innerHTML=!this.state?"Edit Fog":"Close"; document.getElementById('Fog').style.visibility = this.state?"visible":"hidden";

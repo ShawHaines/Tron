@@ -23,6 +23,7 @@ import {initNodeSet, setFrameTree, linkObjects, createBoundingBox} from './setNo
 import {parseModel} from './objLoader.js'
 import {moveNavCamera} from './navInteraction.js'
 import {bindOBJExportInfo2Nodes} from './objExport.js'
+import { collisionWithAll } from "./collision.js";
 
 const m4 = twgl.m4;
 const gl = document.getElementById("c").getContext("webgl");
@@ -164,7 +165,7 @@ function setCameras(){
 /********************************************
 * main() function
 *********************************************/
-var main = function(time){
+function main(time){
     time *= 0.001;
     new_time = time;
     //Limit on maximum FPS. If the render speed is too fast, skip this frame.
@@ -333,6 +334,8 @@ function updateModels(){
     //     m4.scale(world, [5, 5, 5], world);
     //     m4.copy(world, tmp.localMatrix);
     // });
+    if (window.collisionTest) //set globally in index.html
+        if (collisionWithAll(nodes.fighter,nodes.base_node)) alert("You hit something!");
 }
 
 var assignFog2Nodes = function(curNode)
