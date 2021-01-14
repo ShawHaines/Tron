@@ -104,8 +104,7 @@ var bindObjectsWithMeshes = function(objects, meshes, textures, programInfo, gl)
             }
             //add box info
             curObject.hasBoxInfo = true;
-            curObject.boxInfo.push({
-                centroid: object.boundingBox,
+            curObject.boxInfo.push({centroid: object.centroid,
                 boundingBox: object.boundingBox,
             });
             curObject.geoNum++;
