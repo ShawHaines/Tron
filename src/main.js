@@ -255,15 +255,6 @@ function sliderPerspective(){
     cameras.tailCamera.node.localMatrix=tail;
 }
 
-// Ring buffer keeping track of the position and orientation.
-var record = {
-    position: [],
-    orientation: [],
-    pointer: 0,
-    size: 20,
-    // records whether the ring buffer has started over again.
-    full: false,
-}
 function updateModels(){
     /** Rotate the paper plane **/
     var world = m4.identity();
@@ -281,29 +272,7 @@ function updateModels(){
     // m4.rotateX(fighter,Math.PI/2,fighter);
     m4.multiply(fighter, flight.orientation, fighter);
     nodes.fighter_base.localMatrix = fighter;
-    let sidekickPosition=m4.identity(),sidekickOrientation=m4.identity();
-    // write into the ring buffer.
-    if (!record.full){
-        // not full yet, just use the earliest possible value.
-        // FIXME: be careful about the shallow copy!
-        record.position.push(m4.copy(flight.position));
-        record.orientation.push(m4.copy(flight.orientation));
-        m4.copy(record.position[0],sidekickPosition);
-        m4.copy(record.orientation[0],sidekickOrientation);
-        record.pointer++;
-        if (record.pointer>=record.size){
-            record.full=true;
-            record.pointer-=record.size;
-        }
-    } else{
-        // already full, use the one that's going to be overwritten.
-        m4.copy(record.position[record.pointer],sidekickPosition);
-        m4.copy(record.orientation[record.pointer],sidekickOrientation);
-        record.position[record.pointer]=m4.copy(flight.position);
-        record.orientation[record.pointer]=m4.copy(flight.orientation);
-        record.pointer=(record.pointer+1)%record.size;
-    }
-    let sidekick=m4.lookAt(sidekickPosition,flight.position,[0,1,0]);
+    let sidekick=m4.lookAt(flight.sidekickPosition,flight.position,[0,1,0]);
     nodes.sidekick.localMatrix=sidekick;
     /** Update random objects **/
     // nodes.random_nature_nodes.forEach(function (tmp) {
@@ -335,8 +304,12 @@ function updateModels(){
     //     m4.copy(world, tmp.localMatrix);
     // });
     if (window.collisionTest){ //set globally in index.html
-        collisionWithAll(nodes.fighter,nodes.base_node);
-        // if (collisionWithAll(nodes.fighter,nodes.base_node)) alert("You hit something!");
+        // collisionWithAll(nodes.fighter,nodes.base_node);
+        if (collisionWithAll(nodes.fighter,nodes.base_node)){
+            alert("You hit something...");
+            // respawn.
+            
+        }
     }
 }
 

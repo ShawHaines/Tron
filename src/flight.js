@@ -10,6 +10,7 @@ import { mat4, vec3, vec4 } from "../modules/gl-matrix/src/index.js"
  * @type {vec4}
  */
 var position=vec4.fromValues(0,0,50,1);
+var sidekickPosition = vec4.create();
 /**
  * the velocity in self frame. w=0 means vector instead of point.
  * @type {vec4}
@@ -35,8 +36,8 @@ const aFriction=-0.005;
 /** 
  * A transformation matrix that represents the orientation from world frame to self frame.
  * @type {mat4} */
-// var orientation=mat4.create();
 var orientation=mat4.fromXRotation([],Math.PI/2);
+var sidekickOrientation = mat4.clone(orientation);
 
 /**
  * Euler Angle, three components are (in order) yaw, pitch, roll.
@@ -281,9 +282,42 @@ function updateFlight(interval){
             ribbonCount-=ribbonInterval;
             updateRibbon();
         }
+        updateSidekick();
     }
-
 }
 
+
+// Ring buffer keeping track of the position and orientation.
+var record = {
+    position: [],
+    orientation: [],
+    pointer: 0,
+    size: 20,
+    // records whether the ring buffer has started over again.
+    full: false,
+}
+function updateSidekick(){
+    // write into the ring buffer.
+    if (!record.full) {
+        // not full yet, just use the earliest possible value.
+        // FIXME: be careful about the shallow copy!
+        record.position.push(vec4.clone(position));
+        record.orientation.push(mat4.clone(orientation));
+        vec4.copy(sidekickPosition,record.position[0]);
+        mat4.copy(sidekickOrientation,record.orientation[0]);
+        record.pointer++;
+        if (record.pointer >= record.size) {
+            record.full = true;
+            record.pointer -= record.size;
+        }
+    } else {
+        // already full, use the one that's going to be overwritten.
+        vec4.copy(sidekickPosition,record.position[record.pointer]);
+        mat4.copy(sidekickOrientation,record.orientation[record.pointer]);
+        record.position[record.pointer] = vec4.clone(position);
+        record.orientation[record.pointer] = mat4.clone(orientation);
+        record.pointer = (record.pointer + 1) % record.size;
+    }
+}
 // global variables.
-export {euler_matrix, orientation, position, ribbon , ribbonLength, updateFlight, pitchUp, pitchDown, resetPitch};
+export {euler_matrix, orientation, position,sidekickOrientation,sidekickPosition, ribbon , ribbonLength, updateFlight, pitchUp, pitchDown, resetPitch};

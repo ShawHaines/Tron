@@ -39,21 +39,21 @@ class myObject {
         this.geoNum = 0;
         // use ()=> arrow function to avoid messing with this.
         const curObject_bufferArrayByMaterial = {};
-        mesh.geometries.forEach((object)=>{
-            curObject_bufferArrayByMaterial.a_position = object.data.vertices;
-            if (object.data.textures) curObject_bufferArrayByMaterial.a_texcoord = object.data.textures;
-            curObject_bufferArrayByMaterial.a_normal = object.data.vertexNormals;
+        mesh.geometries.forEach((geometry)=>{
+            curObject_bufferArrayByMaterial.a_position = geometry.data.vertices;
+            if (geometry.data.textures) curObject_bufferArrayByMaterial.a_texcoord = geometry.data.textures;
+            curObject_bufferArrayByMaterial.a_normal = geometry.data.vertexNormals;
             const tmpBufferInfo = twgl.createBufferInfoFromArrays(gl, curObject_bufferArrayByMaterial);
             curObject_bufferInfoByMaterial.push(tmpBufferInfo);
 
             if (mesh.useMTL) {
-                const name = object.material;
+                const name = geometry.material;
                 this.materialsByIndex.push(mesh.materials[name]);
             }
             //add box info
             this.boxInfo.push({
-                centroid: object.centroid,
-                boundingBox: object.boundingBox,
+                centroid: geometry.centroid,
+                boundingBox: geometry.boundingBox,
             });
             this.geoNum++;
         });
