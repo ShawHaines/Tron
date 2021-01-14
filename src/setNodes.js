@@ -450,7 +450,7 @@ function createBoundingBoxCore(curNode)
             
             
 
-            // tmp.localMatrix = m4.translation([curNode.boxInfo[i].centroid[0], curNode.boxInfo[i].centroid[1], curNode.boxInfo[i].centroid[2]]);
+            tmp.localMatrix = m4.translation([curNode.boxInfo[i].centroid[0], curNode.boxInfo[i].centroid[1], curNode.boxInfo[i].centroid[2]]);
             tmp.setParent(curNode);
             console.log(tmp);
         }
