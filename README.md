@@ -25,7 +25,7 @@ Computer Graphics Project, inspired by the film *Tron*, based on WebGL. Click **
 - [WebGL Fundamentals](https://webglfundamentals.org/webgl/lessons/zh_cn/)
 
 ### Document in Chinese
-- [《Tron: CG Project 系统设计说明文档》](https://www.yuque.com/docs/share/559b3525-16fe-4686-b8ae-18cc94a64cfa?#)
+- [銆奣ron: CG Project 绯荤粺璁捐璇存槑鏂囨。銆媇(https://www.yuque.com/docs/share/559b3525-16fe-4686-b8ae-18cc94a64cfa?#)
 
 ### **Notice**:
 - Since we're using ES6 features, you need to forward the code to a port if you are trying to run it locally on your PC.
