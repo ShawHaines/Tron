@@ -198,9 +198,8 @@ function parseOBJ(text) {
     for (let i=0;i<3;i++){
       centroid[i]=(min[i]+max[i])/2;
       boundingBox[i]=max[i]-min[i];
-      radius += (boundingBox[i] / 2) * (boundingBox[i] / 2);
     }
-    radius=Math.sqrt(radius);
+    radius=Math.hypot(boundingBox);
     // console.log("min,max,centroid,boundingBox",min,max,centroid,boundingBox);
     return {
       geometries,

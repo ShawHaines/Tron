@@ -129,7 +129,6 @@ var ribbon = {
 }
 
 function updateRibbon() {
-    // TODO: Improve the efficiency by getting rid of the array.shift().
     let displacement=vec4.fromValues(0,ribbonWidth/2,0,0);
     vec4.transformMat4(displacement,displacement,orientation);
     let up = vec3.fromValues(0, 0, -1, 0);
@@ -299,8 +298,8 @@ function updateFlight(interval){
         mat4.fromYRotation(Ry,dPitch);
         mat4.fromXRotation(Rx,dRoll);
         // FIXME: the order matters! first pitch, then roll. Also note the multiplying order.
-        mat4.multiply(orientation,orientation,Rx);
         mat4.multiply(orientation, orientation,Ry);
+        mat4.multiply(orientation,orientation,Rx);
         vec4.scaleAndAdd(u,u,a,dt); if(u[0] < 0) u[0] = 0.02;
         vec4.transformMat4(v,u,orientation);
         vec4.add(position,position,v);
