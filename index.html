@@ -81,7 +81,7 @@
                     <li><button id="pauseButton" class="nav-item">Pause</button></li>
                     <li><button id="navButton" class="nav-item" style="visibility: visible;" >Enable Navigation</button></li>
                     <li><button id="wireFrameButton" class="nav-item" style="visibility: visible;" >Display Wire Frame</button></li>
-                    <li><button id="collisionTestButton" class="nav-item" style="visibility: visible;" >Enable Collision Test</button></li>
+                    <li><button id="collisionTestButton" class="nav-item" style="visibility: visible;" >Disable Collision Test</button></li>
                     <li><button id="lightButton" class="nav-item" style="visibility: visible;" >Edit Light</button></li>
                     <li><button id="fogButton" class="nav-item" style="visibility: visible;" >Edit Fog</button></li>
                     <li><button id="perspectiveButton" class="nav-item" style="visibility: visible;" >Edit Perspective</button></li>
@@ -106,7 +106,7 @@
             window.navMode = false;
             window.pauseCond = false;
             window.wireFrame = false;
-            window.collisionTest = false;
+            window.collisionTest = true;
             // orange by default.
             window.ribbonColor=[1,0.5,0];
             const buttons={
@@ -224,23 +224,27 @@
                 </div>
             </div>
 
-            <div id="help" style="height: 300px; width: 500px; position: absolute; left: 50%; top: 50%; margin-top:-150px; margin-left:-250px; background-color: rgb(30, 39, 56); border: 5px rgb(121, 251, 253) solid;
+            <div id="help" style="height: 200px; width: 400px; position: absolute; left: 50%; top: 50%; margin-top:-100px; margin-left:-200px; background-color: rgb(30, 39, 56); border: 5px rgb(121, 251, 253) solid;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: white;overflow:scroll; visibility: hidden">
                <p style="text-align: center; font-size: 40px">
                    Help
                </p>
                <div style="margin-left: 10%">
                    <p style="font-size: 20px">Fly:</p>
-                   <p>* Arrow key || Virtual joystick
-                   <br/>&nbsp&nbsp&nbsp&nbsp-- Control the plane's direction </p>
-                   <p>* 'Z''X' || hold touch on right-up/right-down side
-                   <br/>&nbsp&nbsp&nbsp&nbsp-- Pitch up/down</p>
+                   <p>* Arrow key up/Hold touch on right-up side -- Pitch up </p>
+                   <p>* Arrow key down/Hold touch on right-down side -- Pitch down </p>
+                   <p>* Arrow key left/Joystick left -- Turn left </p>
+                   <p>* Arrow key right/Joystick right -- Turn right </p>
+                   <p>* Press 'Z'/Joystick up -- Speed up </p>
+                   <p>* Press 'X'/Joystick down -- Speed down </p>
                    <p style="font-size: 20px">Navigate:</p>
-                   <p>* 'W''A''S''D''Q''E' || Virtual joystick -- Control navigation move</p>
-                   <p>* Drag -- Control navigation sight<p/>
+                   <p>* 'W''A''S''D''Q''E' || Virtual joystick -- Move</p>
+                   <p>* Drag -- Change sight<p/>
                    <p style="font-size: 20px">Button</p>
                    <p>* Pause -- Pause the time</p>
                    <p>* Enable/Disable Navigation -- Change between modes</p>
+                   <p>* Display/Hide Wire Frame -- Show/Hide OBB boxes for objects</p>
+                   <p>* Enable/Disable Collision Test -- Response/not when the plane hits an object</p>
                    <p>* Edit light -- Edit the sun light's angle</p>
                    <p>* Edit Fog -- Edit the fog's density</p>
                    <p>* Edit Perspective -- Edit the perspective in fly mode</p>
@@ -257,7 +261,7 @@
                <br/><br/>
            </div>
 
-           <div id="about" style="height: 300px; width: 500px; position: absolute; left: 50%; top: 50%; margin-top:-150px; margin-left:-250px; background-color: rgb(30, 39, 56); border: 5px rgb(121, 251, 253) solid;
+           <div id="about" style="height: 200px; width: 400px; position: absolute; left: 50%; top: 50%; margin-top:-100px; margin-left:-200px; background-color: rgb(30, 39, 56); border: 5px rgb(121, 251, 253) solid;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: white;overflow:scroll; visibility: hidden">
                <p style="text-align: center; font-size: 40px">
                    About
@@ -269,6 +273,7 @@
                    &nbsp&nbsp&nbsp&nbsp<a style="font-size: 25px; color: white" href="https://github.com/ShawHaines">@ShawHaines</a>
                    &nbsp&nbsp&nbsp&nbsp<a style="font-size: 25px; color: white" href="https://github.com/zjulzhhh">@LZH</a>
                    <br/><br/>
+                   <a style="font-size: 15px; color: white;" href="https://github.com/ShawHaines/Tron">Github Repository</a>
                    <button onclick="document.getElementById('about').style.visibility='hidden';"> Close</button>
                    <br/><br/>
                </div>
