@@ -6,11 +6,10 @@ import {myNode} from "./myNode.js";
 import {myObject} from "./myObject.js";
 import {Camera,updateCameras} from "./camera.js";
 import {Light, pack, updateLights} from "./light.js";
-// import * as texture_shader from "../pages/Preview/src/texture-shader.js";
-import * as texture_shader from "../pages/Preview/src/texture-shader-with-shadow.js";
-import * as shadow_shader from '../pages/Preview/src/shadow-shader.js';
-import * as sky_shader from "../pages/Preview/src/sky_shader.js";
-import * as transparent_shader from "../pages/Preview/src/transparent-shader.js";
+import * as texture_shader from "./texture-shader-with-shadow.js";
+import * as shadow_shader from './shadow-shader.js';
+import * as sky_shader from "./sky_shader.js";
+import * as transparent_shader from "./transparent-shader.js";
 import * as flight from "./flight.js";
 import {models, naturePackModelNames} from "./modelList.js"
 import {renderScene} from './renderScene.js';
