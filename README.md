@@ -1,29 +1,28 @@
 # Tron
 
-CG Project, inspired by the film Tron, based on WebGL.
+Computer Graphics Project, inspired by the film *Tron*, based on WebGL. Click **[here](http://code.vtu.life/Tron/index.html)** to play!
 
 ![](image/Screenshot.png)
 
-## Features
+### Directory structure
+- Most of the codes are placed under `./src`.
+- Some huge externel modules are placed under `./modules`.
+- Models and pictures are stored under `./resource`. Do NOT take the 'NaturePack' OBJs for other usages!
+- `pages` should never be used other than testing. However, there are some interesting testing works in it.
 
-- [ ] WebGL2 Support
-  - [ ] ~~Screenshot~~
-  - [x] Texture
-  - [x] Lighting
-  - [ ] ~~Music~~
-- [ ] Interactive Scene Editor
-  - [x] Import .obj files
-  - [x] Export .obj files
-  - [ ] ~~blender~~
-- [ ] Collision Detection
-  - [ ] AABB Box
-  - [ ] Dynamic Update
-- [ ] ~~Particle Effect~~
-- [ ] Control System
-  - [x] Full roll, pitch, ~~yaw~~
-  - [ ] Controller Support
-- [x] Viewing Angle
-- [x] Light Ribbon
-- [x] Interaction callback
-- [ ] Multiple players
+### Implemented with
+- [twgl.js](https://github.com/greggman/twgl.js)
+- [gl-matrix.js](https://github.com/toji/gl-matrix)
+- [virtualjoystick.js](https://github.com/jeromeetienne/virtualjoystick.js)
+- [webgl-lessons-ui.js](https://webglfundamentals.org/webgl/lessons/zh_cn/)
+- [navStyle.css](https://webgl-shaders.com/)
+- [perlin.js](https://github.com/wwwtyro/perlin.js)
+- [LowPoly Nature - Trees Grass and Rocks Low-poly 3D model](https://www.cgtrader.com/3d-models/exterior/landscape/lowpoly-nature-trees-grass-and-rocks) Nature Pack models bought from *cgtrader*
+- [Paper airplane Low-poly 3D model](https://www.cgtrader.com/3d-models/sports/toy/paper-airplane-a16df32d-2b2f-4016-89a8-67d9598234b7) Paper Plane model bought from *cgtrader*
 
+### Referencing
+- [WebGL with Perlin Noise ¡ª Part 1](https://medium.com/neosavvy-labs/webgl-with-perlin-noise-part-1-a87b56bbc9fb)
+- [WebGL Fundamentals](https://webglfundamentals.org/webgl/lessons/zh_cn/)
+
+### **Notice**:
+- Since we're using ES6 features, you need to forward the code to a port if you are trying to run it locally on your PC.
