@@ -275,40 +275,54 @@ function updateModels(){
     let sidekick=m4.lookAt(flight.sidekickPosition,flight.position,[0,1,0]);
     nodes.sidekick.localMatrix=sidekick;
     /** Update random objects **/
-    // nodes.random_nature_nodes.forEach(function (tmp) {
-    //     // tmp.xRot = tmp.xRotInit + tmp.xRotSpeed * g_time;
-    //     // tmp.yRot = tmp.yRotInit + tmp.yRotSpeed * g_time;
-    //     // tmp.zRot = tmp.zRotInit + tmp.zRotSpeed * g_time;
-    //     // tmp.y = tmp.yInit + tmp.ySpeed * g_time;
+    nodes.random_nature_nodes.forEach(function (tmp) {
+        // tmp.xRot = tmp.xRotInit + tmp.xRotSpeed * g_time;
+        // tmp.yRot = tmp.yRotInit + tmp.yRotSpeed * g_time;
+        // tmp.zRot = tmp.zRotInit + tmp.zRotSpeed * g_time;
+        // tmp.y = tmp.yInit + tmp.ySpeed * g_time;
 
-    //     tmp.xRot += tmp.xRotSpeed * g_time_interval;
-    //     tmp.yRot += tmp.yRotSpeed * g_time_interval;
-    //     tmp.zRot += tmp.zRotSpeed * g_time_interval;
-    //     // tmp.y += tmp.ySpeed * g_time_interval;
+        tmp.xRot += tmp.xRotSpeed * g_time_interval;
+        tmp.yRot += tmp.yRotSpeed * g_time_interval;
+        tmp.zRot += tmp.zRotSpeed * g_time_interval;
+        // tmp.y += tmp.ySpeed * g_time_interval;
 
-    //     while(tmp.xRot > 360) tmp.xRot -= 360;
-    //     while(tmp.yRot > 360) tmp.yRot -= 360;
-    //     while(tmp.zRot > 360) tmp.zRot -= 360;
-    //     while(tmp.xRot < 0) tmp.xRot += 360;
-    //     while(tmp.yRot < 0) tmp.yRot += 360;
-    //     while(tmp.zRot < 0) tmp.zRot += 360;
-    //     // while(tmp.y > 100) tmp.y -= 100;
-    //     // while(tmp.y < 0) tmp.y += 100;
+        while(tmp.xRot > 360) tmp.xRot -= 360;
+        while(tmp.yRot > 360) tmp.yRot -= 360;
+        while(tmp.zRot > 360) tmp.zRot -= 360;
+        while(tmp.xRot < 0) tmp.xRot += 360;
+        while(tmp.yRot < 0) tmp.yRot += 360;
+        while(tmp.zRot < 0) tmp.zRot += 360;
+        // while(tmp.y > 100) tmp.y -= 100;
+        // while(tmp.y < 0) tmp.y += 100;
         
-    //     var world = m4.identity();
-    //     world = m4.multiply(world, m4.translation([tmp.x, tmp.y, tmp.z]));
-    //     world = m4.multiply(world, m4.rotateX(world, tmp.xRot / 180 * Math.PI));
-    //     world = m4.multiply(world, m4.rotateY(world, tmp.yRot / 180 * Math.PI));
-    //     world = m4.multiply(world, m4.rotateZ(world, tmp.zRot / 180 * Math.PI));
-    //     m4.scale(world, [5, 5, 5], world);
-    //     m4.copy(world, tmp.localMatrix);
-    // });
+        var world = m4.identity();
+        world = m4.multiply(world, m4.translation([tmp.x, tmp.y, tmp.z]));
+        world = m4.multiply(world, m4.rotateX(world, tmp.xRot / 180 * Math.PI));
+        world = m4.multiply(world, m4.rotateY(world, tmp.yRot / 180 * Math.PI));
+        world = m4.multiply(world, m4.rotateZ(world, tmp.zRot / 180 * Math.PI));
+        m4.scale(world, [5, 5, 5], world);
+        m4.copy(world, tmp.localMatrix);
+    });
     if (window.collisionTest){ //set globally in index.html
         // collisionWithAll(nodes.fighter,nodes.base_node);
-        if (collisionWithAll(nodes.fighter,nodes.base_node)){
-            alert("You hit something...");
+        var hitNode = collisionWithAll(nodes.fighter,nodes.base_node);
+        if (hitNode != null){
+            // alert("You hit something...");
             // respawn.
-            flight.resetAll();
+            // flight.resetAll();
+            
+            function killObject(node) {
+                console.log(node);
+                if(node.type == "OBJECT")
+                {
+                    for(var i = 0; i < node.drawInfo.groupNum; i++)
+                    node.drawInfo.programInfoList[i] = transparentProgramInfo;
+                }
+                // curNode.children.forEach(function (child) {
+                //     killObject(child);
+                // });
+            }
+            killObject(hitNode);
         }
     }
 }
