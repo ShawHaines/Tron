@@ -80,7 +80,7 @@
                 <ul class="nav-menu-list">
                     <li><button id="pauseButton" class="nav-item">Pause</button></li>
                     <li><button id="navButton" class="nav-item" style="visibility: visible;" >Enable Navigation</button></li>
-                    <li><button id="wireFrameButton" class="nav-item" style="visibility: visible;" >Display Wire Frame</button></li>
+                    <li><button id="wireFrameButton" class="nav-item" style="visibility: visible;" >Show Wire Frame</button></li>
                     <li><button id="collisionTestButton" class="nav-item" style="visibility: visible;" >Disable Collision Test</button></li>
                     <li><button id="lightButton" class="nav-item" style="visibility: visible;" >Edit Light</button></li>
                     <li><button id="fogButton" class="nav-item" style="visibility: visible;" >Edit Fog</button></li>
@@ -130,7 +130,7 @@
             console.log(buttons);
             buttons.pause.update=function(){this.innerHTML=!this.state?"Pause":"Continue"; window.pauseCond = this.state;};
             buttons.nav.update  =function(){this.innerHTML=!this.state?"Enable Navigation":"Disable Navigation";window.navMode = this.state;};
-            buttons.wireFrame.update  =function(){this.innerHTML=!this.state?"Display Wire Frame":"Hide Wire Frame";window.wireFrame = this.state;};
+            buttons.wireFrame.update  =function(){this.innerHTML=!this.state?"Show Wire Frame":"Hide Wire Frame";window.wireFrame = this.state;};
             buttons.collisionTest.update  =function(){this.innerHTML=!this.state?"Enable Collision Test":"Disable Collision Test";window.collisionTest = this.state;};
             buttons.light.update=function(){this.innerHTML=!this.state?"Edit Light":"Close"; document.getElementById('Light').style.visibility = this.state ? "visible" : "hidden";
                     if (this.state) resetStates(this);};
@@ -224,12 +224,16 @@
                 </div>
             </div>
 
-            <div id="help" style="height: 200px; width: 400px; position: absolute; left: 50%; top: 50%; margin-top:-100px; margin-left:-200px; background-color: rgb(30, 39, 56); border: 5px rgb(121, 251, 253) solid;
+            <div id="help" style="height: 400px; width: 400px; position: absolute; left: 50%; top: 50%; margin-top:-200px; margin-left:-200px; background-color: rgb(30, 39, 56); border: 5px rgb(121, 251, 253) solid;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: white;overflow:scroll; visibility: hidden">
+               <button style="position: absolute; right: 2%; top: 5%; background-color: red" onclick="document.getElementById('help').style.visibility='hidden';"> X </button>
                <p style="text-align: center; font-size: 40px">
                    Help
                </p>
                <div style="margin-left: 10%">
+                   <p>Notice: It might not display correctly for your iPhone,
+                    <br/> iPad or some other mobile phones! It's the GPU's fault :(
+                   </p>
                    <p style="font-size: 20px">Fly:</p>
                    <p>* Arrow key up/Hold touch on right-up side -- Pitch up </p>
                    <p>* Arrow key down/Hold touch on right-down side -- Pitch down </p>
@@ -243,7 +247,7 @@
                    <p style="font-size: 20px">Button</p>
                    <p>* Pause -- Pause the time</p>
                    <p>* Enable/Disable Navigation -- Change between modes</p>
-                   <p>* Display/Hide Wire Frame -- Show/Hide OBB boxes for objects</p>
+                   <p>* Show/Hide Wire Frame -- Show/Hide OBB boxes for objects</p>
                    <p>* Enable/Disable Collision Test -- Response/not when the plane hits an object</p>
                    <p>* Edit light -- Edit the sun light's angle</p>
                    <p>* Edit Fog -- Edit the fog's density</p>
@@ -255,26 +259,23 @@
                    <p>* About -- About this demo and us</p>
                </div>
                <br/><br/>
-               <div style="margin: 0 auto; text-align: center">
-                   <button onclick="document.getElementById('help').style.visibility='hidden';"> Close</button>
-               </div>
-               <br/><br/>
            </div>
 
-           <div id="about" style="height: 200px; width: 400px; position: absolute; left: 50%; top: 50%; margin-top:-100px; margin-left:-200px; background-color: rgb(30, 39, 56); border: 5px rgb(121, 251, 253) solid;
+           <div id="about" style="height: 300px; width: 400px; position: absolute; left: 50%; top: 50%; margin-top:-150px; margin-left:-200px; background-color: rgb(30, 39, 56); border: 5px rgb(121, 251, 253) solid;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: white;overflow:scroll; visibility: hidden">
+               <button style="position: absolute; right: 2%; top: 5%; background-color: red" onclick="document.getElementById('about').style.visibility='hidden';"> X</button>
                <p style="text-align: center; font-size: 40px">
                    About
                </p>
-               <div style="margin-left: 5%">
+               <div style="height: 20px; width: 350px; position: absolute; left: 50%; margin-top:-35px; margin-left:-155px;">
                    <p> A tiny webgl 3D engine demo for Zhejiang University Computer Graphics course, developed by</p>
                </div>
+               <br/>
                <div style="margin: 0 auto; text-align: center"><a style="font-size: 25px; color: white" href="http://vtu.life">@Vitus</a>
                    &nbsp&nbsp&nbsp&nbsp<a style="font-size: 25px; color: white" href="https://github.com/ShawHaines">@ShawHaines</a>
                    &nbsp&nbsp&nbsp&nbsp<a style="font-size: 25px; color: white" href="https://github.com/zjulzhhh">@LZH</a>
                    <br/><br/>
                    <a style="font-size: 15px; color: white;" href="https://github.com/ShawHaines/Tron">Github Repository</a>
-                   <button onclick="document.getElementById('about').style.visibility='hidden';"> Close</button>
                    <br/><br/>
                </div>
            </div>
