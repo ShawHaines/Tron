@@ -247,13 +247,12 @@ function setNodeAsObject(curNode, curObject)
  * @param {myNode} curNode a root of the node tree
  * @param {myNode []} nodes the node set
  */
-function createBoundingBox(curNode, nodes)
+function createBoundingBox(curNode, boundingBoxSet)
 {
-    // nodes.boundingBox = [];
-    createBoundingBoxCore(curNode);
+    createBoundingBoxCore(curNode, boundingBoxSet);
 }
 
-function createBoundingBoxCore(curNode)
+function createBoundingBoxCore(curNode, boundingBoxSet)
 {
     if(curNode.hasBoxInfo)
     {
@@ -314,127 +313,8 @@ function createBoundingBoxCore(curNode)
                 boxWidth/2, -boxHeight/2, -boxDepth/2,
                 boxWidth/2, -boxHeight/2, -boxDepth/2,
                 boxWidth/2, -boxHeight/2, boxDepth/2,
-
-                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, -boxHeight/2, boxDepth/2,
-                // -boxWidth/2, boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, boxHeight/2, boxDepth/2,
-
-                // boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-                // boxWidth/2, boxHeight/2, -boxDepth/2,
-                // boxWidth/2, boxHeight/2, boxDepth/2,
-
-                // boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // boxWidth/2, boxHeight/2, -boxDepth/2,
-                // boxWidth/2, boxHeight/2, -boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,                
-                // boxWidth/2, boxHeight/2, boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-                // boxWidth/2, boxHeight/2, -boxDepth/2,
-
-                // -boxWidth/2, -boxHeight/2, boxDepth/2,
-                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-                // boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
-
-                // -boxWidth/2, boxHeight/2, boxDepth/2,
-                // boxWidth/2, boxHeight/2, boxDepth/2,
-                // boxWidth/2, boxHeight/2, boxDepth/2,
-                // -boxWidth/2, boxHeight/2, -boxDepth/2,
-                // boxWidth/2, boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, boxHeight/2, -boxDepth/2,
-                // boxWidth/2, boxHeight/2, boxDepth/2,
-
-                // -boxWidth/2, -boxHeight/2, boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-                // -boxWidth/2, boxHeight/2, boxDepth/2,
-                // boxWidth/2, boxHeight/2, boxDepth/2,
-                // -boxWidth/2, boxHeight/2, boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-
-                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, boxHeight/2, -boxDepth/2,
-                // boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // boxWidth/2, boxHeight/2, -boxDepth/2,
-                // boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, boxHeight/2, -boxDepth/2,
-
-                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, -boxHeight/2, boxDepth/2,
-                // -boxWidth/2, boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, boxHeight/2, boxDepth/2,
-                // -boxWidth/2, boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, -boxHeight/2, boxDepth/2,
-
-                // boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // boxWidth/2, boxHeight/2, -boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,                
-                // boxWidth/2, boxHeight/2, boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-                // boxWidth/2, boxHeight/2, -boxDepth/2,
-
-                // -boxWidth/2, -boxHeight/2, boxDepth/2,
-                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-                // boxWidth/2, -boxHeight/2, -boxDepth/2,
-                // boxWidth/2, -boxHeight/2, boxDepth/2,
-                // -boxWidth/2, -boxHeight/2, -boxDepth/2,
-
-                // -boxWidth/2, boxHeight/2, boxDepth/2,
-                // boxWidth/2, boxHeight/2, boxDepth/2,
-                // -boxWidth/2, boxHeight/2, -boxDepth/2,
-                // boxWidth/2, boxHeight/2, -boxDepth/2,
-                // -boxWidth/2, boxHeight/2, -boxDepth/2,
-                // boxWidth/2, boxHeight/2, boxDepth/2,
-                
             ];
-            // tmpBufferArrayInfo.a_normal = [
-            //     0, 0, 1,
-            //     0, 0, 1,
-            //     0, 0, 1,
-            //     0, 0, 1,
-            //     0, 0, 1,
-            //     0, 0, 1,
-            //     0, 0, -1,
-            //     0, 0, -1,
-            //     0, 0, -1,
-            //     0, 0, -1,
-            //     0, 0, -1,
-            //     0, 0, -1,
-                
-            //     -1, 0, 0,
-            //     -1, 0, 0,
-            //     -1, 0, 0,
-            //     -1, 0, 0,
-            //     -1, 0, 0,
-            //     -1, 0, 0,
-            //     1, 0, 0,
-            //     1, 0, 0,
-            //     1, 0, 0,
-            //     1, 0, 0,
-            //     1, 0, 0,
-            //     1, 0, 0,
 
-            //     // 0, -1, 0,
-            //     // 0, -1, 0,
-            //     // 0, -1, 0,
-            //     // 0, -1, 0,
-            //     // 0, -1, 0,
-            //     // 0, -1, 0,
-            //     // 0, 1, 0,
-            //     // 0, 1, 0,
-            //     // 0, 1, 0,
-            //     // 0, 1, 0,
-            //     // 0, 1, 0,
-            //     // 0, 1, 0,
-            // ];
             const tmpBufferInfo = twgl.createBufferInfoFromArrays(gl, tmpBufferArrayInfo);
             tmp.drawInfo.bufferInfoList.push(tmpBufferInfo);
 
@@ -453,15 +333,16 @@ function createBoundingBoxCore(curNode)
             tmp.localMatrix = m4.translation([curNode.boxInfo[i].centroid[0], curNode.boxInfo[i].centroid[1], curNode.boxInfo[i].centroid[2]]);
             tmp.setParent(curNode);
             // console.log(tmp);
+            boundingBoxSet.push(tmp);
         }
         
         
-        // nodes.push(tmp);
+        
         // console.log(curNode);
         
     }
     curNode.children.forEach(child => {
-        createBoundingBoxCore(child);
+        createBoundingBoxCore(child, boundingBoxSet);
     });
 }
 
