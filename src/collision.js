@@ -36,8 +36,8 @@ function collisionTest(n1,n2){
 
     // rough estimation based on the circumsphere.
     if (vec3.distance(c1,c2)>r1+r2) return false;
-    console.log("collision point:",n1, n2);
-    console.log(c1,c2,r1,r2);
+    // console.log("collision point:",n1, n2);
+    // console.log(c1,c2,r1,r2);
     return true;
 }
 
@@ -47,11 +47,15 @@ function collisionTest(n1,n2){
  * @param {myNode} base
  */
 function collisionWithAll(node,base){
-    if (collisionTest(node,base)) return true;
-    for (let child of base.children){
-        if (collisionWithAll(node,child)) return true;
+    if (collisionTest(node,base)) {
+        return base;
     }
-    return false;
+    for (let child of base.children){
+        var ret = collisionWithAll(node, child);
+        if(ret != null)
+            return ret;
+    }
+    return null;
 }
 
 export{collisionWithAll};
