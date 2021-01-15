@@ -21,7 +21,7 @@ Computer Graphics Project, inspired by the film *Tron*, based on WebGL. Click **
 - [Paper airplane Low-poly 3D model](https://www.cgtrader.com/3d-models/sports/toy/paper-airplane-a16df32d-2b2f-4016-89a8-67d9598234b7) Paper Plane model bought from *cgtrader*
 
 ### Referencing
-- [WebGL with Perlin Noise ¡ª Part 1](https://medium.com/neosavvy-labs/webgl-with-perlin-noise-part-1-a87b56bbc9fb)
+- [WebGL with Perlin Noise  Part - 1](https://medium.com/neosavvy-labs/webgl-with-perlin-noise-part-1-a87b56bbc9fb)
 - [WebGL Fundamentals](https://webglfundamentals.org/webgl/lessons/zh_cn/)
 
 ### **Notice**:
