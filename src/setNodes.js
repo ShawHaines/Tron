@@ -1,7 +1,7 @@
 import {myNode} from './myNode.js'
 import {m4, naturePackModelNames, twgl, gl, transparentProgramInfo} from './main.js'
 
-const RANDOM_NATURE_NUM = 50;
+const RANDOM_NATURE_NUM = 300;
 
 /**
  * Initialize node set customarily
