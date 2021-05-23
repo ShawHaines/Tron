@@ -1,5 +1,7 @@
 # Tron
 
+![visitors](https://visitor-badge.laobi.icu/badge?page_id=ShawHaines.Tron)
+
 Computer Graphics Project, inspired by the film *Tron*, based on WebGL. Click **[here](http://code.vtu.life/Tron/index.html)** to play!
 
 ![](image/Screenshot.png)
