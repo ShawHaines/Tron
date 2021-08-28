@@ -4,6 +4,12 @@
 
 Computer Graphics Project, inspired by the film *Tron*, based on WebGL. Click **[here](http://code.vtu.life/Tron/index.html)** to play!
 
+A short demo video:
+
+https://user-images.githubusercontent.com/48283858/131208418-5317f2ee-90e6-4773-995f-fb26c83ce2f7.mp4
+
+A screenshot at navigation mode:
+
 ![](image/Screenshot.png)
 
 ### Directory structure
